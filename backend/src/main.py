@@ -1,7 +1,11 @@
+import sys
+sys.dont_write_bytecode = True
+
 import uvicorn
 import logging
 import betterlogging as bl
 from fastapi import FastAPI
+from api.v1.router_registration import register_routers
 from core.config import settings
 
 
@@ -31,7 +35,13 @@ def setup_logging() -> None:
     logger.info("Логирование настроено и приложение запускается...")
 
 
-app = FastAPI()
+app = FastAPI(
+    title="TimeKeep",
+    description="TimeKeep API",
+    version="1.0",
+)
+
+register_routers(app)
 
 
 @app.get("/")
