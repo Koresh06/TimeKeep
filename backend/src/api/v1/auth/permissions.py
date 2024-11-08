@@ -4,11 +4,11 @@ from fastapi import Depends, Security, Request
 from fastapi.security import APIKeyCookie
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from src.core.config import settings
-from src.core.session import get_db
+from core.config import settings
+from core.session import get_db
 
-from src.models import User
-from src.api.v1.user.service import UserService
+from models import User
+from api.v1.user.service import UserService
 
 from .jwt import ALGORITHM
 from .schemas import TokenPayload

@@ -3,9 +3,8 @@ from fastapi import HTTPException, status
 
 from models import User
 from .repository import UserRepository
-from .schemas import UserCreateSchema, UserResponseSchema
+from .schemas import UserCreateSchema
 from ..department.repository import DepartmentRepository
-
 
 
 class UserService(UserRepository):

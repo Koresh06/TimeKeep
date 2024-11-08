@@ -11,19 +11,6 @@ class UserCreateSchema(BaseModel):
     username: str
     password: str
 
-    model_config = {
-        "json_schema_extra": {
-            "examples": [
-                {
-                    "oid": "uuid",
-                    "department_oid": "uuid",
-                    "username": "username",
-                    "password": "password",
-                }
-            ]
-        }
-    }
-
     @classmethod    
     def as_form(
         cls,

@@ -1,13 +1,11 @@
 import uuid
 
 from typing import List, Optional
-from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.future import select
 
+from models import User
 from api.v1.auth.security import get_password_hash
 from core.repo.base import BaseRepo
-
-from models import User
 from api.v1.user.schemas import UserCreateSchema, UserUpdateSchema
 
 
