@@ -14,7 +14,7 @@ environs = "^11.0.0"
 pytest = "^8.3.3"
 pytest-asyncio = "^0.24.0"
 asyncpg = "^0.30.0"
-loguru = "^0.7.2"
+betterlogging = "^1.0.0"
 
 
 [build-system]

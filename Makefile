@@ -1,6 +1,6 @@
 # Переменные
 PYTHON_CMD = python
-MAIN_SCRIPT = src/main.py
+MAIN_SCRIPT = backend/src/main.py
 
 # Запуск FastAPI
 start:
