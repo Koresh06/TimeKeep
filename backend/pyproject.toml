@@ -15,6 +15,7 @@ pytest = "^8.3.3"
 pytest-asyncio = "^0.24.0"
 asyncpg = "^0.30.0"
 betterlogging = "^1.0.0"
+ruff = "^0.7.3"
 
 
 [build-system]

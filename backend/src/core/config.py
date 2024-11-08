@@ -180,4 +180,4 @@ def load_settings(path: str = None) -> Settings:
     )
 
 
-settings = load_settings("backend\.env")
+settings = load_settings(".env")
