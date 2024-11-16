@@ -20,7 +20,6 @@ if TYPE_CHECKING:
 class Role(Enum):
     USER = "user"
     MODERATOR = "moderator"
-    ADMIN = "admin"
 
 
 class User(SQLAlchemyBaseUserTableUUID, Base):
