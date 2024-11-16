@@ -27,7 +27,7 @@ router.include_router(
 @router.post(
     "/register",
     response_model=UserRead,
-    dependencies=[Depends(role_required(Role.MODERATOR))],
+    dependencies=[Depends(current_superuser)],
     status_code=status.HTTP_201_CREATED,
     tags=["auth"],
     name="register:register",
