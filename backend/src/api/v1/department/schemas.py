@@ -18,6 +18,11 @@ class DepartmentUpdate(DepartmentCreate):
     pass
 
 
+class DepartmentUpdatePartil(DepartmentCreate):
+    name: str | None = None
+    description: str | None = None
+
+
 class DepartmentOut(DepartmentBase):
     id: uuid.UUID
 

@@ -16,7 +16,7 @@ class Department(Base):
     __tablename__ = "departments"
 
     id: Mapped[UUID] = mapped_column(GUID, primary_key=True, default=uuid4)
-    name: Mapped[str] = mapped_column(String(255), nullable=False)
+    name: Mapped[str] = mapped_column(String(255), unique=True, nullable=False)
     description: Mapped[str] = mapped_column(String(255), nullable=False)
     create_at: Mapped[datetime] = mapped_column(DateTime, server_default=func.now())
     update_at: Mapped[datetime] = mapped_column(DateTime, server_default=func.now(), onupdate=func.now())
