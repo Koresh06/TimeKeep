@@ -20,7 +20,7 @@ router = APIRouter(
     "/",
     response_model=DepartmentOut,
     status_code=status.HTTP_201_CREATED,
-    dependencies=[Depends(current_superuser)],
+    # dependencies=[Depends(current_superuser)],
 )
 async def create_department(
     session: Annotated[AsyncSession, Depends(get_async_session)],

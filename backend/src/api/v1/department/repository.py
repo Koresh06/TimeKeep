@@ -12,16 +12,21 @@ from .schemas import DepartmentCreate, DepartmentUpdate, DepartmentOut, Departme
 
 class DepartmentRepository(BaseRepo):
     
-    async def create(self, department_create: DepartmentCreate) -> Optional[Department]:
+    async def create(self, department_create: DepartmentCreate) -> DepartmentOut:
+        result = await self.session.execute(select(Department).where(Department.name == department_create.name))
+        existing_department = result.scalar()
+
+        if existing_department:
+            raise HTTPException(status_code=400, detail="Department already exists.")
+        
+        # Создаем новый объект отдела
         department = Department(**department_create.model_dump())
         self.session.add(department)
+        
         try:
             await self.session.commit()
             await self.session.refresh(department)
-            return department
-        except IntegrityError:
-            await self.session.rollback()
-            return None
+            return DepartmentOut.model_validate(department)
         except SQLAlchemyError:
             await self.session.rollback()
             raise HTTPException(status_code=500, detail="Database error during department creation")
