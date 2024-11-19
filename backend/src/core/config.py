@@ -25,7 +25,7 @@ class DbConfig:
             port = self.port
         
         # Проверяем, если это тестовая среда
-        database = self.test_database if is_test else self.database
+        database = "test_db"
 
         uri = URL.create(
             drivername=f"postgresql+{driver}",
