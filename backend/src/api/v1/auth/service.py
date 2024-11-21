@@ -20,3 +20,5 @@ class AuthService():
         result = await self.repository.create_superuser(user_create=user_create)
         if result:
             return f"Superuser created successfully.\nUsername: {user_create.username}"
+        else:
+            return False
