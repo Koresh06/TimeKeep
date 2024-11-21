@@ -3,7 +3,7 @@ from fastapi_users.router.common import ErrorCode, ErrorModel
 from fastapi_users import exceptions
 
 from models.user import Role, User
-from .schemas import UserCreate, UserRead, UserUpdate
+from .schemas import UserCreate, UserOut
 from .users import UserManager, get_user_manager, role_required
 from .users import auth_backend, fastapi_users
 from .schemas import UserRead
@@ -26,8 +26,8 @@ router.include_router(
 
 @router.post(
     "/register",
-    response_model=UserRead,
-    dependencies=[Depends(current_superuser)],
+    response_model=UserOut,
+    # dependencies=[Depends(current_superuser)],
     status_code=status.HTTP_201_CREATED,
     tags=["auth"],
     name="register:register",
@@ -83,6 +83,6 @@ async def register_user(
             },
         )
     
-    return UserRead.model_validate(created_user)
+    return UserOut.model_validate(created_user)
 
 

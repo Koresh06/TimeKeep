@@ -25,9 +25,11 @@ class Role(Enum):
 class User(SQLAlchemyBaseUserTableUUID, Base):
     __tablename__ = "users"
     
-    department_id: Mapped[UUID] = mapped_column(GUID, ForeignKey("departments.id"), nullable=False)
+    department_id: Mapped[UUID] = mapped_column(GUID, ForeignKey("departments.id"), nullable=True)
     username: Mapped[str] = mapped_column(String(255), nullable=False)
+    full_name: Mapped[str] = mapped_column(String(255), nullable=False)
     role: Mapped[Role] = mapped_column(SQLAlchemyEnum(Role), default=Role.USER)
+    position: Mapped[str] = mapped_column(String(255), nullable=False)
     create_at: Mapped[datetime] = mapped_column(DateTime, server_default=func.now())
     update_at: Mapped[datetime] = mapped_column(DateTime, server_default=func.now(), onupdate=func.now())
 

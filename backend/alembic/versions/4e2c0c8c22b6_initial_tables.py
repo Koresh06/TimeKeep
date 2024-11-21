@@ -1,8 +1,8 @@
 """Initial tables
 
-Revision ID: c2a840ad066c
+Revision ID: 4e2c0c8c22b6
 Revises: 
-Create Date: 2024-11-16 10:49:24.820355
+Create Date: 2024-11-21 21:16:35.150744
 
 """
 from typing import Sequence, Union
@@ -13,7 +13,7 @@ import sqlalchemy as sa
 
 
 # revision identifiers, used by Alembic.
-revision: str = 'c2a840ad066c'
+revision: str = '4e2c0c8c22b6'
 down_revision: Union[str, None] = None
 branch_labels: Union[str, Sequence[str], None] = None
 depends_on: Union[str, Sequence[str], None] = None
@@ -27,12 +27,15 @@ def upgrade() -> None:
     sa.Column('description', sa.String(length=255), nullable=False),
     sa.Column('create_at', sa.DateTime(), server_default=sa.text('now()'), nullable=False),
     sa.Column('update_at', sa.DateTime(), server_default=sa.text('now()'), nullable=False),
-    sa.PrimaryKeyConstraint('id', name=op.f('pk__departments'))
+    sa.PrimaryKeyConstraint('id', name=op.f('pk__departments')),
+    sa.UniqueConstraint('name', name=op.f('uq__departments__name'))
     )
     op.create_table('users',
     sa.Column('department_id', fastapi_users_db_sqlalchemy.generics.GUID(), nullable=False),
     sa.Column('username', sa.String(length=255), nullable=False),
+    sa.Column('full_name', sa.String(length=255), nullable=False),
     sa.Column('role', sa.Enum('USER', 'MODERATOR', name='role'), nullable=False),
+    sa.Column('position', sa.String(length=255), nullable=False),
     sa.Column('create_at', sa.DateTime(), server_default=sa.text('now()'), nullable=False),
     sa.Column('update_at', sa.DateTime(), server_default=sa.text('now()'), nullable=False),
     sa.Column('id', fastapi_users_db_sqlalchemy.generics.GUID(), nullable=False),
