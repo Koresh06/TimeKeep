@@ -44,12 +44,12 @@ class DepartmentRepository(BaseRepo):
             raise HTTPException(status_code=500, detail=f"Database error: {str(e)}")
 
 
-    async def get_one(self, id: uuid.UUID) -> Department:
+    async def get_one(self, oid: uuid.UUID) -> Department:
         try:
-            stmt = select(Department).where(Department.id == id)
+            stmt = select(Department).where(Department.oid == oid)
             result: Result = await self.session.scalar(stmt)
             if not result:
-                raise HTTPException(status_code=404, detail=f"Department with ID {id} not found.")
+                raise HTTPException(status_code=404, detail=f"Department with ID {oid} not found.")
             return result
         except SQLAlchemyError as e:
             raise HTTPException(status_code=500, detail=f"Database error: {str(e)}")

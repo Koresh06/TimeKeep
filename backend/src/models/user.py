@@ -2,9 +2,7 @@ from uuid import uuid4
 from typing import List, TYPE_CHECKING
 from enum import Enum
 
-from fastapi_users_db_sqlalchemy import SQLAlchemyBaseUserTableUUID
-from fastapi_users_db_sqlalchemy.generics import GUID
-from sqlalchemy import DateTime, ForeignKey, String, func
+from sqlalchemy import Boolean, DateTime, ForeignKey, String, func
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy import Enum as SQLAlchemyEnum
@@ -22,14 +20,18 @@ class Role(Enum):
     MODERATOR = "moderator"
 
 
-class User(SQLAlchemyBaseUserTableUUID, Base):
+class User(Base):
     __tablename__ = "users"
     
-    department_id: Mapped[UUID] = mapped_column(GUID, ForeignKey("departments.id"), nullable=True)
-    username: Mapped[str] = mapped_column(String(255), nullable=False)
+    oid: Mapped[UUID] = mapped_column(UUID, primary_key=True, default=uuid4)
+    department_oid: Mapped[UUID] = mapped_column(UUID, ForeignKey("departments.oid"), nullable=True)
+    username: Mapped[str] = mapped_column(String(255), unique=True, nullable=False)
     full_name: Mapped[str] = mapped_column(String(255), nullable=False)
     role: Mapped[Role] = mapped_column(SQLAlchemyEnum(Role), default=Role.USER)
+    hashed_password: Mapped[str] = mapped_column(String(255), nullable=False)
     position: Mapped[str] = mapped_column(String(255), nullable=False)
+    is_active: Mapped[bool] = mapped_column(Boolean, default=True)
+    is_superuser: Mapped[bool] = mapped_column(Boolean, default=False)
     create_at: Mapped[datetime] = mapped_column(DateTime, server_default=func.now())
     update_at: Mapped[datetime] = mapped_column(DateTime, server_default=func.now(), onupdate=func.now())
 
@@ -39,4 +41,4 @@ class User(SQLAlchemyBaseUserTableUUID, Base):
 
 
     def __repr__(self):
-        return f"User({self.id}, {self.username}, {self.department_id}, {self.create_at}, {self.update_at})"
+        return f"User({self.oid}, {self.username}, {self.department_oid}, {self.create_at}, {self.update_at})"

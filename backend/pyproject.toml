@@ -17,7 +17,6 @@ ruff = "^0.7.3"
 python-jose = "^3.3.0"
 passlib = "^1.7.4"
 bcrypt = "^4.1.2"
-fastapi-users = {extras = ["sqlalchemy"], version = "^14.0.0"}
 
 
 [tool.poetry.group.dev.dependencies]

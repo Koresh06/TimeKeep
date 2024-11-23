@@ -1,18 +1,27 @@
-from fastapi import APIRouter, Depends
+from typing import Annotated
+from fastapi import APIRouter, Depends, status
+from sqlalchemy.ext.asyncio import AsyncSession
+
 
 from models.user import Role, User
-
-
-from ..auth.users import fastapi_users, role_required, current_active_user, current_superuser
-from ..auth.schemas import UserRead, UserUpdate
-
+from core.session import get_async_session
+from .service import UserService
+from .schemas import UserOut, UserCreate
 
 router = APIRouter(
-    prefix="/users",
-    tags=["users"],
+    prefix="/user",
+    tags=["user"],
 )
 
 
-router.include_router(
-    fastapi_users.get_users_router(UserRead, UserUpdate)
+@router.post(
+    "/register",
+    response_model=UserOut,
+    status_code=status.HTTP_201_CREATED,
 )
+async def register(
+    user_create: UserCreate,
+    session: Annotated[AsyncSession, Depends(get_async_session)],
+):
+    user = await UserService(session).create_user(data=user_create)
+    return user

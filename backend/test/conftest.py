@@ -1,6 +1,7 @@
 import asyncio
 import logging
 from typing import AsyncGenerator
+from fastapi_users import FastAPIUsers
 import pytest
 from sqlalchemy.ext.asyncio import AsyncSession, AsyncConnection, create_async_engine
 from sqlalchemy.orm import sessionmaker
@@ -8,6 +9,10 @@ from sqlalchemy.pool import NullPool
 import pytest_asyncio
 from httpx import ASGITransport, AsyncClient
 from asgi_lifespan import LifespanManager
+from src.api.v1.auth.users import get_user_manager
+from src.models import User
+from src.api.v1.auth.service import AuthService
+from src.api.v1.auth.schemas import UserCreate, UserOut
 from src.main import app
 from src.models import Base
 from src.core.session import get_async_session
@@ -60,11 +65,11 @@ async def async_db_session(async_db_engine):
     )
 
     async with async_session() as session:
-        await session.begin()
-
-        yield session
-
-        await session.rollback()
+        try:
+            yield session
+        finally:
+            await session.rollback()
+            await session.close()
 
 
 @pytest_asyncio.fixture(loop_scope="function", scope="function")
@@ -81,19 +86,56 @@ async def async_client() -> AsyncGenerator[AsyncClient, None]:
 
 
 
-@pytest_asyncio.fixture(scope="function")
-async def test_department(async_db_session: AsyncSession) -> AsyncGenerator[Department, None]:
-    department = Department(
-        name="Human test",
-        description="Responsible for managing employee relations and payroll.",
-    )
 
-    async_db_session.add(department)
-    await async_db_session.commit()
+# Пример фикстуры для создания пользователя и получения токена
+# @pytest_asyncio.fixture(scope="function")
+# async def test_create_superuser(async_db_session: AsyncSession) -> AsyncGenerator[UserOut, None]:
+#     user_data = UserCreate(
+#         username="testuser",
+#         full_name="Test User",
+#         position="testposition",
+#         role="moderator",
+#         email="6YgZU@example.com",
+#         password="testpassword",
+#     )
+#     user_table = await AuthService(session=async_db_session).create_superuser(user_create=user_data)
 
-    yield department
+#     response = await async_client.post("/auth/login", json={"email": "6YgZU@example.com", "password": "testpassword"})
+#     print(response.json())
+    
 
-    await async_db_session.rollback()
+
+# @pytest_asyncio.fixture(scope="function")
+# async def async_client(test_user, async_db_session: AsyncSession) -> AsyncGenerator[AsyncClient, None]:
+#     def override_get_db():
+#         yield async_db_session
+
+#     app.dependency_overrides[get_async_session] = override_get_db
+
+#     async with LifespanManager(app):
+#         async with AsyncClient(transport=ASGITransport(app=app), base_url="http://localhost") as client:
+#             client.headers = {
+#                 "Authorization": f"Bearer {test_user['token']}",
+#                 **client.headers,
+#             }
+#             yield client
+
+
+
+
+# @pytest_asyncio.fixture(scope="function")
+# async def test_department(async_db_session: AsyncSession) -> AsyncGenerator[Department, None]:
+#     department = Department(
+#         name="Human test",
+#         description="Responsible for managing employee relations and payroll.",
+#     )
+
+#     async_db_session.add(department)
+#     await async_db_session.commit()
+
+#     yield department
+
+#     await async_db_session.rollback()
 
 
 

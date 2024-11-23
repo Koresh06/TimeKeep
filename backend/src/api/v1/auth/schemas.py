@@ -1,36 +1,35 @@
-from uuid import UUID
-from fastapi_users import schemas
-from pydantic import ConfigDict, BaseModel, EmailStr
+from datetime import datetime
+import uuid
+from typing import Optional
+from fastapi import Request
+from pydantic import BaseModel, ConfigDict, Field, field_validator
 
 from models.user import Role
+from .security import get_password_hash
 
 
-class UserRead(schemas.BaseUser[UUID]):
-    username: str
-    department_id: UUID | None = None
-    full_name: str
-    position: str
-    role: Role = Role.USER
+class Token(BaseModel):
+    access_token: str
+    token_type: str
 
 
-class UserCreate(schemas.BaseUserCreate):
-    username: str
-    department_id: UUID | None = None
-    full_name: str
-    position: str
-    role: Role = Role.USER
+class TokenPayload(BaseModel):
+    user_oid: uuid.UUID
 
 
-class UserUpdate(schemas.BaseUserUpdate):
-    username: str | None = None
-    department_id: UUID | None = None
-    full_name: str | None = None
-    position: str | None = None
-    role: Role | None = Role.USER
+class LoginResponse(BaseModel):
+    access_token: str
+    token_type: str = "bearer"
 
 
-class UserOut(UserRead):
-    id: UUID
-    _password: str
+class LoginForm:
+    def __init__(self, request: Request) -> None:
+        self.request: Request = request
+        self.username: Optional[str] = None
+        self.password: Optional[str] = None
 
-    model_config = ConfigDict(from_attributes=True)
+
+    async def create_oauth_form(self):
+        form = await self.request.form()
+        self.username = form.get("username")
+        self.password = form.get("password")

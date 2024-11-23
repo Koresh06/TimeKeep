@@ -7,8 +7,8 @@ from models import Department
 from .schemas import DepartmentOut, DepartmentCreate, DepartmentUpdatePartil
 from .service import DepartmentService
 from .dependencies import department_by_id
-from ..auth.users import current_superuser
 
+from ..user.dependencies import get_current_superuser
 
 router = APIRouter(
     prefix="/department",
@@ -20,7 +20,7 @@ router = APIRouter(
     "/",
     response_model=DepartmentOut,
     status_code=status.HTTP_201_CREATED,
-    # dependencies=[Depends(current_superuser)],
+    dependencies=[Depends(get_current_superuser)],
 )
 async def create_department(
     session: Annotated[AsyncSession, Depends(get_async_session)],
@@ -56,7 +56,7 @@ async def get_one_department(department: Department = Depends(department_by_id))
     "/{id}",
     response_model=DepartmentOut,
     status_code=status.HTTP_200_OK,
-    dependencies=[Depends(current_superuser)],
+    # dependencies=[Depends(current_superuser)],
 )
 async def modify_department(
     session: Annotated[AsyncSession, Depends(get_async_session)],
@@ -76,7 +76,7 @@ async def modify_department(
     "/{id}",
     response_model=DepartmentOut,
     status_code=status.HTTP_200_OK,
-    dependencies=[Depends(current_superuser)],
+    # dependencies=[Depends(current_superuser)],
 )
 async def replace_department(
     session: Annotated[AsyncSession, Depends(get_async_session)],
@@ -93,7 +93,7 @@ async def replace_department(
 @router.delete(
     "/{id}",
     status_code=status.HTTP_204_NO_CONTENT,
-    dependencies=[Depends(current_superuser)],
+    # dependencies=[Depends(current_superuser)],
 )
 async def delete_department(
     session: Annotated[AsyncSession, Depends(get_async_session)],

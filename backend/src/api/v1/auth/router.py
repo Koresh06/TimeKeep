@@ -1,13 +1,17 @@
-from fastapi import Depends, APIRouter, HTTPException, Request, status
-from fastapi_users.router.common import ErrorCode, ErrorModel
-from fastapi_users import exceptions
+from typing import Annotated
+from fastapi.responses import JSONResponse
+from fastapi.security import OAuth2PasswordRequestForm
+from sqlalchemy.ext.asyncio import AsyncSession
+from fastapi import APIRouter, Depends, HTTPException, Response, status
 
-from models.user import Role, User
-from .schemas import UserCreate, UserOut
-from .users import UserManager, get_user_manager, role_required
-from .users import auth_backend, fastapi_users
-from .schemas import UserRead
-from .users import current_active_user, current_superuser
+from models import User
+from api.v1.auth.jwt import create_token
+from core.session import get_async_session
+from core.config import settings
+
+from .schemas import Token
+from .dependencies import authenticate_user, get_current_user
+
 
 router = APIRouter(
     prefix="/auth",
@@ -15,74 +19,52 @@ router = APIRouter(
 )
 
 
-router.include_router(
-    fastapi_users.get_auth_router(auth_backend),
-    prefix="/jwt",
+@router.post(
+    path="/access-token",
+    response_model=Token,
+    status_code=status.HTTP_200_OK,
+    description="Login and get token",
 )
+async def login(
+    response: Response,
+    form_data: Annotated[OAuth2PasswordRequestForm, Depends()],
+    session: Annotated[AsyncSession, Depends(get_async_session)],
+):
+    user = await authenticate_user(
+        session=session,
+        username=form_data.username,
+        password=form_data.password,
+    )
 
-# router.include_router(
-#     fastapi_users.get_reset_password_router(),
-# )
+    if not user:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Invalid credentials",
+        )
+
+    token = create_token(user_oid=user.oid)
+
+    response.set_cookie(
+        key="access_token",
+        value=token.access_token,
+        httponly=True,
+        max_age=settings.api.access_token_expire_minutes * 60,
+    )
+
+    return token
+
 
 @router.post(
-    "/register",
-    response_model=UserOut,
-    # dependencies=[Depends(current_superuser)],
-    status_code=status.HTTP_201_CREATED,
-    tags=["auth"],
-    name="register:register",
-    description="Register a new user",
-    responses={
-            status.HTTP_400_BAD_REQUEST: {
-                "model": ErrorModel,
-                "content": {
-                    "application/json": {
-                        "examples": {
-                            ErrorCode.REGISTER_USER_ALREADY_EXISTS: {
-                                "summary": "A user with this email already exists.",
-                                "value": {
-                                    "detail": ErrorCode.REGISTER_USER_ALREADY_EXISTS
-                                },
-                            },
-                            ErrorCode.REGISTER_INVALID_PASSWORD: {
-                                "summary": "Password validation failed.",
-                                "value": {
-                                    "detail": {
-                                        "code": ErrorCode.REGISTER_INVALID_PASSWORD,
-                                        "reason": "Password should be"
-                                        "at least 3 characters",
-                                    }
-                                },
-                            },
-                        }
-                    }
-                },
-            },
-        },
+    path="/logout",
+    status_code=status.HTTP_200_OK,
+    description="Logout user by clearing the access token",
 )
-async def register_user(
-    request: Request,
-    user_create: UserCreate,
-    user_manager: UserManager = Depends(get_user_manager)
+async def logout(
+    response: Response,
+    current_user: User = Depends(get_current_user), 
 ):
-    try:
-        created_user = await user_manager.create(
-            user_create, safe=True, request=request
-        )
-    except exceptions.UserAlreadyExists:
-        raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            detail=ErrorCode.REGISTER_USER_ALREADY_EXISTS,
-        )
-    except exceptions.InvalidPasswordException as e:
-        raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            detail={
-                "code": ErrorCode.REGISTER_INVALID_PASSWORD,
-                "reason": e.reason,
-            },
-        )
-    
-    return UserOut.model_validate(created_user)
-
-
+    response.delete_cookie(key="access_token")
+    return JSONResponse(
+        content={"message": "Successfully logged out"},
+        status_code=status.HTTP_200_OK,
+    )

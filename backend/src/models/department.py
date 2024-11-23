@@ -3,7 +3,6 @@ from typing import List, TYPE_CHECKING
 from sqlalchemy import DateTime, String, func
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 from sqlalchemy.dialects.postgresql import UUID
-from fastapi_users_db_sqlalchemy.generics import GUID
 from datetime import datetime
 
 from .base import Base
@@ -15,7 +14,7 @@ if TYPE_CHECKING:
 class Department(Base):
     __tablename__ = "departments"
 
-    id: Mapped[UUID] = mapped_column(GUID, primary_key=True, default=uuid4)
+    oid: Mapped[UUID] = mapped_column(UUID, primary_key=True, default=uuid4)
     name: Mapped[str] = mapped_column(String(255), unique=True, nullable=False)
     description: Mapped[str] = mapped_column(String(255), nullable=False)
     create_at: Mapped[datetime] = mapped_column(DateTime, server_default=func.now())
@@ -25,4 +24,4 @@ class Department(Base):
 
 
     def __repr__(self):
-        return f"Department({self.id}, {self.name}, {self.description}, {self.create_at}, {self.update_at})"
+        return f"Department({self.oid}, {self.name}, {self.description}, {self.create_at}, {self.update_at})"

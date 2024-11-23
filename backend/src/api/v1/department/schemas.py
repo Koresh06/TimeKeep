@@ -24,7 +24,7 @@ class DepartmentUpdatePartil(DepartmentCreate):
 
 
 class DepartmentOut(DepartmentBase):
-    id: uuid.UUID
+    oid: uuid.UUID
 
     model_config = ConfigDict(from_attributes=True)
 
