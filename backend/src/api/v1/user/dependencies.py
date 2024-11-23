@@ -13,17 +13,17 @@ from ..auth.dependencies import get_current_user
 
 
 
-async def user_by_id(
-    id: Annotated[uuid.UUID, Path],
+async def user_by_oid(
+    oid: Annotated[uuid.UUID, Path],
     session: Annotated[AsyncSession, Depends(get_async_session)],
 ) -> User:
-    user = await UserService(session).get_one(id=id)
+    user = await UserService(session).get_one(oid=oid)
     if user is not None:
         return User
 
     raise HTTPException(
         status_code=status.HTTP_404_NOT_FOUND,
-        detail=f"User {id} not found!",
+        detail=f"User {oid} not found!",
     )
 
 

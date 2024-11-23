@@ -17,9 +17,8 @@ class DepartmentRepository(BaseRepo):
         existing_department = result.scalar()
 
         if existing_department:
-            raise HTTPException(status_code=400, detail="Department already exists.")
-        
-        # Создаем новый объект отдела
+            return None
+
         department = Department(**department_create.model_dump())
         self.session.add(department)
         
@@ -37,8 +36,6 @@ class DepartmentRepository(BaseRepo):
             stmt = select(Department)
             result: Result = await self.session.scalars(stmt)
             departments = result.all()
-            if not departments:
-                raise HTTPException(status_code=404, detail="No departments found.")
             return departments
         except SQLAlchemyError as e:
             raise HTTPException(status_code=500, detail=f"Database error: {str(e)}")
@@ -48,8 +45,6 @@ class DepartmentRepository(BaseRepo):
         try:
             stmt = select(Department).where(Department.oid == oid)
             result: Result = await self.session.scalar(stmt)
-            if not result:
-                raise HTTPException(status_code=404, detail=f"Department with ID {oid} not found.")
             return result
         except SQLAlchemyError as e:
             raise HTTPException(status_code=500, detail=f"Database error: {str(e)}")

@@ -43,7 +43,6 @@ async def get_current_user(
         detail="Could not validate credentials",
         headers={"WWW-Authenticate": "Bearer"},
     )
-    # token = request.cookies.get("access_token")
     try:
         payload = jwt.decode(token, settings.api.secret_key, algorithms=[ALGORITHM])
         token_data = TokenPayload(**payload)

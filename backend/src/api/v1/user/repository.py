@@ -29,3 +29,9 @@ class UserRepository(BaseRepo):
         await self.session.commit()
         await self.session.refresh(user)
         return user
+    
+
+    async def get_one(self, oid: uuid.UUID) -> User:
+        stmt = select(User).where(User.oid == oid)
+        result: Result = await self.session.scalar(stmt)
+        return result

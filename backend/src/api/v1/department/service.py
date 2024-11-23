@@ -31,8 +31,8 @@ class DepartmentService:
         return [DepartmentOut.model_validate(department) for department in departments]  
 
 
-    async def get_one(self, id: uuid.UUID) -> DepartmentOut:
-        department = await self.repository.get_one(id=id)
+    async def get_one(self, oid: uuid.UUID) -> DepartmentOut:
+        department = await self.repository.get_one(oid=oid)
         return department
 
 

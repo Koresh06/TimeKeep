@@ -6,7 +6,7 @@ from core.session import get_async_session
 from models import Department
 from .schemas import DepartmentOut, DepartmentCreate, DepartmentUpdatePartil
 from .service import DepartmentService
-from .dependencies import department_by_id
+from .dependencies import department_by_oid
 
 from ..user.dependencies import get_current_superuser
 
@@ -47,7 +47,7 @@ async def get_all_departments(
     response_model=DepartmentOut,
     status_code=status.HTTP_200_OK,
 )
-async def get_one_department(department: Department = Depends(department_by_id)):
+async def get_one_department(department: Department = Depends(department_by_oid)):
     """Получить отдел по идентификатору"""
     return department
 
@@ -56,14 +56,13 @@ async def get_one_department(department: Department = Depends(department_by_id))
     "/{id}",
     response_model=DepartmentOut,
     status_code=status.HTTP_200_OK,
-    # dependencies=[Depends(current_superuser)],
+    dependencies=[Depends(get_current_superuser)],
 )
 async def modify_department(
     session: Annotated[AsyncSession, Depends(get_async_session)],
     department_update: DepartmentUpdatePartil,
-    department: Department = Depends(department_by_id),
+    department: Department = Depends(department_by_oid),
 ):
-    print(department)
     """Модификация отдел по идентификатору"""
     return await DepartmentService(session).modify(
         department=department,
@@ -76,12 +75,12 @@ async def modify_department(
     "/{id}",
     response_model=DepartmentOut,
     status_code=status.HTTP_200_OK,
-    # dependencies=[Depends(current_superuser)],
+    dependencies=[Depends(get_current_superuser)],
 )
 async def replace_department(
     session: Annotated[AsyncSession, Depends(get_async_session)],
     department_update: DepartmentUpdatePartil,
-    department: Department = Depends(department_by_id),
+    department: Department = Depends(department_by_oid),
 ):
     """Замена отдела по идентификатору"""
     return await DepartmentService(session).replace(
@@ -93,11 +92,11 @@ async def replace_department(
 @router.delete(
     "/{id}",
     status_code=status.HTTP_204_NO_CONTENT,
-    # dependencies=[Depends(current_superuser)],
+    dependencies=[Depends(get_current_superuser)],
 )
 async def delete_department(
     session: Annotated[AsyncSession, Depends(get_async_session)],
-    department: Department = Depends(department_by_id),
+    department: Department = Depends(department_by_oid),
 ):
     """Удаление отдела по идентификатору"""
     await DepartmentService(session).delete(department=department)

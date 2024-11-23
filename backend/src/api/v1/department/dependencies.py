@@ -11,15 +11,15 @@ from .service import DepartmentService
 
 
 
-async def department_by_id(
-    id: Annotated[uuid.UUID, Path],
+async def department_by_oid(
+    oid: Annotated[uuid.UUID, Path],
     session: Annotated[AsyncSession, Depends(get_async_session)],
 ) -> Department:
-    department = await DepartmentService(session).get_one(id=id)
+    department = await DepartmentService(session).get_one(oid=oid)
     if department is not None:
         return department
 
     raise HTTPException(
         status_code=status.HTTP_404_NOT_FOUND,
-        detail=f"Department {id} not found!",
+        detail=f"Department {oid} not found!",
     )

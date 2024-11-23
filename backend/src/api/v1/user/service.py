@@ -18,6 +18,7 @@ class UserService:
         if not user:
             return None
         return user
+        
 
     async def create_user(self, data: UserCreate) -> UserOut:
         user = await self.get_user(username=data.username)
@@ -29,3 +30,12 @@ class UserService:
         user = await self.repository.create_user(data=data)
         return UserOut.model_validate(user)
         
+
+    async def get_one(self, oid: uuid.UUID) -> UserOut:
+        user = await self.repository.get_one(oid=oid)
+        if user is None:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail=f"User {oid} not found!",
+            )
+        return UserOut.model_validate(user)
