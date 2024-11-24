@@ -1,11 +1,12 @@
-from typing import List
+from datetime import datetime
+from typing import List, Optional
 import uuid
 from fastapi import HTTPException, status
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from models import Department
 from .repository import UserRepository
-from .schemas import UserOut, UserCreate
+from .schemas import UserOut, UserCreate, UserFilterParams
 
 
 class UserService:
@@ -30,6 +31,14 @@ class UserService:
         user = await self.repository.create_user(data=data)
         return UserOut.model_validate(user)
         
+
+    async def get_all(
+        self,
+        filters_params: UserFilterParams,
+    ) -> List[UserOut]:
+        users = await self.repository.get_all(filters_params=filters_params)
+        return [UserOut.model_validate(user) for user in users]
+
 
     async def get_one(self, oid: uuid.UUID) -> UserOut:
         user = await self.repository.get_one(oid=oid)

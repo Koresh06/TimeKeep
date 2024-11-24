@@ -1,14 +1,15 @@
-from typing import Annotated
-from fastapi import APIRouter, Depends, status
+from datetime import datetime
+from typing import Annotated, List, Optional
+import uuid
+from fastapi import APIRouter, Depends, Query, status
 from sqlalchemy.ext.asyncio import AsyncSession
-
 
 from models.user import Role, User
 from core.session import get_async_session
+from api.v1.auth.dependencies import get_current_user
 from .service import UserService
-from .schemas import UserOut, UserCreate
-from ..auth.dependencies import get_current_user
-from .dependencies import get_current_superuser
+from .schemas import UserOut, UserCreate, UserFilterParams
+from .dependencies import get_current_superuser, user_by_oid
 
 router = APIRouter(
     prefix="/user",
@@ -33,6 +34,21 @@ async def register(
 
 
 @router.get(
+    "/",
+    response_model=List[UserOut],
+    # dependencies=[Depends(get_current_superuser)],
+    status_code=status.HTTP_200_OK,
+    name="users:get_all",
+    description="Get all users with filters and pagination",
+)
+async def get_all(
+    session: Annotated[AsyncSession, Depends(get_async_session)],
+    filters_params: UserFilterParams = Depends(),
+):
+    return await UserService(session).get_all(filters_params=filters_params)
+
+
+@router.get(
     "/me",
     response_model=UserOut,
     dependencies=[Depends(get_current_user)],
@@ -42,3 +58,18 @@ async def register(
 )
 async def get_me(user: Annotated[User, Depends(get_current_user)]):
     return UserOut.model_validate(user)
+
+
+@router.get(
+    "/{oid}",
+    response_model=UserOut,
+    dependencies=[Depends(get_current_superuser)],
+    status_code=status.HTTP_200_OK,
+    name="users:get_one",
+    description="Get one user by id",
+)
+async def get_one(
+    user: UserOut = Depends(user_by_oid),
+):
+    return user
+

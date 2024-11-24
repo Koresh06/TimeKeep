@@ -48,3 +48,11 @@ class UserOut(UserBase):
     update_at: datetime
 
     model_config = ConfigDict(from_attributes=True)
+
+
+class UserFilterParams(BaseModel):
+    is_active: Optional[bool] = Field(None, description="Filter by active status")
+    start_date: Optional[datetime] = Field(None, description="Filter by creation date start")
+    end_date: Optional[datetime] = Field(None, description="Filter by creation date end")
+    page: int = Field(1, ge=1, description="Page number")
+    limit: int = Field(10, ge=1, le=100, description="Number of items per page")

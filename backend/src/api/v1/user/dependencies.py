@@ -16,10 +16,10 @@ from ..auth.dependencies import get_current_user
 async def user_by_oid(
     oid: Annotated[uuid.UUID, Path],
     session: Annotated[AsyncSession, Depends(get_async_session)],
-) -> User:
+) -> UserOut:
     user = await UserService(session).get_one(oid=oid)
     if user is not None:
-        return User
+        return user
 
     raise HTTPException(
         status_code=status.HTTP_404_NOT_FOUND,

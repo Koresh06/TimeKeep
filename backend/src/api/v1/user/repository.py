@@ -1,13 +1,14 @@
+from datetime import datetime
 import uuid
 
 from typing import List, Optional
 from fastapi import HTTPException
-from sqlalchemy import select, Result
+from sqlalchemy import and_, func, select, Result
 from sqlalchemy.exc import IntegrityError, SQLAlchemyError
 
 from core.repo.base import BaseRepo
 from models import User
-from .schemas import UserCreate
+from .schemas import UserCreate, UserFilterParams
 from ..auth.security import get_password_hash
 
 
@@ -19,19 +20,58 @@ class UserRepository(BaseRepo):
         return result
 
     async def create_user(self, data: UserCreate) -> User:
-        hashed_password = get_password_hash(data.password)
+        try:
+            hashed_password = get_password_hash(data.password)
 
-        user_data = data.model_dump(exclude={"password"})
-        user_data["hashed_password"] = hashed_password
-        user = User(**user_data)
+            user_data = data.model_dump(exclude={"password"})
+            user_data["hashed_password"] = hashed_password
+            user = User(**user_data)
 
-        self.session.add(user)
-        await self.session.commit()
-        await self.session.refresh(user)
-        return user
+            self.session.add(user)
+            await self.session.commit()
+            await self.session.refresh(user)
+            return user
+        except IntegrityError as e:
+            raise HTTPException(status_code=500, detail=f"Database error: {str(e)}")
     
 
+    async def get_all(
+        self,
+        filters_params: UserFilterParams,
+    ) -> List[User]:
+        filters = []
+        try:
+            if filters_params.is_active is not None:
+                filters.append(User.is_active == filters_params.is_active)
+            if filters_params.start_date is not None:
+                filters.append(User.create_at >= filters_params.start_date)
+            if filters_params.end_date is not None:
+                filters.append(User.create_at <= filters_params.end_date)
+
+            query = (
+                select(User)
+                .where(and_(*filters))
+                .offset((filters_params.page - 1) * filters_params.limit) 
+                .limit(filters_params.limit)  
+                .order_by(User.create_at.desc()) 
+            )
+
+            result = await self.session.execute(query)
+            return result.scalars().all()  
+        except SQLAlchemyError as e:
+            raise HTTPException(status_code=500, detail=f"Database error: {str(e)}")
+    
+
+    async def count_all(self, filters: List) -> int:
+        query = select(func.count(User.oid)).where(and_(*filters))
+        result = await self.session.execute(query)
+        return result.scalar()
+
+
     async def get_one(self, oid: uuid.UUID) -> User:
-        stmt = select(User).where(User.oid == oid)
-        result: Result = await self.session.scalar(stmt)
-        return result
+        try:
+            stmt = select(User).where(User.oid == oid)
+            result: Result = await self.session.scalar(stmt)
+            return result
+        except SQLAlchemyError as e:
+            raise HTTPException(status_code=500, detail=f"Database error: {str(e)}")
