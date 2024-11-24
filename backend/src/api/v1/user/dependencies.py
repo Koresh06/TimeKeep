@@ -16,8 +16,8 @@ from ..auth.dependencies import get_current_user
 async def user_by_oid(
     oid: Annotated[uuid.UUID, Path],
     session: Annotated[AsyncSession, Depends(get_async_session)],
-) -> UserOut:
-    user = await UserService(session).get_one(oid=oid)
+) -> User:
+    user = await UserService(session).get_user_by_id(oid=oid)
     if user is not None:
         return user
 

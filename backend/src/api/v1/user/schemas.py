@@ -7,7 +7,6 @@ from models.user import Role
 
 
 class UserBase(BaseModel):
-    department_oid: uuid.UUID
     username: str
     full_name: str
     position: str
@@ -15,33 +14,31 @@ class UserBase(BaseModel):
 
 
 class UserCreate(UserBase):
-    password: str = Field(min_length=8)  # Клиент передаёт "password"
+    password: str = Field(min_length=8) 
 
     @field_validator("password")
     def validate_password(cls, value: str) -> str:
-        # Проверка длины или других условий пароля
         if len(value) < 8:
             raise ValueError("Password must be at least 8 characters")
         return value
 
 
 class UserUpdate(UserBase):
+    department_oid: Optional[uuid.UUID] = None
     username: Optional[str] = None
     full_name: Optional[str] = None
     position: Optional[str] = None
-    role: Optional[str] = None
+    role: Optional[Role] = None
 
 
-class UserUpdatePartial(UserBase):
-    username: Optional[str] = None
-    full_name: Optional[str] = None
-    position: Optional[str] = None
-    role: Optional[str] = None
+class UserUpdatePartial(UserUpdate):
+    pass
 
 
 
 class UserOut(UserBase):
     oid: uuid.UUID
+    department_oid: uuid.UUID
     is_active: bool
     is_superuser: bool
     create_at: datetime

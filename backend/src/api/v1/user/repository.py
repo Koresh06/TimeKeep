@@ -8,7 +8,7 @@ from sqlalchemy.exc import IntegrityError, SQLAlchemyError
 
 from core.repo.base import BaseRepo
 from models import User
-from .schemas import UserCreate, UserFilterParams
+from .schemas import UserCreate, UserFilterParams, UserUpdatePartial, UserUpdate
 from ..auth.security import get_password_hash
 
 
@@ -18,6 +18,12 @@ class UserRepository(BaseRepo):
         stmt = select(User).where(User.username == username)
         result: Result = await self.session.scalar(stmt)
         return result
+    
+    async def get_user_by_id(self, oid: uuid.UUID) -> Optional[User]:
+        stmt = select(User).where(User.oid == oid)
+        result: Result = await self.session.scalar(stmt)
+        return result
+
 
     async def create_user(self, data: UserCreate) -> User:
         try:
@@ -33,7 +39,6 @@ class UserRepository(BaseRepo):
             return user
         except IntegrityError as e:
             raise HTTPException(status_code=500, detail=f"Database error: {str(e)}")
-    
 
     async def get_all(
         self,
@@ -51,22 +56,20 @@ class UserRepository(BaseRepo):
             query = (
                 select(User)
                 .where(and_(*filters))
-                .offset((filters_params.page - 1) * filters_params.limit) 
-                .limit(filters_params.limit)  
-                .order_by(User.create_at.desc()) 
+                .offset((filters_params.page - 1) * filters_params.limit)
+                .limit(filters_params.limit)
+                .order_by(User.create_at.desc())
             )
 
             result = await self.session.execute(query)
-            return result.scalars().all()  
+            return result.scalars().all()
         except SQLAlchemyError as e:
             raise HTTPException(status_code=500, detail=f"Database error: {str(e)}")
-    
 
     async def count_all(self, filters: List) -> int:
         query = select(func.count(User.oid)).where(and_(*filters))
         result = await self.session.execute(query)
         return result.scalar()
-
 
     async def get_one(self, oid: uuid.UUID) -> User:
         try:
@@ -75,3 +78,19 @@ class UserRepository(BaseRepo):
             return result
         except SQLAlchemyError as e:
             raise HTTPException(status_code=500, detail=f"Database error: {str(e)}")
+
+    async def update(
+        self,
+        user: User,
+        user_update: UserUpdate | UserUpdatePartial,
+        partil: bool = False,
+    ) -> User:
+        # try:
+        for key, value in user_update.model_dump(exclude_unset=partil).items():
+            setattr(user, key, value)
+        await self.session.commit()
+        await self.session.refresh(user)
+        return user
+        # except SQLAlchemyError as e:
+        #     await self.session.rollback()
+        #     raise HTTPException(status_code=500, detail=f"Database error: {str(e)}")

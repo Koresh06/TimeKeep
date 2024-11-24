@@ -4,9 +4,15 @@ import uuid
 from fastapi import HTTPException, status
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from models import Department
+from models import User
 from .repository import UserRepository
-from .schemas import UserOut, UserCreate, UserFilterParams
+from .schemas import (
+    UserOut,
+    UserCreate,
+    UserFilterParams,
+    UserUpdatePartial,
+    UserUpdate,
+)
 
 
 class UserService:
@@ -19,18 +25,19 @@ class UserService:
         if not user:
             return None
         return user
-        
+    
+
+    async def get_user_by_id(self, oid: uuid.UUID) -> Optional[User]:
+        return await self.repository.get_user_by_id(oid=oid)
 
     async def create_user(self, data: UserCreate) -> UserOut:
         user = await self.get_user(username=data.username)
         if user:
             raise HTTPException(
-                status_code=status.HTTP_400_BAD_REQUEST,
-                detail="User already exists"
+                status_code=status.HTTP_400_BAD_REQUEST, detail="User already exists"
             )
         user = await self.repository.create_user(data=data)
         return UserOut.model_validate(user)
-        
 
     async def get_all(
         self,
@@ -39,7 +46,6 @@ class UserService:
         users = await self.repository.get_all(filters_params=filters_params)
         return [UserOut.model_validate(user) for user in users]
 
-
     async def get_one(self, oid: uuid.UUID) -> UserOut:
         user = await self.repository.get_one(oid=oid)
         if user is None:
@@ -47,4 +53,17 @@ class UserService:
                 status_code=status.HTTP_404_NOT_FOUND,
                 detail=f"User {oid} not found!",
             )
+        return UserOut.model_validate(user)
+
+    async def modify(
+        self,
+        user: UserOut,
+        user_update: UserUpdatePartial,
+        partil: bool = False,
+    ) -> UserOut:
+        user = await self.repository.update(
+            user=user,
+            user_update=user_update,
+            partil=partil,
+        )
         return UserOut.model_validate(user)

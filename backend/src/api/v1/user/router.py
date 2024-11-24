@@ -8,7 +8,7 @@ from models.user import Role, User
 from core.session import get_async_session
 from api.v1.auth.dependencies import get_current_user
 from .service import UserService
-from .schemas import UserOut, UserCreate, UserFilterParams
+from .schemas import UserOut, UserCreate, UserFilterParams, UserUpdatePartial, UserUpdate
 from .dependencies import get_current_superuser, user_by_oid
 
 router = APIRouter(
@@ -73,3 +73,22 @@ async def get_one(
 ):
     return user
 
+
+@router.patch(
+    "/{oid}",
+    response_model=UserOut,
+    # dependencies=[Depends(get_current_superuser)],
+    status_code=status.HTTP_200_OK,
+    name="users:modify",
+    description="Modify user by id",
+)
+async def modify(
+    session: Annotated[AsyncSession, Depends(get_async_session)],
+    user_update: UserUpdatePartial,
+    user: User = Depends(user_by_oid),
+):
+    return await UserService(session).modify(
+        user=user,
+        user_update=user_update,
+        partil=True,
+    )
