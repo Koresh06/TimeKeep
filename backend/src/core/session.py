@@ -4,7 +4,12 @@ from sqlalchemy.ext.asyncio import (
     AsyncSession,
     async_sessionmaker,
     create_async_engine,
+    AsyncEngine,
 )
+import contextlib
+from typing import AsyncIterator
+from sqlalchemy.exc import DatabaseError
+
 
 from core.config import settings
 
@@ -36,3 +41,40 @@ async def get_async_session() -> AsyncGenerator[AsyncSession, None]:
             raise
         finally:
             await session.close()
+
+
+# class Database:
+#     def __init__(self, db_url: str) -> None:
+#         self.db_url = db_url
+#         self._engine: AsyncEngine | None = create_async_engine(url=db_url, echo=True)
+#         self._sessionmaker: async_sessionmaker[AsyncSession] | None = (
+#             async_sessionmaker(
+#                 autocommit=False,
+#                 autoflush=False,
+#                 bind=self._engine,
+#             )
+#         )
+
+#     async def close(self) -> None:
+#         if self._engine is None:
+#             raise DatabaseError(message="DatabaseSessionManager is not initialized")
+#         await self._engine.dispose()
+
+#         self._engine = None
+#         self._sessionmaker = None
+
+#     @contextlib.asynccontextmanager
+#     async def session(self) -> AsyncIterator[AsyncSession]:
+#         if self._sessionmaker is None:
+#             raise DatabaseError(message="DatabaseSessionManager is not initialized")
+
+#         session = self._sessionmaker()
+#         try:
+#             yield session
+#         except Exception as err:
+#             await session.rollback()
+#             raise DatabaseError(
+#                 message=f"An error occurred during the session {err}"
+#             ) from err
+#         finally:
+#             await session.close()

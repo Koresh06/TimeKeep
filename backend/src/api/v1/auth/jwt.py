@@ -20,19 +20,18 @@ def create_token(user_oid: uuid.UUID) -> Token:
 
     return Token(
         access_token=access_token,
-        token_type="bearer"
+        token_type="bearer",
+        access_token_expires=str(access_token_expires),
     )
 
 def create_access_token(*, data: dict, expires_delta: timedelta = None) -> str:
     """Генерация JWT токена"""
     to_encode = data.copy()
 
-    expire = datetime.now(tz=timezone.utc) + (expires_delta or timedelta(minutes=15))
-    to_encode.update({"exp": expire, "sub": "access"})
-
-    try:
-        encoded_jwt = jwt.encode(to_encode, settings.api.secret_key, algorithm=ALGORITHM)
-    except Exception as e:
-        raise RuntimeError(f"Ошибка создания токена: {str(e)}")
-
+    if expires_delta:
+        expire = datetime.now(tz=timezone.utc) + expires_delta
+    else:
+        expire = datetime.now(tz=timezone.utc) + timedelta(minutes=15)
+    to_encode.update({"exp": expire, "sub": access_token_jwt_subject})
+    encoded_jwt = jwt.encode(to_encode, settings.api.secret_key, algorithm=ALGORITHM)
     return encoded_jwt

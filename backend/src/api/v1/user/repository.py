@@ -25,7 +25,7 @@ class UserRepository(BaseRepo):
         return result
 
 
-    async def create_user(self, data: UserCreate) -> User:
+    async def create(self, data: UserCreate) -> User:
         try:
             hashed_password = get_password_hash(data.password)
 
@@ -39,6 +39,8 @@ class UserRepository(BaseRepo):
             return user
         except IntegrityError as e:
             raise HTTPException(status_code=500, detail=f"Database error: {str(e)}")
+        
+
 
     async def get_all(
         self,

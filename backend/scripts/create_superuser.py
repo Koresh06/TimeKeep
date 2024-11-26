@@ -6,8 +6,8 @@ sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '../s
 import asyncio
 from getpass import getpass
 from src.core.session import async_session_maker
-from src.api.v1.auth.service import AuthService
-from src.api.v1.auth.schemas import UserCreate
+from src.api.v1.user.service import UserService
+from src.api.v1.user.schemas import UserCreate
 
 
 async def create_superuser() -> None:
@@ -29,17 +29,20 @@ async def create_superuser() -> None:
         role = "moderator"
 
         # Проверяем, существует ли пользователь
-        super_user = await AuthService(session).create_superuser(
+        super_user = await UserService(session).create_superuser(
             UserCreate(
                 username=username,
                 full_name=full_name,
                 position=position,
                 role=role,
-                email=email,
-                password=password
+                password=password,
+                is_superuser=True,
             )
         )
-        print(super_user)
+        print(f'Superuser created successfully.\nUsername: {super_user.username}\nPassword: {password}')
 
 if __name__ == '__main__':
-    asyncio.run(create_superuser())
+    try:
+        asyncio.run(create_superuser())
+    except KeyboardInterrupt:
+        pass

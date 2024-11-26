@@ -8,7 +8,13 @@ from models.user import Role, User
 from core.session import get_async_session
 from api.v1.auth.dependencies import get_current_user
 from .service import UserService
-from .schemas import UserOut, UserCreate, UserFilterParams, UserUpdatePartial, UserUpdate
+from .schemas import (
+    UserOut,
+    UserCreate,
+    UserFilterParams,
+    UserUpdatePartial,
+    UserUpdate,
+)
 from .dependencies import get_current_superuser, user_by_oid
 
 router = APIRouter(
@@ -27,7 +33,10 @@ router = APIRouter(
 )
 async def register(
     user_create: UserCreate,
-    session: Annotated[AsyncSession, Depends(get_async_session)],
+    session: Annotated[
+        AsyncSession,
+        Depends(get_async_session),
+    ],
 ):
     user = await UserService(session).create_user(data=user_create)
     return user
@@ -42,7 +51,10 @@ async def register(
     description="Get all users with filters and pagination",
 )
 async def get_all(
-    session: Annotated[AsyncSession, Depends(get_async_session)],
+    session: Annotated[
+        AsyncSession,
+        Depends(get_async_session),
+    ],
     filters_params: UserFilterParams = Depends(),
 ):
     return await UserService(session).get_all(filters_params=filters_params)
@@ -56,7 +68,12 @@ async def get_all(
     name="users:me",
     description="Get current user",
 )
-async def get_me(user: Annotated[User, Depends(get_current_user)]):
+async def get_me(
+    user: Annotated[
+        User,
+        Depends(get_current_user),
+    ]
+):
     return UserOut.model_validate(user)
 
 
@@ -83,7 +100,10 @@ async def get_one(
     description="Modify user by id",
 )
 async def modify(
-    session: Annotated[AsyncSession, Depends(get_async_session)],
+    session: Annotated[
+        AsyncSession,
+        Depends(get_async_session),
+    ],
     user_update: UserUpdatePartial,
     user: User = Depends(user_by_oid),
 ):

@@ -1,7 +1,6 @@
 import asyncio
 import logging
 from typing import AsyncGenerator
-from fastapi_users import FastAPIUsers
 import pytest
 from sqlalchemy.ext.asyncio import AsyncSession, AsyncConnection, create_async_engine
 from sqlalchemy.orm import sessionmaker
@@ -9,12 +8,12 @@ from sqlalchemy.pool import NullPool
 import pytest_asyncio
 from httpx import ASGITransport, AsyncClient
 from asgi_lifespan import LifespanManager
-from src.api.v1.auth.users import get_user_manager
-from src.models import User
-from src.api.v1.auth.service import AuthService
-from src.api.v1.auth.schemas import UserCreate, UserOut
+from src.api.v1.department.schemas import DepartmentCreate
+from src.api.v1.user.schemas import UserCreate
+from src.api.v1.user.service import UserService
+from src.api.v1.department.service import DepartmentService
 from src.main import app
-from src.models import Base
+from src.models import Base, User
 from src.core.session import get_async_session
 from src.core.config import settings
 
@@ -85,129 +84,56 @@ async def async_client() -> AsyncGenerator[AsyncClient, None]:
             yield client
 
 
+@pytest.fixture
+async def test_department(async_db_session):
+    department = await DepartmentService(async_db_session).create(
+        department_create=DepartmentCreate(
+            name="Human 6",
+            description="Responsible for managing employee relations and payroll.",
+        )
+    )
+    return department
 
 
-# Пример фикстуры для создания пользователя и получения токена
-# @pytest_asyncio.fixture(scope="function")
-# async def test_create_superuser(async_db_session: AsyncSession) -> AsyncGenerator[UserOut, None]:
-#     user_data = UserCreate(
-#         username="testuser",
-#         full_name="Test User",
-#         position="testposition",
-#         role="moderator",
-#         email="6YgZU@example.com",
-#         password="testpassword",
-#     )
-#     user_table = await AuthService(session=async_db_session).create_superuser(user_create=user_data)
+@pytest.fixture(scope="session")
+async def test_user(async_db_session: AsyncSession, test_department: Department):
+    user = await UserService(async_db_session).create_user(
+        data=UserCreate(
+            department_oid=test_department.oid,
+            username="test_user",
+            full_name="Test User",
+            position="Developer",
+            role = "user",
+            password="test_password",
+        )
+    )
+    return user
 
-#     response = await async_client.post("/auth/login", json={"email": "6YgZU@example.com", "password": "testpassword"})
-#     print(response.json())
-    
+@pytest.fixture
+async def superuser_token(async_client: AsyncClient, async_db_session: AsyncSession, test_department: Department):
+    superuser = await UserService(async_db_session).create_user(
+        data=UserCreate(
+            department_oid=test_department.oid,
+            username="admin_user",
+            full_name="Admin User",
+            position="Administrator",
+            role = "moderator",
+            password="admin_password",
+        )
+    )
+    token_response = await async_client.post(
+        "/auth/access-token",
+        data={"username": superuser.username, "password": "admin_password"},
+    )
+    return token_response.cookies["access_token"]
 
-
-# @pytest_asyncio.fixture(scope="function")
-# async def async_client(test_user, async_db_session: AsyncSession) -> AsyncGenerator[AsyncClient, None]:
-#     def override_get_db():
-#         yield async_db_session
-
-#     app.dependency_overrides[get_async_session] = override_get_db
-
-#     async with LifespanManager(app):
-#         async with AsyncClient(transport=ASGITransport(app=app), base_url="http://localhost") as client:
-#             client.headers = {
-#                 "Authorization": f"Bearer {test_user['token']}",
-#                 **client.headers,
-#             }
-#             yield client
-
-
-
-
-# @pytest_asyncio.fixture(scope="function")
-# async def test_department(async_db_session: AsyncSession) -> AsyncGenerator[Department, None]:
-#     department = Department(
-#         name="Human test",
-#         description="Responsible for managing employee relations and payroll.",
-#     )
-
-#     async_db_session.add(department)
-#     await async_db_session.commit()
-
-#     yield department
-
-#     await async_db_session.rollback()
-
-
-
-
-# @pytest_asyncio.fixture(scope="session")
-# async def engine():
-#     engine = create_async_engine(
-#     url=settings.db.construct_sqlalchemy_url(is_test=True),
-#     echo=False,
-#     pool_pre_ping=True,
-#     poolclass=NullPool,
-# )
-#     yield engine
-#     await engine.dispose()
-
-
-# @pytest_asyncio.fixture(loop_scope="session", scope="session")
-# async def async_db_connection(engine):
-#     """
-#     Создание таблиц для каждого теста и удаление их после выполнения теста.
-#     """
-#     async with engine.begin() as conn:
-#         print("Creating tables...")
-#         await conn.run_sync(Base.metadata.create_all)  # Создаём таблицы
-#         print("Tables created.")
-
-#     yield engine  # Передаём движок в тесты
-
-#     async with engine.begin() as conn:
-#         print("Dropping tables...")
-#         await conn.run_sync(Base.metadata.drop_all)  # Удаляем таблицы
-#         print("Tables dropped.")
-        
-#     # Закрытие соединения после теста
-#     await engine.dispose()  # Явное завершение соединения
-
-
-
-
-# @pytest_asyncio.fixture(scope="function")
-# async def async_db_session(async_db_connection: AsyncConnection):
-#     async_session = sessionmaker(
-#         expire_on_commit=False,
-#         autocommit=False,
-#         autoflush=False,
-#         bind=async_db_connection,
-#         class_=AsyncSession,
-#     )
-#     async with async_session() as session:
-#         trans = await session.begin_nested()  # Используем savepoint для отката
-#         try:
-#             yield session
-#         finally:
-#             await trans.rollback()
-#             await session.close()
-
-
-# # Фикстура для тестового клиента
-# @pytest_asyncio.fixture
-# async def async_client():
-#     # Переопределяем зависимость `get_async_session`
-#     def override_get_db():
-#         yield async_db_session
-
-#     app.dependency_overrides[get_async_session] = override_get_db
-
-#     async with LifespanManager(app):
-#         async with AsyncClient(transport=ASGITransport(app=app), base_url="http://localhost") as client:
-#             yield client
-
-
-
+@pytest.fixture
+async def user_token(async_client: AsyncClient, test_user: User):
+    token_response = await async_client.post(
+        "/auth/access-token",
+        data={"username": test_user.username, "password": "test_password"},
+    )
+    return token_response.cookies["access_token"]
 
 
 

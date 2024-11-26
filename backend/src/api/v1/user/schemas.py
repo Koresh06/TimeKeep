@@ -7,6 +7,7 @@ from models.user import Role
 
 
 class UserBase(BaseModel):
+    department_oid: uuid.UUID = None
     username: str
     full_name: str
     position: str
@@ -15,6 +16,7 @@ class UserBase(BaseModel):
 
 class UserCreate(UserBase):
     password: str = Field(min_length=8) 
+    is_superuser: bool = False
 
     @field_validator("password")
     def validate_password(cls, value: str) -> str:
@@ -38,7 +40,6 @@ class UserUpdatePartial(UserUpdate):
 
 class UserOut(UserBase):
     oid: uuid.UUID
-    department_oid: uuid.UUID
     is_active: bool
     is_superuser: bool
     create_at: datetime

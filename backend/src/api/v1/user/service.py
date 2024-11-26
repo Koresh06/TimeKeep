@@ -30,14 +30,21 @@ class UserService:
     async def get_user_by_id(self, oid: uuid.UUID) -> Optional[User]:
         return await self.repository.get_user_by_id(oid=oid)
 
+
     async def create_user(self, data: UserCreate) -> UserOut:
         user = await self.get_user(username=data.username)
         if user:
             raise HTTPException(
                 status_code=status.HTTP_400_BAD_REQUEST, detail="User already exists"
             )
-        user = await self.repository.create_user(data=data)
+        user = await self.repository.create(data=data)
         return UserOut.model_validate(user)
+    
+
+    async def create_superuser(self, data: UserCreate):
+        user = await self.repository.create(data=data)
+        return user
+
 
     async def get_all(
         self,
@@ -45,6 +52,7 @@ class UserService:
     ) -> List[UserOut]:
         users = await self.repository.get_all(filters_params=filters_params)
         return [UserOut.model_validate(user) for user in users]
+
 
     async def get_one(self, oid: uuid.UUID) -> UserOut:
         user = await self.repository.get_one(oid=oid)
@@ -54,6 +62,7 @@ class UserService:
                 detail=f"User {oid} not found!",
             )
         return UserOut.model_validate(user)
+
 
     async def modify(
         self,
