@@ -1,7 +1,6 @@
 from datetime import datetime
-from typing import Optional
 import uuid
-from pydantic import BaseModel, ConfigDict, Field, field_validator, model_validator
+from pydantic import BaseModel, ConfigDict, Field, field_validator
 
 from models.user import Role
 
@@ -26,11 +25,11 @@ class UserCreate(UserBase):
 
 
 class UserUpdate(UserBase):
-    department_oid: Optional[uuid.UUID] = None
-    username: Optional[str] = None
-    full_name: Optional[str] = None
-    position: Optional[str] = None
-    role: Optional[Role] = None
+    department_oid: uuid.UUID | None = None
+    username: str | None = None
+    full_name: str | None = None
+    position: str | None = None
+    role: Role | None = None
 
 
 class UserUpdatePartial(UserUpdate):
@@ -49,8 +48,8 @@ class UserOut(UserBase):
 
 
 class UserFilterParams(BaseModel):
-    is_active: Optional[bool] = Field(None, description="Filter by active status")
-    start_date: Optional[datetime] = Field(None, description="Filter by creation date start")
-    end_date: Optional[datetime] = Field(None, description="Filter by creation date end")
+    is_active: bool | None = Field(None, description="Filter by active status")
+    start_date: datetime | None = Field(None, description="Filter by creation date start")
+    end_date: datetime | None = Field(None, description="Filter by creation date end")
     page: int = Field(1, ge=1, description="Page number")
     limit: int = Field(10, ge=1, le=100, description="Number of items per page")

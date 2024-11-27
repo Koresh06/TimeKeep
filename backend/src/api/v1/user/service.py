@@ -76,6 +76,20 @@ class UserService:
             partil=partil,
         )
         return UserOut.model_validate(user)
+    
+
+    async def replace(
+        self,
+        user: UserOut,
+        user_update: UserUpdate,
+        partil: bool = False,
+    ) -> UserOut:
+        user = await self.repository.update(
+            user=user,
+            user_update=user_update,
+            partil=partil,
+        )
+        return UserOut.model_validate(user)
 
 
     async def delete(self, user: UserOut):

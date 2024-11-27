@@ -114,6 +114,30 @@ async def modify(
     )
 
 
+
+@router.put(
+    "/{oid}",
+    response_model=UserOut,
+    # dependencies=[Depends(get_current_superuser)],
+    status_code=status.HTTP_200_OK,
+    name="users:replace",
+    description="Replace user by id",
+)
+async def replace(
+    session: Annotated[
+        AsyncSession,
+        Depends(get_async_session),
+    ],
+    user_update: UserUpdate,
+    user: User = Depends(user_by_oid),
+):
+    return await UserService(session).replace(
+        user=user,
+        user_update=user_update,
+        partil=False,
+    )
+
+
 @router.delete(
     "/{oid}",
     dependencies=[Depends(get_current_superuser)],
