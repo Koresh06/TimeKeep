@@ -7,7 +7,7 @@ from sqlalchemy import and_, func, select, Result
 from sqlalchemy.exc import IntegrityError, SQLAlchemyError
 
 from core.repo.base import BaseRepo
-from models import User
+from models.user import User, Role
 from .schemas import UserCreate, UserFilterParams, UserUpdatePartial, UserUpdate
 from ..auth.security import get_password_hash
 
@@ -105,6 +105,20 @@ class UserRepository(BaseRepo):
         try:
             await self.session.delete(user)
             await self.session.commit()
+        except SQLAlchemyError as e:
+            await self.session.rollback()
+            raise HTTPException(status_code=500, detail=f"Database error: {str(e)}")
+        
+
+    async def toggle_role(self, user: User, role: Role) -> User:
+        try:
+            # user.role = Role.MODERATOR if user.role == Role.USER else Role.USER
+            if user.role == role:
+                raise HTTPException(status_code=400, detail="User already has this role")
+            user.role = role
+            await self.session.commit()
+            await self.session.refresh(user)
+            return user
         except SQLAlchemyError as e:
             await self.session.rollback()
             raise HTTPException(status_code=500, detail=f"Database error: {str(e)}")

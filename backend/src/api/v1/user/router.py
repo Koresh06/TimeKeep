@@ -1,7 +1,7 @@
 from datetime import datetime
 from typing import Annotated, List, Optional
 import uuid
-from fastapi import APIRouter, Depends, Query, status
+from fastapi import APIRouter, Body, Depends, Query, status
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from models.user import Role, User
@@ -118,7 +118,7 @@ async def modify(
 @router.put(
     "/{oid}",
     response_model=UserOut,
-    # dependencies=[Depends(get_current_superuser)],
+    dependencies=[Depends(get_current_superuser)],
     status_code=status.HTTP_200_OK,
     name="users:replace",
     description="Replace user by id",
@@ -153,3 +153,22 @@ async def delete(
     user: User = Depends(user_by_oid),
 ):
     await UserService(session).delete(user=user)
+
+
+@router.post(
+    "/toggle-role/{oid}",
+    # dependencies=[Depends(get_current_superuser)],
+    response_model=UserOut,
+    status_code=status.HTTP_200_OK,
+    name="users:toggle-role",
+    description="Toggle user's role between USER and MODERATOR on each call",
+)
+async def toggle(
+    session: Annotated[
+        AsyncSession,
+        Depends(get_async_session),
+    ],
+    user: User = Depends(user_by_oid),
+    role: Role = Query(Role),
+):
+    return await UserService(session).toggle_role(user=user, role=role)

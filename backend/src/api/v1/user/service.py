@@ -4,7 +4,7 @@ import uuid
 from fastapi import HTTPException, status
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from models import User
+from models.user import User, Role
 from .repository import UserRepository
 from .schemas import (
     UserOut,
@@ -94,3 +94,8 @@ class UserService:
 
     async def delete(self, user: UserOut):
         await self.repository.delete(user=user)
+
+
+    async def toggle_role(self, user: UserOut, role: Role):
+        user = await self.repository.toggle_role(user=user, role=role)
+        return UserOut.model_validate(user)
