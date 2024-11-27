@@ -1,7 +1,6 @@
-from datetime import datetime
-from typing import Annotated, List, Optional
+from typing import Annotated, List
 import uuid
-from fastapi import APIRouter, Body, Depends, Query, status
+from fastapi import APIRouter, Depends, Query, status
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from models.user import Role, User
@@ -16,6 +15,7 @@ from .schemas import (
     UserUpdate,
 )
 from .dependencies import get_current_superuser, user_by_oid
+
 
 router = APIRouter(
     prefix="/user",
@@ -157,7 +157,7 @@ async def delete(
 
 @router.post(
     "/toggle-role/{oid}",
-    # dependencies=[Depends(get_current_superuser)],
+    dependencies=[Depends(get_current_superuser)],
     response_model=UserOut,
     status_code=status.HTTP_200_OK,
     name="users:toggle-role",

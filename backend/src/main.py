@@ -57,10 +57,14 @@ def read_root() -> dict:
 
 
 if __name__ == "__main__":
-    setup_logging()
+    try:
+        setup_logging()
 
-    uvicorn.run(
-        app=app,
-        host=settings.api.host,
-        port=settings.api.port,
-    )
+        uvicorn.run(
+            app=app,
+            host=settings.api.host,
+            port=settings.api.port,
+        )
+
+    except KeyboardInterrupt as e:
+        logger.info("Программа завершена пользователем")
