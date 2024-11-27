@@ -38,14 +38,14 @@ async def register(
         Depends(get_async_session),
     ],
 ):
-    user = await UserService(session).create_user(data=user_create)
+    user = await UserService(session).create(data=user_create)
     return user
 
 
 @router.get(
     "/",
     response_model=List[UserOut],
-    # dependencies=[Depends(get_current_superuser)],
+    dependencies=[Depends(get_current_superuser)],
     status_code=status.HTTP_200_OK,
     name="users:get_all",
     description="Get all users with filters and pagination",
@@ -94,7 +94,7 @@ async def get_one(
 @router.patch(
     "/{oid}",
     response_model=UserOut,
-    # dependencies=[Depends(get_current_superuser)],
+    dependencies=[Depends(get_current_superuser)],
     status_code=status.HTTP_200_OK,
     name="users:modify",
     description="Modify user by id",
@@ -112,3 +112,20 @@ async def modify(
         user_update=user_update,
         partil=True,
     )
+
+
+@router.delete(
+    "/{oid}",
+    dependencies=[Depends(get_current_superuser)],
+    status_code=status.HTTP_204_NO_CONTENT,
+    name="users:delete",
+    description="Delete user by id",
+)
+async def delete(
+    session: Annotated[
+        AsyncSession,
+        Depends(get_async_session),
+    ],
+    user: User = Depends(user_by_oid),
+):
+    await UserService(session).delete(user=user)

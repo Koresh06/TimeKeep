@@ -1,76 +1,41 @@
 import pytest
 from httpx import AsyncClient
 from fastapi import status
+from sqlalchemy.ext.asyncio import AsyncSession
 
-from src.api.v1.user.schemas import UserOut
-
-
-# async def test_login_success(async_client: AsyncClient, test_user: UserOut):
-#     # test_user должен быть создан заранее (например, через фикстуру)
-#     response = await async_client.post(
-#         "/access-token",
-#         data={"username": test_user.username, "password": "test_password"}
-#     )
-#     # assert response.status_code == status.HTTP_200_OK
-#     # assert "access_token" in response.cookies
-#     print(response.json())
+from src.models import Department
+from src.api.v1.auth.schemas import Token
+from src.api.v1.auth.service import AuthService
+from src.api.v1.user.service import UserService
 
 
-# async def test_login_invalid_credentials(async_client: AsyncClient):
-#     response = await async_client.post(
-#         "/access-token",
-#         data={"username": "invalid_user", "password": "wrong_password"}
-#     )
-#     assert response.status_code == status.HTTP_401_UNAUTHORIZED
-#     assert response.json()["detail"] == "Invalid credentials"
+async def test_login_access_token_success(
+    async_client: AsyncClient,
+    async_db_session: AsyncSession,
+    test_department: Department,
+):
+    # Создаем тестового пользователя
+    test_user = {
+        "department_oid": test_department.oid,
+        "username": "testuser",
+        "password": "testpassword",
+        "full_name": "Test User",
+        "position": "Developer",
+        "role": "user",
+    }
+    # Предполагаем, что у вас есть сервис для создания пользователя
+    await UserService(async_db_session).create_user(**test_user)
 
-
-
-async def test_register_user_as_superuser(async_client: AsyncClient, superuser_token):
+    # Запрос токена
     response = await async_client.post(
-        "/register",
-        headers={"Authorization": f"Bearer {superuser_token}"},
-        json={
-            "username": "new_user",
-            "full_name": "New User",
-            "password": "password123",
-            "position": "Developer",
-            "role": "USER"
-        }
+        "/auth/access-token",
+        data={
+            "username": "testuser",
+            "password": "testpassword",
+        },
     )
+
+    # assert response.status_code == 200
+    # token = Token(**response.json())
+    # assert token.access_token is not None
     print(response.json())
-    # assert response.status_code == status.HTTP_201_CREATED
-    # data = response.json()
-    # assert data["username"] == "new_user"
-    # assert data["role"] == "USER"
-
-
-# async def test_register_user_as_non_superuser(async_client: AsyncClient, user_token):
-#     response = await async_client.post(
-#         "/register",
-#         headers={"Authorization": f"Bearer {user_token}"},
-#         json={
-#             "username": "new_user",
-#             "full_name": "New User",
-#             "password": "password123",
-#             "position": "Developer",
-#             "role": "USER"
-#         }
-#     )
-#     assert response.status_code == status.HTTP_400_BAD_REQUEST
-#     assert response.json()["detail"] == "The user doesn't have enough privileges"
-
-
-# async def test_register_user_without_auth(async_client: AsyncClient):
-#     response = await async_client.post(
-#         "/register",
-#         json={
-#             "username": "new_user",
-#             "full_name": "New User",
-#             "password": "password123",
-#             "position": "Developer",
-#             "role": "USER"
-#         }
-#     )
-#     assert response.status_code == status.HTTP_401_UNAUTHORIZED
-#     assert response.json()["detail"] == "Could not validate credentials"

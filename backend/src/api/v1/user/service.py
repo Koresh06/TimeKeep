@@ -31,7 +31,7 @@ class UserService:
         return await self.repository.get_user_by_id(oid=oid)
 
 
-    async def create_user(self, data: UserCreate) -> UserOut:
+    async def create(self, data: UserCreate) -> UserOut:
         user = await self.get_user(username=data.username)
         if user:
             raise HTTPException(
@@ -76,3 +76,7 @@ class UserService:
             partil=partil,
         )
         return UserOut.model_validate(user)
+
+
+    async def delete(self, user: UserOut):
+        await self.repository.delete(user=user)

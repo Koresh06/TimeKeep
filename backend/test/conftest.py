@@ -53,7 +53,7 @@ async def async_db_engine(engine):
         await conn.run_sync(Base.metadata.drop_all)
 
 
-@pytest_asyncio.fixture(loop_scope="function", scope="function")
+@pytest_asyncio.fixture(loop_scope="session", scope="session")
 async def async_db_session(async_db_engine):
     async_session = sessionmaker(
         expire_on_commit=False,
@@ -71,7 +71,7 @@ async def async_db_session(async_db_engine):
             await session.close()
 
 
-@pytest_asyncio.fixture(loop_scope="function", scope="function")
+@pytest_asyncio.fixture(loop_scope="session", scope="session")
 async def async_client() -> AsyncGenerator[AsyncClient, None]:
     def override_get_db():
         yield async_db_session
@@ -84,56 +84,56 @@ async def async_client() -> AsyncGenerator[AsyncClient, None]:
             yield client
 
 
-@pytest.fixture
-async def test_department(async_db_session):
-    department = await DepartmentService(async_db_session).create(
-        department_create=DepartmentCreate(
-            name="Human 6",
-            description="Responsible for managing employee relations and payroll.",
-        )
-    )
-    return department
+# @pytest.fixture(scope="session")
+# async def test_department(async_db_session):
+#     department = await DepartmentService(async_db_session).create(
+#         department_create=DepartmentCreate(
+#             name="Human 6",
+#             description="Responsible for managing employee relations and payroll.",
+#         )
+#     )
+#     return department
 
 
-@pytest.fixture(scope="session")
-async def test_user(async_db_session: AsyncSession, test_department: Department):
-    user = await UserService(async_db_session).create_user(
-        data=UserCreate(
-            department_oid=test_department.oid,
-            username="test_user",
-            full_name="Test User",
-            position="Developer",
-            role = "user",
-            password="test_password",
-        )
-    )
-    return user
+# @pytest.fixture(scope="session")
+# async def test_user(async_db_session: AsyncSession, test_department: Department):
+#     user = await UserService(async_db_session).create_user(
+#         data=UserCreate(
+#             department_oid=test_department.oid,
+#             username="test_user",
+#             full_name="Test User",
+#             position="Developer",
+#             role = "user",
+#             password="test_password",
+#         )
+#     )
+#     return user
 
-@pytest.fixture
-async def superuser_token(async_client: AsyncClient, async_db_session: AsyncSession, test_department: Department):
-    superuser = await UserService(async_db_session).create_user(
-        data=UserCreate(
-            department_oid=test_department.oid,
-            username="admin_user",
-            full_name="Admin User",
-            position="Administrator",
-            role = "moderator",
-            password="admin_password",
-        )
-    )
-    token_response = await async_client.post(
-        "/auth/access-token",
-        data={"username": superuser.username, "password": "admin_password"},
-    )
-    return token_response.cookies["access_token"]
+# @pytest.fixture(scope="session")
+# async def superuser_token(async_client: AsyncClient, async_db_session: AsyncSession, test_department: Department):
+#     superuser = await UserService(async_db_session).create_user(
+#         data=UserCreate(
+#             department_oid=test_department.oid,
+#             username="admin_user",
+#             full_name="Admin User",
+#             position="Administrator",
+#             role = "moderator",
+#             password="admin_password",
+#         )
+#     )
+#     token_response = await async_client.post(
+#         "/auth/login",
+#         data={"username": superuser.username, "password": "admin_password"},
+#     )
+#     return token_response.cookies["access_token"]
 
-@pytest.fixture
-async def user_token(async_client: AsyncClient, test_user: User):
-    token_response = await async_client.post(
-        "/auth/access-token",
-        data={"username": test_user.username, "password": "test_password"},
-    )
-    return token_response.cookies["access_token"]
+# @pytest.fixture(scope="session")
+# async def user_token(async_client: AsyncClient, test_user: User):
+#     token_response = await async_client.post(
+#         "/auth/login",
+#         data={"username": test_user.username, "password": "test_password"},
+#     )
+#     return token_response.cookies["access_token"]
 
 
 

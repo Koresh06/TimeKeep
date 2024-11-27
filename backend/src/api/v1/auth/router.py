@@ -74,6 +74,7 @@ async def logout(
     current_user: User = Depends(get_current_user),
 ):
     response.delete_cookie(key="access_token")
+    
     return JSONResponse(
         content={"message": "Successfully logged out"},
         status_code=status.HTTP_200_OK,

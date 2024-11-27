@@ -19,9 +19,6 @@ from .schemas import TokenPayload
 cookie_scheme = APIKeyCookie(name="access_token", auto_error=False)
 
 
-
-
-
 async def get_current_user(
     request: Request,
     session: Annotated[AsyncSession, Depends(get_async_session)],

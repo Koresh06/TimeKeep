@@ -19,6 +19,7 @@ class UserRepository(BaseRepo):
         result: Result = await self.session.scalar(stmt)
         return result
     
+
     async def get_user_by_id(self, oid: uuid.UUID) -> Optional[User]:
         stmt = select(User).where(User.oid == oid)
         result: Result = await self.session.scalar(stmt)
@@ -40,7 +41,6 @@ class UserRepository(BaseRepo):
         except IntegrityError as e:
             raise HTTPException(status_code=500, detail=f"Database error: {str(e)}")
         
-
 
     async def get_all(
         self,
@@ -68,10 +68,12 @@ class UserRepository(BaseRepo):
         except SQLAlchemyError as e:
             raise HTTPException(status_code=500, detail=f"Database error: {str(e)}")
 
+
     async def count_all(self, filters: List) -> int:
         query = select(func.count(User.oid)).where(and_(*filters))
         result = await self.session.execute(query)
         return result.scalar()
+
 
     async def get_one(self, oid: uuid.UUID) -> User:
         try:
@@ -81,18 +83,28 @@ class UserRepository(BaseRepo):
         except SQLAlchemyError as e:
             raise HTTPException(status_code=500, detail=f"Database error: {str(e)}")
 
+
     async def update(
         self,
         user: User,
         user_update: UserUpdate | UserUpdatePartial,
         partil: bool = False,
     ) -> User:
-        # try:
-        for key, value in user_update.model_dump(exclude_unset=partil).items():
-            setattr(user, key, value)
-        await self.session.commit()
-        await self.session.refresh(user)
-        return user
-        # except SQLAlchemyError as e:
-        #     await self.session.rollback()
-        #     raise HTTPException(status_code=500, detail=f"Database error: {str(e)}")
+        try:
+            for key, value in user_update.model_dump(exclude_unset=partil).items():
+                setattr(user, key, value)
+            await self.session.commit()
+            await self.session.refresh(user)
+            return user
+        except SQLAlchemyError as e:
+            await self.session.rollback()
+            raise HTTPException(status_code=500, detail=f"Database error: {str(e)}")
+
+
+    async def delete(self, user: User):
+        try:
+            await self.session.delete(user)
+            await self.session.commit()
+        except SQLAlchemyError as e:
+            await self.session.rollback()
+            raise HTTPException(status_code=500, detail=f"Database error: {str(e)}")
