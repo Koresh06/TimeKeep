@@ -20,7 +20,6 @@ router = APIRouter(
 )
 
 
-
 @router.post(
     "/",
     response_model=OvertimeOut,
@@ -28,7 +27,7 @@ router = APIRouter(
     name="overtime:create",
     description="Create overtime",
 )
-async def create(
+async def create_overtime(
     session: Annotated[
         AsyncSession,
         Depends(get_async_session),
@@ -45,7 +44,7 @@ async def create(
     name="overtime:get_all",
     description="Get all overtimes",
 )
-async def get_all(
+async def get_all_overtimes(
     session: Annotated[
         AsyncSession,
         Depends(get_async_session),
@@ -63,7 +62,29 @@ async def get_all(
     name="overtime:get_one",
     description="Get one overtime by id",
 )
-async def get_one(
+async def get_one_overtime(
     overtime: OvertimeOut = Depends(overtime_by_oid),
 ):
     return overtime
+
+
+@router.patch(
+    "/{oid}",
+    response_model=OvertimeOut,
+    status_code=status.HTTP_200_OK,
+    name="overtime:modify",
+    description="Modify overtime",
+)
+async def modify_overtime(
+    session: Annotated[
+        AsyncSession,
+        Depends(get_async_session),
+    ],
+    overtime_update: OvertimeUpdatePartial,
+    overtime: OvertimeOut = Depends(overtime_by_oid),
+):
+    return await OvertimeService(session).modify(
+        overtime=overtime,
+        overtime_update=overtime_update,
+        partial=True,
+    )

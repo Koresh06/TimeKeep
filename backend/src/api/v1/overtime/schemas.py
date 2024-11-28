@@ -24,9 +24,10 @@ class OvertimeCreate(OvertimeBase):
 
 
 class OvertimeUpdate(OvertimeBase):
+    user_oid: uuid.UUID | None = None
     o_date: date | None = None
     hours: int | None = None
-    description: str | None
+    description: str | None = None
 
 
 class OvertimeUpdatePartial(OvertimeUpdate):
