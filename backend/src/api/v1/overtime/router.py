@@ -11,6 +11,7 @@ from .schemas import (
     OvertimeUpdatePartial,
     PaginatedResponse,
 )
+from .dependencies import overtime_by_oid
 
 
 router = APIRouter(
@@ -53,3 +54,16 @@ async def get_all(
     offset: int = Query(0, ge=0),
 ):
     return await OvertimeService(session).get_all(limit=limit, offset=offset)
+
+
+@router.get(
+    "/{oid}",
+    response_model=OvertimeOut,
+    status_code=status.HTTP_200_OK,
+    name="overtime:get_one",
+    description="Get one overtime by id",
+)
+async def get_one(
+    overtime: OvertimeOut = Depends(overtime_by_oid),
+):
+    return overtime

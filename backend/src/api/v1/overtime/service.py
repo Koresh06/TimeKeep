@@ -31,5 +31,6 @@ class OvertimeService:
         return PaginatedResponse(count=len(overtimes_data), items=overtimes_data)
     
 
-
-    
+    async def get_one(self, oid: uuid.UUID) -> OvertimeOut:
+        overtime = await self.repository.get_one(oid=oid)
+        return OvertimeOut.model_validate(overtime)

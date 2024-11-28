@@ -32,3 +32,12 @@ class OvertimeRepository(BaseRepo):
             return overtime
         except SQLAlchemyError as e:
             raise HTTPException(status_code=500, detail=f"Database error: {str(e)}")
+        
+
+    async def get_one(self, oid: uuid.UUID) -> Optional[Overtime]:
+        try:
+            stmt = select(Overtime).where(Overtime.oid == oid)
+            result: Result = await self.session.scalar(stmt)
+            return result
+        except SQLAlchemyError as e:
+            raise HTTPException(status_code=500, detail=f"Database error: {str(e)}")
