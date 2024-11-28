@@ -4,6 +4,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from core.session import get_async_session
 from .service import OvertimeService
+from models import Overtime
 from .schemas import (
     OvertimeOut,
     OvertimeCreate,
@@ -81,10 +82,47 @@ async def modify_overtime(
         Depends(get_async_session),
     ],
     overtime_update: OvertimeUpdatePartial,
-    overtime: OvertimeOut = Depends(overtime_by_oid),
+    overtime: Overtime = Depends(overtime_by_oid),
 ):
     return await OvertimeService(session).modify(
         overtime=overtime,
         overtime_update=overtime_update,
         partial=True,
     )
+
+
+@router.put(
+    "/{oid}",
+    response_model=OvertimeOut,
+    status_code=status.HTTP_200_OK,
+    name="overtime:replace",
+    description="Replace overtime",
+)
+async def replace_overtime(
+    session: Annotated[
+        AsyncSession,
+        Depends(get_async_session),
+    ],
+    overtime_update: OvertimeUpdate,
+    overtime: Overtime = Depends(overtime_by_oid),
+):
+    return await OvertimeService(session).replace(
+        overtime=overtime,
+        overtime_update=overtime_update,
+)
+
+
+@router.delete(
+    "/{oid}",
+    status_code=status.HTTP_204_NO_CONTENT,
+    name="overtime:delete",
+    description="Delete overtime",
+)
+async def delete_overtime(
+    session: Annotated[
+        AsyncSession,
+        Depends(get_async_session),
+    ],
+    overtime: Overtime = Depends(overtime_by_oid),
+):
+    await OvertimeService(session).delete(overtime=overtime)

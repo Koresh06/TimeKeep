@@ -60,9 +60,17 @@ class OvertimeRepository(BaseRepo):
         try:
             for key, value in overtime_update.model_dump(exclude_unset=partial).items():
                 setattr(overtime, key, value)
-                
+
             await self.session.commit()
             await self.session.refresh(overtime)
             return overtime
         except IntegrityError as e:
+            raise HTTPException(status_code=500, detail=f"Database error: {str(e)}")
+
+    async def delete(self, overtime: Overtime):
+        try:
+            await self.session.delete(overtime)
+            await self.session.commit()
+        except SQLAlchemyError as e:
+            await self.session.rollback()
             raise HTTPException(status_code=500, detail=f"Database error: {str(e)}")

@@ -53,3 +53,17 @@ class OvertimeService:
             partial=partial,
         )
         return OvertimeOut.model_validate(overtime)
+
+    async def replace(
+        self,
+        overtime: Overtime,
+        overtime_update: OvertimeUpdate,
+    ) -> OvertimeOut:
+        overtime = await self.repository.update(
+            overtime=overtime,
+            overtime_update=overtime_update,
+        )
+        return OvertimeOut.model_validate(overtime)
+    
+    async def delete(self, overtime: Overtime):
+        await self.repository.delete(overtime=overtime)
