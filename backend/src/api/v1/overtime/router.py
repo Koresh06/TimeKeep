@@ -2,9 +2,10 @@ from fastapi import APIRouter, status, Depends, HTTPException, Query
 from typing import Annotated, List
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from models import Overtime, Role
 from core.session import get_async_session
+from src.api.v1.auth.permissions import RoleRequired
 from .service import OvertimeService
-from models import Overtime
 from .schemas import (
     OvertimeOut,
     OvertimeCreate,
@@ -25,6 +26,7 @@ router = APIRouter(
     "/",
     response_model=OvertimeOut,
     status_code=status.HTTP_201_CREATED,
+    dependencies=[Depends(RoleRequired(Role.SUPERUSER, Role.MODERATOR, Role.USER))],
     name="overtime:create",
     description="Create overtime",
 )
@@ -42,6 +44,7 @@ async def create_overtime(
     "/",
     response_model=PaginatedResponse[OvertimeOut],
     status_code=status.HTTP_200_OK,
+    dependencies=[Depends(RoleRequired(Role.SUPERUSER, Role.MODERATOR, Role.USER))],
     name="overtime:get_all",
     description="Get all overtimes",
 )
@@ -60,6 +63,7 @@ async def get_all_overtimes(
     "/{oid}",
     response_model=OvertimeOut,
     status_code=status.HTTP_200_OK,
+    dependencies=[Depends(RoleRequired(Role.SUPERUSER, Role.MODERATOR, Role.USER))],
     name="overtime:get_one",
     description="Get one overtime by id",
 )
@@ -73,6 +77,7 @@ async def get_one_overtime(
     "/{oid}",
     response_model=OvertimeOut,
     status_code=status.HTTP_200_OK,
+    dependencies=[Depends(RoleRequired(Role.SUPERUSER, Role.MODERATOR))],
     name="overtime:modify",
     description="Modify overtime",
 )
@@ -95,6 +100,7 @@ async def modify_overtime(
     "/{oid}",
     response_model=OvertimeOut,
     status_code=status.HTTP_200_OK,
+    dependencies=[Depends(RoleRequired(Role.SUPERUSER, Role.MODERATOR))],
     name="overtime:replace",
     description="Replace overtime",
 )
@@ -115,6 +121,7 @@ async def replace_overtime(
 @router.delete(
     "/{oid}",
     status_code=status.HTTP_204_NO_CONTENT,
+    dependencies=[Depends(RoleRequired(Role.SUPERUSER, Role.MODERATOR))],
     name="overtime:delete",
     description="Delete overtime",
 )

@@ -27,8 +27,14 @@ router = APIRouter(
     name="auth:access_token",
 )
 async def login_access_token(
-    form_data: Annotated[OAuth2PasswordRequestForm, Depends()],
-    session: Annotated[AsyncSession, Depends(get_async_session)],
+    form_data: Annotated[
+        OAuth2PasswordRequestForm,
+        Depends(),
+    ],
+    session: Annotated[
+        AsyncSession,
+        Depends(get_async_session),
+    ],
 ) -> Token:
     return await AuthService(session).authenticate_and_create_token(form_data)
 
@@ -42,8 +48,14 @@ async def login_access_token(
 )
 async def login(
     response: Response,
-    form_data: Annotated[LoginForm, Depends(LoginForm.as_form)],
-    session: Annotated[AsyncSession, Depends(get_async_session)],
+    form_data: Annotated[
+        LoginForm,
+        Depends(LoginForm.as_form),
+    ],
+    session: Annotated[
+        AsyncSession,
+        Depends(get_async_session),
+    ],
 ) -> Token:
     oauth_form_data = OAuth2PasswordRequestForm(
         username=form_data.username,
@@ -74,7 +86,7 @@ async def logout(
     current_user: User = Depends(get_current_user),
 ):
     response.delete_cookie(key="access_token")
-    
+
     return JSONResponse(
         content={"message": "Successfully logged out"},
         status_code=status.HTTP_200_OK,

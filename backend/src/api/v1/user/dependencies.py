@@ -26,22 +26,3 @@ async def user_by_oid(
         detail=f"User {oid} not found!",
     )
 
-
-async def get_current_moderator(
-    current_user: Annotated[UserOut, Depends(get_current_user)]
-) -> UserOut:
-    if not current_user.role == "moderator":
-        raise HTTPException(
-            status_code=400, detail="The user doesn't have enough privileges"
-        )
-    return current_user
-
-
-async def get_current_superuser(
-    current_user: Annotated[UserOut, Depends(get_current_user)]
-) -> UserOut:
-    if not current_user.is_superuser:
-        raise HTTPException(
-            status_code=400, detail="The user doesn't have enough privileges"
-        )
-    return current_user

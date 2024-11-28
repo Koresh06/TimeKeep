@@ -15,7 +15,6 @@ class UserBase(BaseModel):
 
 class UserCreate(UserBase):
     password: str = Field(min_length=8) 
-    is_superuser: bool = False
 
     @field_validator("password")
     def validate_password(cls, value: str) -> str:

@@ -1,8 +1,8 @@
-"""Initial tables/
+"""Initial tables
 
-Revision ID: e7af5730d89a
+Revision ID: e93964efefb1
 Revises: 
-Create Date: 2024-11-23 20:33:36.246280
+Create Date: 2024-11-28 21:26:42.360215
 
 """
 from typing import Sequence, Union
@@ -12,7 +12,7 @@ import sqlalchemy as sa
 
 
 # revision identifiers, used by Alembic.
-revision: str = 'e7af5730d89a'
+revision: str = 'e93964efefb1'
 down_revision: Union[str, None] = None
 branch_labels: Union[str, Sequence[str], None] = None
 depends_on: Union[str, Sequence[str], None] = None
@@ -34,15 +34,15 @@ def upgrade() -> None:
     sa.Column('department_oid', sa.UUID(), nullable=True),
     sa.Column('username', sa.String(length=255), nullable=False),
     sa.Column('full_name', sa.String(length=255), nullable=False),
-    sa.Column('role', sa.Enum('USER', 'MODERATOR', name='role'), nullable=False),
+    sa.Column('role', sa.Enum('USER', 'MODERATOR', 'SUPERUSER', name='role'), nullable=False),
     sa.Column('hashed_password', sa.String(length=255), nullable=False),
     sa.Column('position', sa.String(length=255), nullable=False),
     sa.Column('is_active', sa.Boolean(), nullable=False),
-    sa.Column('is_superuser', sa.Boolean(), nullable=False),
     sa.Column('create_at', sa.DateTime(), server_default=sa.text('now()'), nullable=False),
     sa.Column('update_at', sa.DateTime(), server_default=sa.text('now()'), nullable=False),
     sa.ForeignKeyConstraint(['department_oid'], ['departments.oid'], name=op.f('users_department_oid_fkey')),
-    sa.PrimaryKeyConstraint('oid', name=op.f('pk__users'))
+    sa.PrimaryKeyConstraint('oid', name=op.f('pk__users')),
+    sa.UniqueConstraint('username', name=op.f('uq__users__username'))
     )
     op.create_table('day_offs',
     sa.Column('oid', sa.UUID(), nullable=False),
@@ -58,9 +58,11 @@ def upgrade() -> None:
     op.create_table('overtimes',
     sa.Column('oid', sa.UUID(), nullable=False),
     sa.Column('user_oid', sa.UUID(), nullable=False),
-    sa.Column('date', sa.DateTime(), nullable=False),
+    sa.Column('o_date', sa.Date(), nullable=False),
     sa.Column('hours', sa.Integer(), nullable=False),
     sa.Column('description', sa.String(length=500), nullable=False),
+    sa.Column('create_at', sa.DateTime(), server_default=sa.text('now()'), nullable=False),
+    sa.Column('update_at', sa.DateTime(), server_default=sa.text('now()'), nullable=False),
     sa.ForeignKeyConstraint(['user_oid'], ['users.oid'], name=op.f('overtimes_user_oid_fkey')),
     sa.PrimaryKeyConstraint('oid', name=op.f('pk__overtimes'))
     )
@@ -68,6 +70,8 @@ def upgrade() -> None:
     sa.Column('oid', sa.UUID(), nullable=False),
     sa.Column('overtime_oid', sa.UUID(), nullable=False),
     sa.Column('day_off_oid', sa.UUID(), nullable=False),
+    sa.Column('create_at', sa.DateTime(), server_default=sa.text('now()'), nullable=False),
+    sa.Column('update_at', sa.DateTime(), server_default=sa.text('now()'), nullable=False),
     sa.ForeignKeyConstraint(['day_off_oid'], ['day_offs.oid'], name=op.f('overtime_day_off_links_day_off_oid_fkey')),
     sa.ForeignKeyConstraint(['overtime_oid'], ['overtimes.oid'], name=op.f('overtime_day_off_links_overtime_oid_fkey')),
     sa.PrimaryKeyConstraint('oid', name=op.f('pk__overtime_day_off_links'))

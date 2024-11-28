@@ -5,6 +5,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from models.user import Role, User
 from core.session import get_async_session
+from src.api.v1.auth.permissions import RoleRequired
 from api.v1.auth.dependencies import get_current_user
 from .service import UserService
 from .schemas import (
@@ -14,7 +15,7 @@ from .schemas import (
     UserUpdatePartial,
     UserUpdate,
 )
-from .dependencies import get_current_superuser, user_by_oid
+from .dependencies import user_by_oid
 
 
 router = APIRouter(
@@ -26,7 +27,7 @@ router = APIRouter(
 @router.post(
     "/register",
     response_model=UserOut,
-    dependencies=[Depends(get_current_superuser)],
+    dependencies=[Depends(RoleRequired(Role.SUPERUSER))],
     status_code=status.HTTP_201_CREATED,
     name="users:register",
     description="Create user",
@@ -45,7 +46,7 @@ async def register(
 @router.get(
     "/",
     response_model=List[UserOut],
-    dependencies=[Depends(get_current_superuser)],
+    dependencies=[Depends(RoleRequired(Role.SUPERUSER, Role.MODERATOR))],
     status_code=status.HTTP_200_OK,
     name="users:get_all",
     description="Get all users with filters and pagination",
@@ -63,7 +64,7 @@ async def get_all(
 @router.get(
     "/me",
     response_model=UserOut,
-    dependencies=[Depends(get_current_user)],
+    dependencies=[Depends(RoleRequired(Role.SUPERUSER, Role.MODERATOR))],
     status_code=status.HTTP_200_OK,
     name="users:me",
     description="Get current user",
@@ -80,7 +81,7 @@ async def get_me(
 @router.get(
     "/{oid}",
     response_model=UserOut,
-    dependencies=[Depends(get_current_superuser)],
+    dependencies=[Depends(RoleRequired(Role.SUPERUSER))],
     status_code=status.HTTP_200_OK,
     name="users:get_one",
     description="Get one user by id",
@@ -94,7 +95,7 @@ async def get_one(
 @router.patch(
     "/{oid}",
     response_model=UserOut,
-    dependencies=[Depends(get_current_superuser)],
+    dependencies=[Depends(RoleRequired(Role.SUPERUSER))],
     status_code=status.HTTP_200_OK,
     name="users:modify",
     description="Modify user by id",
@@ -118,7 +119,7 @@ async def modify(
 @router.put(
     "/{oid}",
     response_model=UserOut,
-    dependencies=[Depends(get_current_superuser)],
+    dependencies=[Depends(RoleRequired(Role.SUPERUSER))],
     status_code=status.HTTP_200_OK,
     name="users:replace",
     description="Replace user by id",
@@ -140,7 +141,7 @@ async def replace(
 
 @router.delete(
     "/{oid}",
-    dependencies=[Depends(get_current_superuser)],
+    dependencies=[Depends(RoleRequired(Role.SUPERUSER))],
     status_code=status.HTTP_204_NO_CONTENT,
     name="users:delete",
     description="Delete user by id",
@@ -157,7 +158,7 @@ async def delete(
 
 @router.post(
     "/toggle-role/{oid}",
-    dependencies=[Depends(get_current_superuser)],
+    dependencies=[Depends(RoleRequired(Role.SUPERUSER))],
     response_model=UserOut,
     status_code=status.HTTP_200_OK,
     name="users:toggle-role",

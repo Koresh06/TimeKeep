@@ -3,12 +3,12 @@ from fastapi import APIRouter, Depends, status
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from core.session import get_async_session
-from models import Department
+from models import Department, Role
+from api.v1.auth.permissions import RoleRequired
 from .schemas import DepartmentOut, DepartmentCreate, DepartmentUpdatePartil
 from .service import DepartmentService
 from .dependencies import department_by_oid
 
-from ..user.dependencies import get_current_superuser
 
 router = APIRouter(
     prefix="/department",
@@ -20,12 +20,17 @@ router = APIRouter(
     "/",
     response_model=DepartmentOut,
     status_code=status.HTTP_201_CREATED,
-    dependencies=[Depends(get_current_superuser)],
+    dependencies=[
+        Depends(RoleRequired(Role.SUPERUSER)),
+    ],
     name="department:create",
     description="Create department",
 )
 async def create_department(
-    session: Annotated[AsyncSession, Depends(get_async_session)],
+    session: Annotated[
+        AsyncSession,
+        Depends(get_async_session),
+    ],
     department_create: DepartmentCreate,
 ):
     return await DepartmentService(session).create(department_create=department_create)
@@ -35,11 +40,15 @@ async def create_department(
     "/",
     response_model=List[DepartmentOut],
     status_code=status.HTTP_200_OK,
+    dependencies=[Depends(RoleRequired([Role.SUPERUSER, Role.MODERATOR, Role.USER]))],
     name="department:get_all",
     description="Get all departments",
 )
 async def get_all_departments(
-    session: Annotated[AsyncSession, Depends(get_async_session)],
+    session: Annotated[
+        AsyncSession,
+        Depends(get_async_session),
+    ],
 ):
     return await DepartmentService(session).get_all()
 
@@ -48,6 +57,7 @@ async def get_all_departments(
     "/{oid}",
     response_model=DepartmentOut,
     status_code=status.HTTP_200_OK,
+    dependencies=[Depends(RoleRequired([Role.SUPERUSER, Role.MODERATOR]))],
     name="department:get_one",
     description="Get one department by id",
 )
@@ -59,7 +69,7 @@ async def get_one_department(department: Department = Depends(department_by_oid)
     "/{oid}",
     response_model=DepartmentOut,
     status_code=status.HTTP_200_OK,
-    dependencies=[Depends(get_current_superuser)],
+    dependencies=[Depends(RoleRequired(Role.SUPERUSER))],
     name="department:modify",
     description="Modify department by id",
 )
@@ -79,7 +89,7 @@ async def modify_department(
     "/{oid}",
     response_model=DepartmentOut,
     status_code=status.HTTP_200_OK,
-    dependencies=[Depends(get_current_superuser)],
+    dependencies=[Depends(RoleRequired(Role.SUPERUSER))],
     name="department:replace",
     description="Replace department by id",
 )
@@ -97,7 +107,7 @@ async def replace_department(
 @router.delete(
     "/{oid}",
     status_code=status.HTTP_204_NO_CONTENT,
-    dependencies=[Depends(get_current_superuser)],
+    dependencies=[Depends(RoleRequired(Role.SUPERUSER))],
     name="department:delete",
     description="Delete department by id",
 )

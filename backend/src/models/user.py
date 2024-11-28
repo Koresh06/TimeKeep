@@ -18,6 +18,7 @@ if TYPE_CHECKING:
 class Role(Enum):
     USER = "user"
     MODERATOR = "moderator"
+    SUPERUSER = "superuser"
 
 
 class User(Base):
@@ -31,7 +32,6 @@ class User(Base):
     hashed_password: Mapped[str] = mapped_column(String(255), nullable=False)
     position: Mapped[str] = mapped_column(String(255), nullable=False)
     is_active: Mapped[bool] = mapped_column(Boolean, default=True)
-    is_superuser: Mapped[bool] = mapped_column(Boolean, default=False)
     create_at: Mapped[datetime] = mapped_column(DateTime, server_default=func.now())
     update_at: Mapped[datetime] = mapped_column(DateTime, server_default=func.now(), onupdate=func.now())
 
