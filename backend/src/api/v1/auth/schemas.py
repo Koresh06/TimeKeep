@@ -1,11 +1,7 @@
-from datetime import datetime
 import uuid
-from typing import Optional
-from fastapi import Request, Form
-from pydantic import BaseModel, Field
+from fastapi import Form
+from pydantic import BaseModel
 
-from models.user import Role
-from .security import get_password_hash
 
 
 class Token(BaseModel):

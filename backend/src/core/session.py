@@ -1,19 +1,13 @@
 from typing import AsyncGenerator
-from fastapi import Depends
 from sqlalchemy.ext.asyncio import (
     AsyncSession,
     async_sessionmaker,
     create_async_engine,
-    AsyncEngine,
 )
-import contextlib
-from typing import AsyncIterator
-from sqlalchemy.exc import DatabaseError
 
 
 from core.config import settings
 
-from models import User
 
 
 engine = create_async_engine(

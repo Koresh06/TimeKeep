@@ -3,7 +3,7 @@ import uuid
 from typing import List, Optional
 from fastapi import HTTPException
 from sqlalchemy import select, Result
-from sqlalchemy.exc import IntegrityError, SQLAlchemyError
+from sqlalchemy.exc import SQLAlchemyError
 
 from core.repo.base import BaseRepo
 from models import Department

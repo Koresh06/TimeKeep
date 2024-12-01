@@ -1,4 +1,3 @@
-from datetime import datetime, timedelta, timezone
 from typing import Annotated
 from jose import jwt, JWTError
 from fastapi import Depends, HTTPException, Security, Request, status
@@ -7,7 +6,6 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from core.config import settings
 from core.session import get_async_session
-from .security import verify_password
 
 from models import User
 from .service import AuthService

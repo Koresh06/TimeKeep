@@ -1,23 +1,16 @@
 import asyncio
-import logging
 from typing import AsyncGenerator
-import pytest
-from sqlalchemy.ext.asyncio import AsyncSession, AsyncConnection, create_async_engine
+from sqlalchemy.ext.asyncio import AsyncSession, create_async_engine
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy.pool import NullPool
 import pytest_asyncio
 from httpx import ASGITransport, AsyncClient
 from asgi_lifespan import LifespanManager
-from src.api.v1.department.schemas import DepartmentCreate
-from src.api.v1.user.schemas import UserCreate
-from src.api.v1.user.service import UserService
-from src.api.v1.department.service import DepartmentService
 from src.main import app
-from src.models import Base, User
+from src.models import Base
 from src.core.session import get_async_session
 from src.core.config import settings
 
-from src.models import Department
 
 
 @pytest_asyncio.fixture(loop_scope="session", scope="session")

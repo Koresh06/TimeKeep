@@ -8,8 +8,6 @@ from core.session import get_async_session
 from models import User
 
 from .service import UserService
-from .schemas import UserOut
-from ..auth.dependencies import get_current_user
 
 
 

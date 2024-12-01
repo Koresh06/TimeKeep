@@ -1,11 +1,7 @@
-import pytest
 from httpx import AsyncClient
-from fastapi import status
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from src.models import Department
-from src.api.v1.auth.schemas import Token
-from src.api.v1.auth.service import AuthService
 from src.api.v1.user.service import UserService
 
 

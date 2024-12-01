@@ -10,7 +10,7 @@ class UserBase(BaseModel):
     username: str
     full_name: str
     position: str
-    role: Role = Role.USER
+    role: str | None = Field(default=Role.USER.value)
 
 
 class UserCreate(UserBase):

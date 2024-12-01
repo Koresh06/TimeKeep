@@ -14,7 +14,6 @@ from src.models.user import Role
 async def create_superuser() -> None:
     async with async_session_maker() as session:  
         print("Создание суперпользователя")
-        email = "superuser@example.com"
         
         # Проверка пароля
         while True:

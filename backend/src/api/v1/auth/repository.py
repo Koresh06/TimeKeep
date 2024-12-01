@@ -1,6 +1,6 @@
 import uuid
 
-from typing import List, Optional
+from typing import Optional
 from sqlalchemy.future import select
 
 from core.repo.base import BaseRepo

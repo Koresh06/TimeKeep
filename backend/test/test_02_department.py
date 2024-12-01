@@ -1,8 +1,4 @@
-from httpx import AsyncClient
-from sqlalchemy.ext.asyncio import AsyncSession
-import pytest
 
-from src.models.department import Department
 
 
 # async def test_create_department(async_client: AsyncClient, async_db_session: AsyncSession):

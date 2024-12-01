@@ -1,11 +1,10 @@
 from typing import Annotated, List
-import uuid
 from fastapi import APIRouter, Depends, Query, status
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from models.user import Role, User
 from core.session import get_async_session
-from src.api.v1.auth.permissions import RoleRequired
+from api.v1.auth.permissions import RoleRequired
 from api.v1.auth.dependencies import get_current_user
 from .service import UserService
 from .schemas import (
@@ -46,7 +45,7 @@ async def register(
 @router.get(
     "/",
     response_model=List[UserOut],
-    dependencies=[Depends(RoleRequired(Role.SUPERUSER, Role.MODERATOR))],
+    dependencies=[Depends(RoleRequired([Role.SUPERUSER, Role.MODERATOR]))],
     status_code=status.HTTP_200_OK,
     name="users:get_all",
     description="Get all users with filters and pagination",
@@ -64,7 +63,7 @@ async def get_all(
 @router.get(
     "/me",
     response_model=UserOut,
-    dependencies=[Depends(RoleRequired(Role.SUPERUSER, Role.MODERATOR))],
+    dependencies=[Depends(RoleRequired([Role.SUPERUSER, Role.MODERATOR]))],
     status_code=status.HTTP_200_OK,
     name="users:me",
     description="Get current user",
