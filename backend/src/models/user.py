@@ -21,6 +21,12 @@ class Role(Enum):
     SUPERUSER = "superuser"
 
 
+class WorkSchedule(Enum):
+    DAILY = "daily"     # Ежедневники
+    SHIFT = "shift"     # Сменники
+
+
+
 class User(Base):
     __tablename__ = "users"
     
@@ -29,6 +35,7 @@ class User(Base):
     username: Mapped[str] = mapped_column(String(255), unique=True, nullable=False)
     full_name: Mapped[str] = mapped_column(String(255), nullable=False)
     role: Mapped[Role] = mapped_column(SQLAlchemyEnum(Role), default=Role.USER)
+    work_schedule: Mapped[WorkSchedule] = mapped_column(SQLAlchemyEnum(WorkSchedule))
     hashed_password: Mapped[str] = mapped_column(String(255), nullable=False)
     position: Mapped[str] = mapped_column(String(255), nullable=False)
     is_active: Mapped[bool] = mapped_column(Boolean, default=True)

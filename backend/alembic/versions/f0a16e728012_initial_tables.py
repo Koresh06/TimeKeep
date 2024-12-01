@@ -1,8 +1,8 @@
 """Initial tables
 
-Revision ID: e93964efefb1
+Revision ID: f0a16e728012
 Revises: 
-Create Date: 2024-11-28 21:26:42.360215
+Create Date: 2024-12-01 22:46:26.007019
 
 """
 from typing import Sequence, Union
@@ -12,7 +12,7 @@ import sqlalchemy as sa
 
 
 # revision identifiers, used by Alembic.
-revision: str = 'e93964efefb1'
+revision: str = 'f0a16e728012'
 down_revision: Union[str, None] = None
 branch_labels: Union[str, Sequence[str], None] = None
 depends_on: Union[str, Sequence[str], None] = None
@@ -35,6 +35,7 @@ def upgrade() -> None:
     sa.Column('username', sa.String(length=255), nullable=False),
     sa.Column('full_name', sa.String(length=255), nullable=False),
     sa.Column('role', sa.Enum('USER', 'MODERATOR', 'SUPERUSER', name='role'), nullable=False),
+    sa.Column('work_schedule', sa.Enum('DAILY', 'SHIFT', name='workschedule'), nullable=False),
     sa.Column('hashed_password', sa.String(length=255), nullable=False),
     sa.Column('position', sa.String(length=255), nullable=False),
     sa.Column('is_active', sa.Boolean(), nullable=False),
@@ -47,7 +48,7 @@ def upgrade() -> None:
     op.create_table('day_offs',
     sa.Column('oid', sa.UUID(), nullable=False),
     sa.Column('user_oid', sa.UUID(), nullable=False),
-    sa.Column('date', sa.DateTime(), nullable=False),
+    sa.Column('o_date', sa.Date(), nullable=False),
     sa.Column('reason', sa.String(length=500), nullable=False),
     sa.Column('is_approved', sa.Boolean(), nullable=False),
     sa.Column('create_at', sa.DateTime(), server_default=sa.text('now()'), nullable=False),
@@ -60,7 +61,9 @@ def upgrade() -> None:
     sa.Column('user_oid', sa.UUID(), nullable=False),
     sa.Column('o_date', sa.Date(), nullable=False),
     sa.Column('hours', sa.Integer(), nullable=False),
+    sa.Column('remaining_hours', sa.Integer(), nullable=False),
     sa.Column('description', sa.String(length=500), nullable=False),
+    sa.Column('is_used', sa.Boolean(), nullable=False),
     sa.Column('create_at', sa.DateTime(), server_default=sa.text('now()'), nullable=False),
     sa.Column('update_at', sa.DateTime(), server_default=sa.text('now()'), nullable=False),
     sa.ForeignKeyConstraint(['user_oid'], ['users.oid'], name=op.f('overtimes_user_oid_fkey')),

@@ -8,7 +8,7 @@ from getpass import getpass
 from src.core.session import async_session_maker
 from src.api.v1.user.service import UserService
 from src.api.v1.user.schemas import UserCreate
-from src.models.user import Role
+from src.models.user import Role, WorkSchedule
 
 
 async def create_superuser() -> None:
@@ -27,6 +27,7 @@ async def create_superuser() -> None:
         full_name = "Superuser"
         position = "superuser"
         role = Role.SUPERUSER.value
+        work_schedule = WorkSchedule.DAILY.value
 
         # Проверяем, существует ли пользователь
         super_user = await UserService(session).create_superuser(
@@ -35,6 +36,7 @@ async def create_superuser() -> None:
                 full_name=full_name,
                 position=position,
                 role=role,
+                work_schedule=work_schedule,
                 password=password,
             )
         )

@@ -14,7 +14,7 @@ class PaginatedResponse(BaseModel, Generic[M]):
 class OvertimeBase(BaseModel):
     user_oid: uuid.UUID
     o_date: date
-    hours: int
+    hours: int = Field(..., ge=1, le=24) 
     description: str | None
 
 

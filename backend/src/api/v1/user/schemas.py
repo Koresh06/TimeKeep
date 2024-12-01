@@ -2,7 +2,7 @@ from datetime import datetime
 import uuid
 from pydantic import BaseModel, ConfigDict, Field, field_validator
 
-from models.user import Role
+from models import Role, WorkSchedule
 
 
 class UserBase(BaseModel):
@@ -10,7 +10,8 @@ class UserBase(BaseModel):
     username: str
     full_name: str
     position: str
-    role: str | None = Field(default=Role.USER.value)
+    role: Role = Field(..., description="User role: 'user', 'moderator', 'superuser'")
+    work_schedule: WorkSchedule = Field(..., description="Work schedule type: 'daily' or 'shift'")
 
 
 class UserCreate(UserBase):
