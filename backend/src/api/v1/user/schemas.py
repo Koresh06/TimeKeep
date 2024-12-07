@@ -40,7 +40,6 @@ class UserUpdatePartial(UserUpdate):
 class UserOut(UserBase):
     oid: uuid.UUID
     is_active: bool
-    is_superuser: bool
     create_at: datetime
     update_at: datetime
 

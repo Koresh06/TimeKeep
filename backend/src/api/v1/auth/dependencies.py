@@ -26,6 +26,13 @@ async def get_current_user(
         detail="Could not validate credentials",
         headers={"WWW-Authenticate": "Bearer"},
     )
+    not_authenticated = HTTPException(
+        status_code=status.HTTP_401_UNAUTHORIZED,
+        detail="Not authenticated",
+        headers={"WWW-Authenticate": "Bearer"},
+    )
+    if not token:
+        raise not_authenticated
     try:
         payload = jwt.decode(token, settings.api.secret_key, algorithms=[ALGORITHM])
         token_data = TokenPayload(**payload)
