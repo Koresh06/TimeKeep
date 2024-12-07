@@ -9,6 +9,7 @@ from models import User
 
 class AuthRepository(BaseRepo):
 
+
     async def get_user_by_username(self, username: str) -> Optional[User]:
         stmt = select(User).where(User.username == username)
         result = await self.session.scalar(stmt)
@@ -19,6 +20,7 @@ class AuthRepository(BaseRepo):
         stmt = select(User).where(User.oid == user_oid)
         result = await self.session.scalar(stmt)
         return result
+
     
 
     

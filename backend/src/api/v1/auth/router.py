@@ -8,8 +8,8 @@ from models import User
 from core.session import get_async_session
 from core.config import settings
 
+from api.v1.auth.dependencies import get_current_user
 from .schemas import Token, LoginForm
-from .dependencies import get_current_user
 from .service import AuthService
 
 

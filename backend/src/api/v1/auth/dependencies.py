@@ -18,7 +18,6 @@ cookie_scheme = APIKeyCookie(name="access_token", auto_error=False)
 
 
 async def get_current_user(
-    request: Request,
     session: Annotated[AsyncSession, Depends(get_async_session)],
     token: Annotated[str, Security(cookie_scheme)],
 ):
@@ -30,7 +29,6 @@ async def get_current_user(
     try:
         payload = jwt.decode(token, settings.api.secret_key, algorithms=[ALGORITHM])
         token_data = TokenPayload(**payload)
-
     except (JWTError, KeyError):
         raise credentials_exception
 
