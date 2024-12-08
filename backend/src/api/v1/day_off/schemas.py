@@ -1,6 +1,17 @@
+from typing import List, TypeVar, Generic
 import uuid
-from pydantic import BaseModel, ConfigDict
+from pydantic import BaseModel, ConfigDict, Field
 from datetime import date
+
+from api.v1.user.schemas import UserOut
+
+
+M = TypeVar('M')
+
+class PaginatedResponse(BaseModel, Generic[M]):
+    count: int = Field(description='Number of items returned in the response')
+    items: List[M] = Field(description='List of items returned in the response following given criteria')
+
 
 
 class DayOffBase(BaseModel):
@@ -22,6 +33,12 @@ class DayOffUpdate(DayOffBase):
 
 class DayOffOut(DayOffBase):
     oid: uuid.UUID
+
+    model_config = ConfigDict(from_attributes=True)
+
+
+class DayOffExtendedOut(DayOffOut):
+    user: UserOut
 
     model_config = ConfigDict(from_attributes=True)
 

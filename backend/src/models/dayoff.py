@@ -28,4 +28,4 @@ class DayOff(Base):
 
 
     def __repr__(self):
-        return f"DayOff({self.oid}, {self.user_oid}, {self.date} {self.reason}, {self.is_approved}, {self.create_at}, {self.update_at})"
+        return f"DayOff({self.oid}, {self.user_oid}, {self.o_date}, {self.reason}, {self.is_approved}, {self.create_at}, {self.update_at})"
