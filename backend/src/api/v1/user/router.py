@@ -63,7 +63,7 @@ async def get_all(
 @router.get(
     "/me",
     response_model=UserOut,
-    dependencies=[Depends(RoleRequired([Role.SUPERUSER, Role.MODERATOR]))],
+    dependencies=[Depends(RoleRequired([Role.SUPERUSER, Role.MODERATOR, Role.USER]))],
     status_code=status.HTTP_200_OK,
     name="users:me",
     description="Get current user",
@@ -80,7 +80,7 @@ async def get_me(
 @router.get(
     "/{oid}",
     response_model=UserOut,
-    dependencies=[Depends(RoleRequired(Role.SUPERUSER))],
+    dependencies=[Depends(RoleRequired([Role.SUPERUSER, Role.MODERATOR]))],
     status_code=status.HTTP_200_OK,
     name="users:get_one",
     description="Get one user by id",

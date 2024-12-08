@@ -6,7 +6,7 @@ from models import Role, WorkSchedule
 
 
 class UserBase(BaseModel):
-    department_oid: uuid.UUID = None
+    department_oid: uuid.UUID | None = None
     username: str
     full_name: str
     position: str
@@ -30,6 +30,7 @@ class UserUpdate(UserBase):
     full_name: str | None = None
     position: str | None = None
     role: Role | None = None
+    work_schedule: WorkSchedule | None = None
 
 
 class UserUpdatePartial(UserUpdate):

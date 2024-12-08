@@ -1,6 +1,6 @@
 from typing import Annotated
 from jose import jwt, JWTError
-from fastapi import Depends, HTTPException, Security, Request, status
+from fastapi import Depends, HTTPException, Security, status
 from fastapi.security import APIKeyCookie
 from sqlalchemy.ext.asyncio import AsyncSession
 

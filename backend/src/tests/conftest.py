@@ -9,7 +9,7 @@ from asgi_lifespan import LifespanManager
 from main import app
 from core.session import get_async_session
 from core.config import settings
-from models import Base, Role, WorkSchedule, User, Department
+from models import Base, Role, WorkSchedule, Department
 from api.v1.user.service import UserService
 from api.v1.user.schemas import UserCreate
 from api.v1.auth.jwt import create_access_token
@@ -20,6 +20,7 @@ async def loop():
     loop = asyncio.get_event_loop()
     yield loop
     loop.close()
+
 
 @pytest_asyncio.fixture(scope="function")
 async def engine():
@@ -32,6 +33,7 @@ async def engine():
     yield engine
     await engine.dispose()
 
+
 @pytest_asyncio.fixture(scope="function")
 async def async_db_engine(engine):
     async with engine.begin() as conn:
@@ -42,6 +44,7 @@ async def async_db_engine(engine):
 
     async with engine.begin() as conn:
         await conn.run_sync(Base.metadata.drop_all)
+
 
 @pytest_asyncio.fixture(scope="function")
 async def async_db_session(async_db_engine):
@@ -69,7 +72,9 @@ async def async_client(async_db_session) -> AsyncGenerator[AsyncClient, None]:
     app.dependency_overrides[get_async_session] = override_get_db
 
     async with LifespanManager(app):
-        async with AsyncClient(transport=ASGITransport(app=app), base_url="http://localhost") as client:
+        async with AsyncClient(
+            transport=ASGITransport(app=app), base_url="http://localhost"
+        ) as client:
             yield client
 
 
@@ -87,7 +92,7 @@ async def test_superuser(async_client: AsyncClient, async_db_session: AsyncSessi
     )
     token = create_access_token(data={"user_oid": str(superuser.oid)})
     async_client.cookies.set("access_token", token)
-    return token
+    return superuser
 
 
 @pytest_asyncio.fixture(scope="function")
@@ -95,13 +100,15 @@ async def created_department(async_client: AsyncClient, test_superuser):
     token = async_client.cookies.get("access_token")
 
     headers = {"Authorization": f"Bearer {token}"}
-    
+
     department_data = {
         "name": "name 1",
         "description": "description 1",
     }
-    
-    response = await async_client.post("/department/", json=department_data, headers=headers)
+
+    response = await async_client.post(
+        "/department/", json=department_data, headers=headers
+    )
     assert response.status_code == 201
 
     department = response.json()
@@ -110,7 +117,11 @@ async def created_department(async_client: AsyncClient, test_superuser):
 
 
 @pytest_asyncio.fixture(scope="function")
-async def test_moderator(async_client: AsyncClient, async_db_session: AsyncSession, created_department: Department):
+async def test_moderator(
+    async_client: AsyncClient,
+    async_db_session: AsyncSession,
+    created_department: Department,
+):
     moderator = await UserService(async_db_session).create(
         UserCreate(
             department_oid=created_department.get("oid"),
@@ -124,11 +135,15 @@ async def test_moderator(async_client: AsyncClient, async_db_session: AsyncSessi
     )
     token = create_access_token(data={"user_oid": str(moderator.oid)})
     async_client.cookies.set("access_token", token)
-    return token
+    return moderator
 
 
 @pytest_asyncio.fixture(scope="function")
-async def test_user(async_client: AsyncClient, async_db_session: AsyncSession, created_department: Department):
+async def test_user(
+    async_client: AsyncClient,
+    async_db_session: AsyncSession,
+    created_department: Department,
+):
     user = await UserService(async_db_session).create(
         UserCreate(
             department_oid=created_department.get("oid"),
@@ -142,4 +157,4 @@ async def test_user(async_client: AsyncClient, async_db_session: AsyncSession, c
     )
     token = create_access_token(data={"user_oid": str(user.oid)})
     async_client.cookies.set("access_token", token)
-    return token
+    return user
