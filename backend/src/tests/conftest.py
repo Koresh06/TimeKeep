@@ -60,6 +60,7 @@ async def async_db_session(async_db_engine):
             await session.rollback()
             await session.close()
 
+
 @pytest_asyncio.fixture(scope="function")
 async def async_client(async_db_session) -> AsyncGenerator[AsyncClient, None]:
     def override_get_db() -> Iterator[AsyncSession]:
@@ -70,6 +71,7 @@ async def async_client(async_db_session) -> AsyncGenerator[AsyncClient, None]:
     async with LifespanManager(app):
         async with AsyncClient(transport=ASGITransport(app=app), base_url="http://localhost") as client:
             yield client
+
 
 @pytest_asyncio.fixture(scope="function")
 async def test_superuser(async_client: AsyncClient, async_db_session: AsyncSession):
