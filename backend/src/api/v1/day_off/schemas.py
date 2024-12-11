@@ -30,6 +30,10 @@ class DayOffUpdate(DayOffBase):
     reason: str | None = None
 
 
+class DayOffUpdatePartil(DayOffUpdate):
+    pass
+
+
 
 class DayOffOut(DayOffBase):
     oid: uuid.UUID

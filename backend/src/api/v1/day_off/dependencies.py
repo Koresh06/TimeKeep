@@ -7,20 +7,24 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from core.session import get_async_session
 from models import DayOff, User
 from .service import DayOffService
-from .schemas import DayOffOut, DayOffExtendedOut
 from api.v1.auth.dependencies import get_current_user
+from .errors import DayOffNotFoundError
 
 
 async def day_off_by_oid(
     oid: Annotated[uuid.UUID, Path],
     session: Annotated[AsyncSession, Depends(get_async_session)],
     current_user: User = Depends(get_current_user),
-) -> DayOffOut | DayOffExtendedOut:
-    day_off = await DayOffService(session).get_one(current_user=current_user, oid=oid)
-    if day_off is not None:
+) -> DayOff:
+    try:
+        day_off = await DayOffService(session).get_day_off_oid(current_user=current_user, oid=oid)
+        if not day_off:
+            raise DayOffNotFoundError(oid)
+
         return day_off
 
-    raise HTTPException(
-        status_code=status.HTTP_404_NOT_FOUND,
-        detail=f"Day off {oid} not found!",
-    )
+    except DayOffNotFoundError as e:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=f"Day off with oid {oid} not found",
+        )

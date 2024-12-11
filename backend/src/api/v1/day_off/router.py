@@ -1,11 +1,19 @@
 from typing import Annotated, List
-from fastapi import APIRouter, Depends, Query, status
+import uuid
+from fastapi import APIRouter, Depends, Path, Query, status
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from core.session import get_async_session
-from models import User, Role
+from models import User, Role, DayOff
 
-from .schemas import DayOffOut, DayOffCreate, DayOffExtendedOut, PaginatedResponse
+from .schemas import (
+    DayOffOut,
+    DayOffCreate,
+    DayOffExtendedOut,
+    PaginatedResponse,
+    DayOffUpdate,
+    DayOffUpdatePartil,
+)
 from .service import DayOffService
 from api.v1.auth.dependencies import get_current_user
 from api.v1.auth.permissions import RoleRequired
@@ -48,7 +56,7 @@ async def create_day_off(
     name="day_off:get_all",
     description="Get all day offs",
 )
-async def get_all_day_offs_superuser(
+async def get_all_day_offs(
     session: Annotated[
         AsyncSession,
         Depends(get_async_session),
@@ -73,6 +81,28 @@ async def get_all_day_offs_superuser(
     description="Get one day off by id",
 )
 async def get_one_day_off(
-    day_off: DayOffOut | DayOffExtendedOut = Depends(day_off_by_oid),
+    oid: Annotated[uuid.UUID, Path],
+    session: Annotated[AsyncSession, Depends(get_async_session)],
+    current_user: User = Depends(get_current_user),
 ):
-    return day_off
+    return await DayOffService(session).get_one(current_user=current_user, oid=oid)
+
+
+@router.patch(
+    "/{oid}",
+    response_model=DayOffOut,
+    status_code=status.HTTP_200_OK,
+    dependencies=[Depends(RoleRequired([Role.SUPERUSER, Role.MODERATOR]))],
+    name="day_off:modify",
+    description="Modify day off by id",
+)
+async def modify_day_off(
+    session: Annotated[AsyncSession, Depends(get_async_session)],
+    day_off_update: DayOffUpdatePartil,
+    day_off: DayOff = Depends(day_off_by_oid),
+):
+    return await DayOffService(session).modify(
+        day_off=day_off,
+        day_off_update=day_off_update,
+        partil=True,
+    )

@@ -1,9 +1,17 @@
 from typing import List
+import uuid
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from models import Overtime, User, OvertimeDayOffLink, Role
 from .repository import DayOffRepository
-from .schemas import DayOffCreate, DayOffOut, DayOffExtendedOut, PaginatedResponse
+from .schemas import (
+    DayOffCreate,
+    DayOffOut,
+    DayOffExtendedOut,
+    PaginatedResponse,
+    DayOffUpdatePartil,
+    DayOffUpdate,
+)
 from .overtime_allocator import OvertimeAllocator
 from .work_schedule_calculator import WorkScheduleCalculator
 from api.v1.user.schemas import UserOut
@@ -58,10 +66,10 @@ class DayOffService:
         return DayOffOut.model_validate(new_day_off)
 
     async def get_all(
-    self,
-    current_user: User,
-    limit: int,
-    offset: int,
+        self,
+        current_user: User,
+        limit: int,
+        offset: int,
     ) -> PaginatedResponse[DayOffOut | DayOffExtendedOut]:
         day_offs = await self.repository.get_all(
             current_user=current_user,
@@ -70,10 +78,10 @@ class DayOffService:
         )
         if current_user.role == Role.USER:
             day_offs_data = [
-                DayOffOut.model_validate(day_off).model_dump() for day_off  in day_offs
+                DayOffOut.model_validate(day_off).model_dump() for day_off in day_offs
             ]
-            return PaginatedResponse(count=len(day_offs_data),  items=day_offs_data)
-    
+            return PaginatedResponse(count=len(day_offs_data), items=day_offs_data)
+
         else:
             extended_day_offs_data = [
                 DayOffExtendedOut.model_validate(
@@ -84,11 +92,27 @@ class DayOffService:
                 )
                 for day_off in day_offs
             ]
-            return PaginatedResponse(count=len(extended_day_offs_data), items=extended_day_offs_data)
-    
-    
-    async def get_one(self, current_user: User, oid: int) -> DayOffOut | DayOffExtendedOut:
-        day_off: DayOff = await self.repository.get_one(current_user=current_user, oid=oid)
+            return PaginatedResponse(
+                count=len(extended_day_offs_data), items=extended_day_offs_data
+            )
+
+    async def get_day_off_oid(
+        self,
+        current_user: User,
+        oid: uuid.UUID,
+    ) -> DayOff:
+        day_off: DayOff = await self.repository.get_day_off_oid(
+            current_user=current_user,
+            oid=oid,
+        )
+        return day_off
+
+    async def get_one(
+        self, current_user: User, oid: int
+    ) -> DayOffOut | DayOffExtendedOut:
+        day_off: DayOff = await self.repository.get_one(
+            current_user=current_user, oid=oid
+        )
         if current_user.role == Role.USER:
             return DayOffOut.model_validate(day_off)
         else:
@@ -98,3 +122,16 @@ class DayOffService:
                     "user": UserOut.model_validate(day_off.user_rel).model_dump(),
                 }
             )
+
+    async def modify(
+        self,
+        day_off: DayOff,
+        day_off_update: DayOffUpdatePartil,
+        partil: bool,
+    ) -> DayOffOut:
+        day_off = await self.repository.update(
+            day_off=day_off,
+            day_off_update=day_off_update,
+            partil=partil,
+        )
+        return DayOffOut.model_validate(day_off)
