@@ -67,7 +67,6 @@ class DayOffService:
             limit=limit,
             offset=offset,
         )
-    
         if current_user.role == Role.USER:
             day_offs_data = [
                 DayOffOut.model_validate(day_off).model_dump() for day_off  in day_offs

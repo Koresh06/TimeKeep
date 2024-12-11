@@ -71,22 +71,25 @@ class DayOffRepository(BaseRepo):
     ) -> List[DayOff]:
         """Получение всех отгулов."""
         try:
-            stmt = (
-                select(DayOff)
-                .join(User)
-                .options(joinedload(DayOff.user_rel))
-                .limit(limit)
-                .offset(offset)
-            )
+            stmt = select(DayOff).limit(limit).offset(offset)
 
-            if current_user == Role.USER:
+            if current_user.role == Role.USER:
                 stmt = stmt.where(DayOff.user_oid == current_user.oid)
 
-            if current_user.role == Role.MODERATOR:
-                stmt = stmt.where(User.department_oid == current_user.department_oid)
+            elif current_user.role == Role.MODERATOR:
+                stmt = (
+                    stmt
+                    .join(User)
+                    .where(User.department_oid == current_user.department_oid)
+                    .options(joinedload(DayOff.user_rel))
+                )
+
+            elif current_user.role == Role.SUPERUSER:
+                stmt = stmt.options(joinedload(DayOff.user_rel))
 
             day_offs = await self.session.scalars(stmt)
 
             return day_offs
         except SQLAlchemyError as e:
             raise HTTPException(status_code=500, detail=f"Database error: {str(e)}")
+

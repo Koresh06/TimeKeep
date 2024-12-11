@@ -40,12 +40,12 @@ async def create_day_off(
 
 
 @router.get(
-    "/superuser",
-    response_model=PaginatedResponse[DayOffExtendedOut],
+    "/",
+    response_model=PaginatedResponse[DayOffOut | DayOffExtendedOut],
     status_code=status.HTTP_200_OK,
-    dependencies=[Depends(RoleRequired([Role.SUPERUSER]))],
-    name="day_off:get_all_superuser",
-    description="Get all day offs for superuser",
+    dependencies=[Depends(RoleRequired([Role.SUPERUSER, Role.MODERATOR, Role.USER]))],
+    name="day_off:get_all",
+    description="Get all day offs",
 )
 async def get_all_day_offs_superuser(
     session: Annotated[
@@ -63,49 +63,4 @@ async def get_all_day_offs_superuser(
     )
 
 
-@router.get(
-    "/moderator",
-    response_model=PaginatedResponse[DayOffExtendedOut],
-    status_code=status.HTTP_200_OK,
-    dependencies=[Depends(RoleRequired([Role.MODERATOR]))],
-    name="day_off:get_all_moderator",
-    description="Get day offs for moderator within their department",
-)
-async def get_all_day_offs_moderator(
-    session: Annotated[
-        AsyncSession,
-        Depends(get_async_session),
-    ], 
-    current_user: User = Depends(get_current_user),
-    limit: int = Query(10, ge=1, le=100),
-    offset: int = Query(0, ge=0),
-):
-    return await DayOffService(session).get_all(
-        current_user=current_user,
-        limit=limit,
-        offset=offset,
-    )
-    
 
-@router.get(
-    "/user",
-    response_model=PaginatedResponse[DayOffOut],
-    status_code=status.HTTP_200_OK,
-    dependencies=[Depends(RoleRequired([Role.USER]))],
-    name="day_off:get_all_user",
-    description="Get only user's own day offs",
-)
-async def get_all_day_offs_user(
-    session: Annotated[
-        AsyncSession,
-        Depends(get_async_session),
-    ], 
-    current_user: User = Depends(get_current_user),
-    limit: int = Query(10, ge=1, le=100),
-    offset: int = Query(0, ge=0),
-):
-    return await DayOffService(session).get_all(
-        current_user=current_user,
-        limit=limit,
-        offset=offset,
-    )
