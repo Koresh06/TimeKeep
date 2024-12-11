@@ -9,6 +9,7 @@ from .schemas import DayOffOut, DayOffCreate, DayOffExtendedOut, PaginatedRespon
 from .service import DayOffService
 from api.v1.auth.dependencies import get_current_user
 from api.v1.auth.permissions import RoleRequired
+from .dependencies import day_off_by_oid
 
 
 router = APIRouter(
@@ -63,4 +64,15 @@ async def get_all_day_offs_superuser(
     )
 
 
-
+@router.get(
+    "/{oid}",
+    response_model=DayOffOut | DayOffExtendedOut,
+    status_code=status.HTTP_200_OK,
+    dependencies=[Depends(RoleRequired([Role.SUPERUSER, Role.MODERATOR, Role.USER]))],
+    name="day_off:get_one",
+    description="Get one day off by id",
+)
+async def get_one_day_off(
+    day_off: DayOffOut | DayOffExtendedOut = Depends(day_off_by_oid),
+):
+    return day_off

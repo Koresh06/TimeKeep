@@ -7,6 +7,7 @@ from .schemas import DayOffCreate, DayOffOut, DayOffExtendedOut, PaginatedRespon
 from .overtime_allocator import OvertimeAllocator
 from .work_schedule_calculator import WorkScheduleCalculator
 from api.v1.user.schemas import UserOut
+from models import DayOff
 
 
 class DayOffService:
@@ -86,3 +87,14 @@ class DayOffService:
             return PaginatedResponse(count=len(extended_day_offs_data), items=extended_day_offs_data)
     
     
+    async def get_one(self, current_user: User, oid: int) -> DayOffOut | DayOffExtendedOut:
+        day_off: DayOff = await self.repository.get_one(current_user=current_user, oid=oid)
+        if current_user.role == Role.USER:
+            return DayOffOut.model_validate(day_off)
+        else:
+            return DayOffExtendedOut.model_validate(
+                {
+                    **DayOffOut.model_validate(day_off).model_dump(),
+                    "user": UserOut.model_validate(day_off.user_rel).model_dump(),
+                }
+            )

@@ -1,7 +1,7 @@
 import uuid
 
 from typing import List
-from fastapi import HTTPException
+from fastapi import HTTPException, status
 from sqlalchemy import select
 from sqlalchemy.orm import joinedload
 from sqlalchemy.exc import IntegrityError, SQLAlchemyError
@@ -10,6 +10,7 @@ from core.repo.base import BaseRepo
 from models import DayOff, Overtime, OvertimeDayOffLink, User, Role
 
 from .schemas import DayOffCreate
+from .errors import DayOffNotFoundError
 
 
 class DayOffRepository(BaseRepo):
@@ -63,20 +64,28 @@ class DayOffRepository(BaseRepo):
         except SQLAlchemyError as e:
             raise HTTPException(status_code=500, detail=f"Database error: {str(e)}")
 
-    async def get_all(
-        self,
-        current_user: User,
-        limit: int,
-        offset: int,
-    ) -> List[DayOff]:
-        """Получение всех отгулов."""
-        try:
-            stmt = select(DayOff).limit(limit).offset(offset)
-
-            if current_user.role == Role.USER:
+    async def _build_stmt_for_role(
+        self, 
+        current_user: User, 
+        stmt: select, 
+        oid: int = None
+    ) -> select:
+        """Общая логика для построения запроса в зависимости от роли пользователя."""
+        if current_user.role == Role.USER:
+            if oid:
+                stmt = stmt.where((DayOff.oid == oid) & (DayOff.user_oid == current_user.oid))
+            else:
                 stmt = stmt.where(DayOff.user_oid == current_user.oid)
 
-            elif current_user.role == Role.MODERATOR:
+        elif current_user.role == Role.MODERATOR:
+            if oid:
+                stmt = (
+                    stmt
+                    .join(User)
+                    .where((User.department_oid == current_user.department_oid) & (DayOff.oid == oid))
+                    .options(joinedload(DayOff.user_rel))
+                )
+            else:
                 stmt = (
                     stmt
                     .join(User)
@@ -84,12 +93,48 @@ class DayOffRepository(BaseRepo):
                     .options(joinedload(DayOff.user_rel))
                 )
 
-            elif current_user.role == Role.SUPERUSER:
+        elif current_user.role == Role.SUPERUSER:
+            if oid:
+                stmt = stmt.options(joinedload(DayOff.user_rel)).where(DayOff.oid == oid)
+            else:
                 stmt = stmt.options(joinedload(DayOff.user_rel))
 
-            day_offs = await self.session.scalars(stmt)
+        return stmt
 
+    async def get_all(
+        self, 
+        current_user: User, 
+        limit: int, 
+        offset: int
+    ) -> List[DayOff]:
+        """Получение всех отгулов."""
+        try:
+            stmt = select(DayOff).limit(limit).offset(offset)
+            stmt = await self._build_stmt_for_role(current_user, stmt)
+            
+            day_offs = await self.session.scalars(stmt)
             return day_offs
+
         except SQLAlchemyError as e:
             raise HTTPException(status_code=500, detail=f"Database error: {str(e)}")
 
+    async def get_one(self, current_user: User, oid: int) -> DayOff:
+        """Получение одного отгула."""
+        try:
+            stmt = select(DayOff)
+            stmt = await self._build_stmt_for_role(current_user, stmt, oid)
+
+            day_off = await self.session.scalar(stmt)
+
+            if not day_off:
+                raise DayOffNotFoundError(oid)
+
+            return day_off
+
+        except DayOffNotFoundError as e:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail=f"Day off with oid {oid} not found",
+            )
+        except SQLAlchemyError as e:
+            raise HTTPException(status_code=500, detail=f"Database error: {str(e)}")

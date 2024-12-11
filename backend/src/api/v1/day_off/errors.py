@@ -1,0 +1,3 @@
+
+class DayOffNotFoundError(Exception):
+    pass
