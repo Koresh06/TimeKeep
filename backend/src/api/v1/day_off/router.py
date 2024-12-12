@@ -100,8 +100,10 @@ async def modify_day_off(
     session: Annotated[AsyncSession, Depends(get_async_session)],
     day_off_update: DayOffUpdatePartil,
     day_off: DayOff = Depends(day_off_by_oid),
+    current_user: User = Depends(get_current_user),
 ):
     return await DayOffService(session).modify(
+        current_user=current_user,
         day_off=day_off,
         day_off_update=day_off_update,
         partil=True,
@@ -112,14 +114,34 @@ async def modify_day_off(
     "/{oid}",
     response_model=None,
     status_code=status.HTTP_204_NO_CONTENT,
-    dependencies=[Depends(RoleRequired([Role.SUPERUSER, Role.MODERATOR, Role.USER]))],
+    dependencies=[Depends(RoleRequired([Role.SUPERUSER, Role.MODERATOR]))],
     name="day_off:delete",
     description="Delete day off by id",
 )
 async def delete_day_off(
     session: Annotated[AsyncSession, Depends(get_async_session)],
     day_off: DayOff = Depends(day_off_by_oid),
+    current_user: User = Depends(get_current_user),
 ):
-    return await DayOffService(session).delete(day_off=day_off)
+    return await DayOffService(session).delete(current_user=current_user, day_off=day_off)
 
 
+@router.patch(
+    "/{oid}/approve",
+    response_model=DayOffOut,
+    status_code=status.HTTP_200_OK,
+    dependencies=[Depends(RoleRequired([Role.SUPERUSER, Role.MODERATOR]))],
+    name="day_off:approve",
+    description="Approve day off by id",
+)
+async def approve_day_off(
+    session: Annotated[AsyncSession, Depends(get_async_session)],
+    is_approved: bool,
+    day_off: DayOff = Depends(day_off_by_oid),
+    current_user: User = Depends(get_current_user),
+):
+    return await DayOffService(session).approve(
+        current_user=current_user,
+        day_off=day_off,
+        is_approved=is_approved,
+    )

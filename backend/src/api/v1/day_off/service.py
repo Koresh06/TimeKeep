@@ -123,11 +123,13 @@ class DayOffService:
 
     async def modify(
         self,
+        current_user: User,
         day_off: DayOff,
         day_off_update: DayOffUpdatePartil,
         partil: bool,
     ) -> DayOffOut:
         day_off = await self.repository.update(
+            current_user=current_user,
             day_off=day_off,
             day_off_update=day_off_update,
             partil=partil,
@@ -135,5 +137,14 @@ class DayOffService:
         return DayOffOut.model_validate(day_off)
 
 
-    async def delete(self, day_off: DayOff):
-        await self.repository.delete(day_off=day_off)
+    async def delete(self, current_user: User, day_off: DayOff):
+        await self.repository.delete(current_user=current_user, day_off=day_off)
+
+
+    async def approve(self, current_user: User, day_off: DayOff, is_approved: bool):
+        day_off = await self.repository.approve(
+            current_user=current_user,
+            day_off=day_off,
+            is_approved=is_approved, 
+        )
+        return DayOffOut.model_validate(day_off)    

@@ -17,6 +17,7 @@ class PaginatedResponse(BaseModel, Generic[M]):
 class DayOffBase(BaseModel):
     o_date: date
     reason: str
+    is_approved: bool
 
 
 class DayOffCreate(DayOffBase):
@@ -26,6 +27,7 @@ class DayOffCreate(DayOffBase):
 class DayOffUpdate(DayOffBase):
     o_date: date | None = None
     reason: str | None = None
+    is_approved: bool | None = None
 
 
 class DayOffUpdatePartil(DayOffUpdate):

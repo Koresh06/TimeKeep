@@ -3,14 +3,14 @@ import uuid
 from typing import List
 from fastapi import HTTPException, status
 from sqlalchemy import select, Select
-from sqlalchemy.orm import joinedload
+from sqlalchemy.orm import joinedload, selectinload
 from sqlalchemy.exc import IntegrityError, SQLAlchemyError
 
 from core.repo.base import BaseRepo
 from models import DayOff, Overtime, OvertimeDayOffLink, User, Role
 
 from .schemas import DayOffCreate, DayOffUpdatePartil, DayOffUpdate
-from .errors import DayOffNotFoundError
+from .errors import DayOffNotFoundError, DepartmentPermissionError
 
 
 class DayOffRepository(BaseRepo):
@@ -136,12 +136,10 @@ class DayOffRepository(BaseRepo):
     ) -> DayOff:
         """Получение отгула по oid, проверка на существование."""
         try:
-            stmt = select(DayOff).where(DayOff.oid == oid)
+            stmt = select(DayOff).options(selectinload(DayOff.user_rel)).where(DayOff.oid == oid)
             day_off = await self.session.scalar(stmt)
-
             if not day_off:
                 raise DayOffNotFoundError(oid)
-
             return day_off
         except DayOffNotFoundError as e:
             raise HTTPException(
@@ -180,12 +178,15 @@ class DayOffRepository(BaseRepo):
 
     async def update(
         self,
+        current_user: User,
         day_off: DayOff,
         day_off_update: DayOffUpdate | DayOffUpdatePartil,
         partil: bool = False,
     ) -> DayOff:
         """Обновить отгул."""
         try:
+            if current_user.role == Role.MODERATOR and current_user.department_oid != day_off.user_rel.department_oid:
+                raise DepartmentPermissionError()
             if partil:
                 for attr, value in day_off_update.model_dump(
                     exclude_unset=partil
@@ -202,10 +203,28 @@ class DayOffRepository(BaseRepo):
             )
 
 
-    async def delete(self, day_off: DayOff):
+    async def delete(self, current_user: User, day_off: DayOff):
         """Удалить отгул."""
         try:
+
+            if current_user.role == Role.MODERATOR and current_user.department_oid != day_off.user_rel.department_oid:
+                raise DepartmentPermissionError()
+            
             await self.session.delete(day_off)
             await self.session.commit()
+
+        except SQLAlchemyError as e:
+            raise HTTPException(status_code=500, detail=f"Database error: {str(e)}")
+        
+
+    async def approve(self, day_off: DayOff, is_approved: bool, current_user: User) -> DayOff:
+        """Подтвердить отгул с проверкой отдела."""
+        try:
+            if current_user.role == Role.MODERATOR and current_user.department_oid != day_off.user_rel.department_oid:
+                raise DepartmentPermissionError()
+
+            day_off.is_approved = is_approved
+            await self.session.commit()
+            return day_off
         except SQLAlchemyError as e:
             raise HTTPException(status_code=500, detail=f"Database error: {str(e)}")
