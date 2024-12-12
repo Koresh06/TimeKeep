@@ -16,7 +16,7 @@ class Overtime(Base):
     __tablename__ = "overtimes"
 
     oid: Mapped[UUID] = mapped_column(UUID, primary_key=True, default=uuid4)
-    user_oid: Mapped[UUID] = mapped_column(UUID, ForeignKey("users.oid"), nullable=False)
+    user_oid: Mapped[UUID] = mapped_column(UUID, ForeignKey("users.oid", ondelete="CASCADE"), nullable=False)
     o_date: Mapped[date] = mapped_column(Date, nullable=False)
     hours: Mapped[int] = mapped_column(Integer, nullable=False)
     remaining_hours: Mapped[int] = mapped_column(Integer, nullable=False)
@@ -26,7 +26,7 @@ class Overtime(Base):
     update_at: Mapped[datetime] = mapped_column(DateTime, server_default=func.now(), onupdate=func.now())
 
     user_rel: Mapped["User"] = relationship("User", back_populates="overtime_rel")
-    links: Mapped[List["OvertimeDayOffLink"]] = relationship("OvertimeDayOffLink", back_populates="overtime_rel")
+    links: Mapped[List["OvertimeDayOffLink"]] = relationship("OvertimeDayOffLink", back_populates="overtime_rel", cascade="all, delete")
 
     def __init__(self, **kwargs):
         super().__init__(**kwargs)

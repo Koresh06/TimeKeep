@@ -15,7 +15,6 @@ class PaginatedResponse(BaseModel, Generic[M]):
 
 
 class DayOffBase(BaseModel):
-    user_oid: uuid.UUID
     o_date: date
     reason: str
 
@@ -25,7 +24,6 @@ class DayOffCreate(DayOffBase):
 
 
 class DayOffUpdate(DayOffBase):
-    user_oid: uuid.UUID | None = None
     o_date: date | None = None
     reason: str | None = None
 

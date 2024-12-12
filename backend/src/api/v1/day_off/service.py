@@ -98,11 +98,9 @@ class DayOffService:
 
     async def get_day_off_oid(
         self,
-        current_user: User,
         oid: uuid.UUID,
     ) -> DayOff:
         day_off: DayOff = await self.repository.get_day_off_oid(
-            current_user=current_user,
             oid=oid,
         )
         return day_off
@@ -135,3 +133,7 @@ class DayOffService:
             partil=partil,
         )
         return DayOffOut.model_validate(day_off)
+
+
+    async def delete(self, day_off: DayOff):
+        await self.repository.delete(day_off=day_off)

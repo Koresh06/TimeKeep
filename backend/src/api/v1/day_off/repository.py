@@ -132,12 +132,11 @@ class DayOffRepository(BaseRepo):
 
     async def get_day_off_oid(
         self,
-        current_user: User,
         oid: uuid.UUID,
     ) -> DayOff:
+        """Получение отгула по oid, проверка на существование."""
         try:
             stmt = select(DayOff).where(DayOff.oid == oid)
-            stmt = await self._build_stmt_for_role(current_user, stmt, oid)
             day_off = await self.session.scalar(stmt)
 
             if not day_off:
@@ -157,7 +156,7 @@ class DayOffRepository(BaseRepo):
         current_user: User,
         oid: int,
     ) -> DayOff:
-        """Получение одного отгула."""
+        """Получение одного отгула по oid."""
         try:
             stmt = select(DayOff)
             stmt = await self._build_stmt_for_role(
@@ -184,7 +183,8 @@ class DayOffRepository(BaseRepo):
         day_off: DayOff,
         day_off_update: DayOffUpdate | DayOffUpdatePartil,
         partil: bool = False,
-    ):
+    ) -> DayOff:
+        """Обновить отгул."""
         try:
             if partil:
                 for attr, value in day_off_update.model_dump(
@@ -200,3 +200,12 @@ class DayOffRepository(BaseRepo):
                 status_code=status.HTTP_400_BAD_REQUEST,
                 detail=f"Database error: {str(e)}",
             )
+
+
+    async def delete(self, day_off: DayOff):
+        """Удалить отгул."""
+        try:
+            await self.session.delete(day_off)
+            await self.session.commit()
+        except SQLAlchemyError as e:
+            raise HTTPException(status_code=500, detail=f"Database error: {str(e)}")

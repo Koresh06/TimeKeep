@@ -15,7 +15,7 @@ class DayOff(Base):
     __tablename__ = "day_offs"
 
     oid: Mapped[UUID] = mapped_column(UUID, primary_key=True, default=uuid4)
-    user_oid: Mapped[UUID] = mapped_column(UUID(as_uuid=True), ForeignKey("users.oid"), nullable=False)
+    user_oid: Mapped[UUID] = mapped_column(UUID(as_uuid=True), ForeignKey("users.oid", ondelete="CASCADE"), nullable=False)
     o_date: Mapped[date] = mapped_column(Date, nullable=False)
     reason: Mapped[str] = mapped_column(String(500), nullable=False)
     is_approved: Mapped[bool] = mapped_column(Boolean, default=False)
@@ -23,7 +23,7 @@ class DayOff(Base):
     update_at: Mapped[datetime] = mapped_column(DateTime, server_default=func.now(), onupdate=func.now())
 
     user_rel: Mapped["User"] = relationship("User", back_populates="day_off_rel")
-    links: Mapped[List["OvertimeDayOffLink"]] = relationship("OvertimeDayOffLink", back_populates="day_off_rel")
+    links: Mapped[List["OvertimeDayOffLink"]] = relationship("OvertimeDayOffLink", back_populates="day_off_rel", cascade="all, delete")
 
 
 

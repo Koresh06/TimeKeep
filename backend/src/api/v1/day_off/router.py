@@ -106,3 +106,20 @@ async def modify_day_off(
         day_off_update=day_off_update,
         partil=True,
     )
+
+
+@router.delete(
+    "/{oid}",
+    response_model=None,
+    status_code=status.HTTP_204_NO_CONTENT,
+    dependencies=[Depends(RoleRequired([Role.SUPERUSER, Role.MODERATOR, Role.USER]))],
+    name="day_off:delete",
+    description="Delete day off by id",
+)
+async def delete_day_off(
+    session: Annotated[AsyncSession, Depends(get_async_session)],
+    day_off: DayOff = Depends(day_off_by_oid),
+):
+    return await DayOffService(session).delete(day_off=day_off)
+
+

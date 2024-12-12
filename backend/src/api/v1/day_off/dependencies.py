@@ -14,10 +14,9 @@ from .errors import DayOffNotFoundError
 async def day_off_by_oid(
     oid: Annotated[uuid.UUID, Path],
     session: Annotated[AsyncSession, Depends(get_async_session)],
-    current_user: User = Depends(get_current_user),
 ) -> DayOff:
     try:
-        day_off = await DayOffService(session).get_day_off_oid(current_user=current_user, oid=oid)
+        day_off = await DayOffService(session).get_day_off_oid(oid=oid)
         if not day_off:
             raise DayOffNotFoundError(oid)
 
