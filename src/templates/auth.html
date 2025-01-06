@@ -1,0 +1,58 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-6">
+            <div class="card shadow-lg border-0">
+                <div class="card-header text-center">
+                    <h2 class="h4 text-primary">Авторизация</h2>
+                </div>
+
+                {% if msg %}
+                    <div class="alert alert-warning fade show" role="alert">
+                        {{ msg }}
+                    </div>
+                {% endif %}
+
+                <div class="card-body">
+                    <form action="/auth/" method="post">
+                        <div class="form-group mb-4">
+                            <label for="username" class="form-label">Имя пользователя</label>
+                            <div class="input-group">
+                                <span class="input-group-text"><i class="bi bi-person"></i></span>
+                                <input type="text" id="username" name="username" class="form-control form-control-lg" required placeholder="Введите имя пользователя">
+                            </div>
+                        </div>
+
+                        <div class="form-group mb-4">
+                            <label for="password" class="form-label">Пароль</label>
+                            <div class="input-group">
+                                <span class="input-group-text"><i class="bi bi-lock"></i></span>
+                                <input type="password" id="password" name="password" class="form-control form-control-lg" required placeholder="Введите пароль">
+                            </div>
+                        </div>
+
+                        <div class="form-check mb-4">
+                            <input type="checkbox" class="form-check-input" id="rememberMe" name="rememberMe">
+                            <label class="form-check-label" for="rememberMe">Запомнить меня</label>
+                        </div>
+
+                        <div class="form-group text-center">
+                            <button type="submit" class="btn btn-primary btn-lg w-100">Войти</button>
+                        </div>
+
+                        <div class="d-flex justify-content-between mb-4">
+                            <a href="/user/register" class="text-decoration-none text-primary">Зарегистрироваться</a>
+                        </div>
+                    </form>
+                </div>
+
+                <div class="card-footer text-center">
+                    <small>&copy; 2024 - TimeKeep</small>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

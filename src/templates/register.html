@@ -1,0 +1,87 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-6">
+            <div class="card shadow-lg border-0">
+                <div class="card-header text-center">
+                    <h2 class="h4 text-primary">Регистрация</h2>
+                </div>
+                {% if msg %}
+                    <div class="alert alert-info fade show" role="alert">
+                        {{ msg }}
+                    </div>
+                {% endif %}
+                <div class="card-body">
+                    <form action="/user/register" method="post">
+                        <div class="form-group mb-3">
+                            <label for="username" class="form-label">Имя пользователя</label>
+                            <div class="input-group">
+                                <span class="input-group-text"><i class="bi bi-person"></i></span>
+                                <input type="text" id="username" name="username" class="form-control form-control-lg" required placeholder="Введите имя пользователя">
+                            </div>
+                        </div>
+                        
+                        <div class="form-group mb-3">
+                            <label for="password" class="form-label">Пароль</label>
+                            <div class="input-group">
+                                <span class="input-group-text"><i class="bi bi-lock"></i></span>
+                                <input type="password" id="password" name="password" class="form-control form-control-lg" required minlength="8" placeholder="Введите пароль">
+                            </div>
+                            <small id="passwordHelp" class="form-text text-muted">Пароль должен содержать не менее 8 символов.</small>
+                        </div>
+
+                        <div class="form-group mb-3">
+                            <label for="full_name" class="form-label">Полное имя</label>
+                            <div class="input-group">
+                                <span class="input-group-text"><i class="bi bi-person-lines-fill"></i></span>
+                                <input type="text" id="full_name" name="full_name" class="form-control form-control-lg" required placeholder="Введите ФИО">
+                            </div>
+                        </div>
+
+                        <div class="form-group mb-3">
+                            <label for="position" class="form-label">Позиция</label>
+                            <div class="input-group">
+                                <span class="input-group-text"><i class="bi bi-briefcase"></i></span>
+                                <input type="text" id="position" name="position" class="form-control form-control-lg" required placeholder="Введите позицию">
+                            </div>
+                        </div>
+
+                        <div class="form-group mb-3">
+                            <label for="department_oid" class="form-label">Выберите департамент</label>
+                            <select id="department_oid" name="department_oid" class="form-control form-control-lg" required>
+                                <option value="" disabled selected>Выберите департамент</option>
+                                {% for department in departments %}
+                                    <option value="{{ department.oid }}">{{ department.name }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+
+                        <div class="form-group mb-3">
+                            <label for="work_schedule" class="form-label">Выберите режим работы</label>
+                            <select id="work_schedule" name="work_schedule" class="form-control form-control-lg" required>
+                                <option value="" disabled selected>Выберите режим работы</option>
+                                <option value="daily">Ежедневник</option>
+                                <option value="shift">Смена</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group text-center">
+                            <button type="submit" class="btn btn-primary btn-lg w-100">Зарегистрироваться</button>
+                        </div>
+
+                        <div class="text-center mb-1 mt-3 text-muted">
+                            Уже есть аккаунт? <a href="/auth/" class="text-decoration-none text-primary">Войти</a>
+                        </div>
+                    </form>
+                </div>
+
+                <div class="card-footer text-center">
+                    <small>&copy; 2024 - TimeKeep</small>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
