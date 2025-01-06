@@ -1,14 +1,15 @@
 from typing import Annotated
-from fastapi.responses import JSONResponse
+from fastapi.responses import JSONResponse, HTMLResponse, RedirectResponse
 from fastapi.security import OAuth2PasswordRequestForm
 from sqlalchemy.ext.asyncio import AsyncSession
-from fastapi import APIRouter, Depends, Response, status
+from fastapi import APIRouter, Depends, Request, Response, status
 
 from models import User
 from core.session import get_async_session
 from core.config import settings
 
 from api.v1.auth.dependencies import get_current_user
+from api.conf_static import templates
 from .schemas import Token, LoginForm
 from .service import AuthService
 
@@ -17,6 +18,14 @@ router = APIRouter(
     prefix="/auth",
     tags=["auth"],
 )
+
+
+@router.get("/", response_class=HTMLResponse)
+async def authentication_page(request: Request):
+    return templates.TemplateResponse(
+        request=request,
+        name="auth.html",
+    )
 
 
 @router.post(
@@ -41,7 +50,7 @@ async def login_access_token(
 
 @router.post(
     "/login",
-    response_model=Token,
+    response_class=RedirectResponse,
     status_code=status.HTTP_200_OK,
     description="Login and get token",
     name="auth:login",
@@ -56,7 +65,7 @@ async def login(
         AsyncSession,
         Depends(get_async_session),
     ],
-) -> Token:
+):
     oauth_form_data = OAuth2PasswordRequestForm(
         username=form_data.username,
         password=form_data.password,
@@ -67,13 +76,13 @@ async def login(
     response.set_cookie(
         key="access_token",
         value=token.access_token,
-        max_age=settings.api.access_token_expire_minutes * 60,
+        max_age=settings.api.access_token_expire_minutes * 60,  # type: ignore
         httponly=True,
         secure=True,
         samesite="strict",
     )
 
-    return token
+    return RedirectResponse(url='/overtimes/', status_code=status.HTTP_302_FOUND)
 
 
 @router.post(

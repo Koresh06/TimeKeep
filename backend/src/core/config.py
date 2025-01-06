@@ -160,7 +160,7 @@ class Settings:
     api: Optional[ApiConfig] = None
 
 
-def load_settings(path: str = None) -> Settings:
+def load_settings(path: str) -> Settings:
     """
     This function takes an optional file path as input and returns a Settings object.
     :param path: The path of env file from where to load the configuration variables.

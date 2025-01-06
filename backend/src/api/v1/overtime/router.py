@@ -1,7 +1,9 @@
-from fastapi import APIRouter, status, Depends, Query
+from fastapi import APIRouter, status, Depends, Query, Request
+from fastapi.responses import HTMLResponse
 from typing import Annotated
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from api.conf_static import templates
 from models import Overtime, Role
 from core.session import get_async_session
 from api.v1.auth.permissions import RoleRequired
@@ -42,13 +44,14 @@ async def create_overtime(
 
 @router.get(
     "/",
-    response_model=PaginatedResponse[OvertimeOut],
+    response_class=HTMLResponse,
     status_code=status.HTTP_200_OK,
     dependencies=[Depends(RoleRequired([Role.SUPERUSER, Role.MODERATOR, Role.USER]))],
     name="overtime:get_all",
     description="Get all overtimes",
 )
 async def get_all_overtimes(
+    request: Request,
     session: Annotated[
         AsyncSession,
         Depends(get_async_session),
@@ -56,7 +59,13 @@ async def get_all_overtimes(
     limit: int = Query(10, ge=1, le=100),
     offset: int = Query(0, ge=0),
 ):
-    return await OvertimeService(session).get_all(limit=limit, offset=offset)
+    overtimes, total_count = await OvertimeService(session).get_all(limit=limit, offset=offset)
+
+    return templates.TemplateResponse(
+        request=request,
+        name="overtime.html",
+        context={"overtimes": overtimes, "total_count": total_count},
+    )
 
 
 @router.get(
