@@ -1,3 +1,4 @@
+from datetime import datetime, timedelta
 from typing import Annotated
 from fastapi.responses import JSONResponse, HTMLResponse, RedirectResponse
 from fastapi.security import OAuth2PasswordRequestForm
@@ -21,13 +22,16 @@ router = APIRouter(
 
 
 @router.get("/", response_class=HTMLResponse)
-async def authentication_page(request: Request, response: Response, is_authenticated: bool = Depends(get_is_authenticated)):
-    print(request.cookies.get("access_token"))
-    response.delete_cookie(key="access_token")
-    return templates.TemplateResponse(
-        "auth.html",
-        {"request": request, "is_authenticated": is_authenticated}
-    )
+async def authentication_page(
+    request: Request,
+    is_authenticated: bool = Depends(get_is_authenticated),
+):
+    if "access_token" in request.cookies:
+        redirect_response = RedirectResponse(url="/auth/", status_code=status.HTTP_302_FOUND)
+        redirect_response.delete_cookie(key="access_token", httponly=True)
+        return redirect_response
+    else:
+        return templates.TemplateResponse("auth.html", {"request": request, "is_authenticated": is_authenticated})
 
 
 
@@ -69,19 +73,20 @@ async def login(
             password=form_data.password,
             scope="",
         )
-        
-        # Получаем токен через сервис
-        token = await AuthService(session).authenticate_and_create_token(oauth_form_data)
 
-        response = RedirectResponse(url='/overtime/', status_code=status.HTTP_302_FOUND)
+        # Получаем токен через сервис
+        token = await AuthService(session).authenticate_and_create_token(
+            oauth_form_data
+        )
+
+        response = RedirectResponse(url="/overtime/", status_code=status.HTTP_302_FOUND)
 
         # Устанавливаем токен в cookie
         response.set_cookie(
             key="access_token",
             value=token.access_token,
-            max_age=settings.api.access_token_expire_minutes * 60,
+            max_age=settings.api.access_token_expire_minutes * 60, 
             httponly=True,
-            samesite="strict",
         )
 
         return response
@@ -89,22 +94,19 @@ async def login(
     except HTTPException as e:
         # Перехватываем исключение и передаем сообщение об ошибке на фронт
         return templates.TemplateResponse(
-            "auth.html", 
-            {"request": request, "msg": e.detail}
+            "auth.html", {"request": request, "msg": e.detail}
         )
+
 
 @router.get(
     path="/logout",
     status_code=status.HTTP_200_OK,
-    description="Logout user by clearing the access token",
+    description="Logout user by clearing the access token and redirecting to auth page",
 )
 async def logout(
-    response: Response,
     current_user: User = Depends(get_current_user),
 ):
-    response.delete_cookie(key="access_token")
-
-    return JSONResponse(
-        content={"message": "Successfully logged out"},
-        status_code=status.HTTP_200_OK,
-    )
+    redirect_response = RedirectResponse(url="/auth/", status_code=status.HTTP_302_FOUND)
+    redirect_response.delete_cookie(key="access_token", httponly=True)
+    
+    return redirect_response

@@ -1,9 +1,5 @@
 from fastapi import APIRouter, HTTPException, status, Depends, Query, Request
 from fastapi.responses import HTMLResponse, RedirectResponse
-from fastapi.exception_handlers import (
-    http_exception_handler,
-    request_validation_exception_handler,
-)
 from typing import Annotated
 from sqlalchemy.ext.asyncio import AsyncSession
 
