@@ -8,7 +8,7 @@ from models import User
 from core.session import get_async_session
 from core.config import settings
 
-from api.v1.auth.dependencies import get_current_user
+from api.v1.auth.dependencies import get_current_user, get_is_authenticated
 from api.conf_static import templates
 from .schemas import Token, LoginForm
 from .service import AuthService
@@ -21,11 +21,14 @@ router = APIRouter(
 
 
 @router.get("/", response_class=HTMLResponse)
-async def authentication_page(request: Request):
+async def authentication_page(request: Request, response: Response, is_authenticated: bool = Depends(get_is_authenticated)):
+    print(request.cookies.get("access_token"))
+    response.delete_cookie(key="access_token")
     return templates.TemplateResponse(
-        request=request,
-        name="auth.html",
+        "auth.html",
+        {"request": request, "is_authenticated": is_authenticated}
     )
+
 
 
 @router.post(
@@ -90,7 +93,7 @@ async def login(
             {"request": request, "msg": e.detail}
         )
 
-@router.post(
+@router.get(
     path="/logout",
     status_code=status.HTTP_200_OK,
     description="Logout user by clearing the access token",

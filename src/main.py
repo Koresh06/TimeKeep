@@ -8,6 +8,7 @@ import betterlogging as bl
 from fastapi import FastAPI, Request, status
 from fastapi.exceptions import HTTPException
 from fastapi.responses import RedirectResponse
+from api.conf_static import configure_static
 from api.v1.router_registration import register_routers
 from api.error_handlers import http_exception_handler
 from core.config import settings
@@ -24,7 +25,7 @@ app = FastAPI(
 async def validation_exception_handler(request: Request, exc: HTTPException):
     return RedirectResponse("/auth/", status_code=status.HTTP_307_TEMPORARY_REDIRECT)
 
-
+configure_static(app)
 register_routers(app)
 
 app.add_exception_handler(HTTPException, http_exception_handler)

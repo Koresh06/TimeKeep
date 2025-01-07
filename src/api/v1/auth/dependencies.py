@@ -1,6 +1,6 @@
 from typing import Annotated
 from jose import jwt, JWTError
-from fastapi import Depends, HTTPException, Security, status
+from fastapi import Depends, HTTPException, Request, Security, status
 from fastapi.security import APIKeyCookie
 from fastapi.responses import RedirectResponse
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -45,6 +45,10 @@ async def get_current_user(
         raise credentials_exception
 
     return user
+
+
+def get_is_authenticated(request: Request):
+    return "access_token" in request.cookies
 
 
 

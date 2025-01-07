@@ -1,0 +1,100 @@
+/* Сброс для всех элементов */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    text-decoration: none;
+    font-family: "Poppins", sans-serif;
+}
+
+/* Стили для navbar */
+header {
+    position: fixed;
+    width: 100%;
+    background-color: #333;
+    z-index: 1000;
+    top: 0;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px 50px;
+    background: linear-gradient(135deg, #5ca9e6, #f0f8ff);  
+    color: #333;
+    box-shadow: 0 0.5rem 1.5rem rgba(0, 0, 0, 0.2);
+}
+
+header .logo {
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+}
+
+/* Стили для меню */
+header .nav-links {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 20px;
+    font-size: 18px;
+    font-weight: 500;
+    letter-spacing: 0.5px;
+}
+
+header .nav-links a {
+    color: #fff;
+    font-size: 18px;
+    font-weight: 500;
+    letter-spacing: 0.5px;
+    padding: 12px 20px;
+    background-color: #4caf50;
+    border-radius: 20px;
+    transition: background-color 0.3s ease, transform 0.3s ease;
+}
+
+header .nav-links a:hover {
+    background-color: #388e3c;
+    transform: translateY(-2px);
+}
+
+header .nav-links a:active {
+    transform: translateY(0);
+}
+
+/* Мобильная версия: скрываем навигацию по умолчанию */
+@media screen and (max-width: 768px) {
+    .nav-links {
+        display: none; /* Меню скрыто по умолчанию */
+        flex-direction: column;
+        position: fixed;
+        top: 0;
+        right: 0;
+        background-color: #333;
+        width: 250px;
+        height: 100%;
+        padding: 20px;
+        z-index: 999;
+    }
+
+    /* Показываем меню при активном состоянии */
+    .nav-links.show {
+        display: flex;
+    }
+
+    /* Стили для ссылок в меню */
+    header .nav-links a {
+        padding: 15px;
+        text-align: center;
+        border-radius: 5px;
+        margin: 5px 0;
+    }
+
+    /* Стили для кнопки "закрыть" */
+    .close-btn {
+        color: white;
+        font-size: 30px;
+        position: absolute;
+        top: 20px;
+        right: 20px;
+        cursor: pointer;
+    }
+}

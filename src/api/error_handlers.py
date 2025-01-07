@@ -23,4 +23,4 @@ async def http_exception_handler(request: Request, exc: HTTPException):
         return RedirectResponse("/server-error/", status_code=status.HTTP_307_TEMPORARY_REDIRECT)
     
     # Для других ошибок возвращаем стандартное исключение
-    return exc
+    return False

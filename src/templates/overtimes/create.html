@@ -1,21 +1,48 @@
 {% extends "base.html" %}
 
+{% block styles %}
+    <!-- Подключаем стили для страницы "Создание переработки" -->
+    <link rel="stylesheet" href="{{ url_for('static', path='css/overtimes/create.css') }}">
+{% endblock %}
+
 {% block content %}
 <div class="container mt-5">
     <h1 class="mb-4">Создание переработки</h1>
 
+    <!-- Показать успешный алерт, если есть сообщение -->
     {% if msg %}
-    <div class="alert alert-success fade show" role="alert">
+    <div class="alert alert-success alert-dismissible fade show" role="alert" id="alertSuccess">
         {{ msg }}
     </div>
+    <script>
+        setTimeout(function() {
+            var alertSuccess = document.getElementById('alertSuccess');
+            if (alertSuccess) {
+                alertSuccess.classList.remove('show');
+                alertSuccess.classList.add('fade');
+            }
+        }, 3000);  // Убираем алерт через 3 секунды
+    </script>
     {% endif %}
 
+    <!-- Показать алерт об ошибке, если есть ошибка -->
     {% if error %}
-    <div class="alert alert-danger fade show" role="alert">
+    <div class="alert alert-danger alert-dismissible fade show" role="alert" id="alertError">
         {{ error }}
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
     </div>
+    <script>
+        setTimeout(function() {
+            var alertError = document.getElementById('alertError');
+            if (alertError) {
+                alertError.classList.remove('show');
+                alertError.classList.add('fade');
+            }
+        }, 3000);  // Убираем алерт через 3 секунды
+    </script>
     {% endif %}
 
+    <!-- Форма создания переработки -->
     <form method="post" action="/overtime/create" class="form-group">
         <div class="mb-3">
             <label for="o_date" class="form-label">Дата переработки:</label>
@@ -29,8 +56,7 @@
 
         <div class="mb-3">
             <label for="description" class="form-label">Описание:</label>
-            <textarea id="description" name="description" maxlength="500" class="form-control" rows="4"
-                required></textarea>
+            <textarea id="description" name="description" maxlength="500" class="form-control" rows="4" required></textarea>
         </div>
 
         <button type="submit" class="btn btn-primary w-100">Создать</button>

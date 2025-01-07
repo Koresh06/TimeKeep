@@ -1,11 +1,14 @@
 from fastapi import APIRouter, HTTPException, status, Depends, Query, Request
 from fastapi.responses import HTMLResponse, RedirectResponse
-from fastapi.exception_handlers import http_exception_handler, request_validation_exception_handler
+from fastapi.exception_handlers import (
+    http_exception_handler,
+    request_validation_exception_handler,
+)
 from typing import Annotated
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from api.conf_static import templates
-from api.v1.auth.dependencies import get_current_user
+from api.v1.auth.dependencies import get_current_user, get_is_authenticated
 from models.user import User
 from models import Overtime, Role
 from core.session import get_async_session
@@ -22,9 +25,7 @@ from .dependencies import overtime_by_oid
 
 
 router = APIRouter(
-    prefix="/overtime",
-    tags=["overtime"],
-    dependencies=[Depends(get_current_user)]
+    prefix="/overtime", tags=["overtime"], dependencies=[Depends(get_current_user)]
 )
 
 
@@ -36,11 +37,15 @@ router = APIRouter(
     name="overtime:create",
     description="Create overtime",
 )
-async def create_overtime_page(request: Request):
+async def create_overtime_page(
+    request: Request, current_user: User = Depends(get_current_user)
+):
     return templates.TemplateResponse(
         request=request,
         name="overtimes/create.html",
+        context={"is_authenticated": current_user},
     )
+
 
 @router.post(
     "/create",
@@ -57,10 +62,16 @@ async def create_overtime(
     overtime_create: OvertimeCreate = Depends(OvertimeCreate.as_form),
 ):
     try:
-        await OvertimeService(session).create(current_user=current_user, overtime_create=overtime_create)
+        await OvertimeService(session).create(
+            current_user=current_user, overtime_create=overtime_create
+        )
         return templates.TemplateResponse(
-            "overtimes/create.html", 
-            {"request": request, "msg": "Переработка успешно создана!"}
+            "overtimes/create.html",
+            {
+                "request": request,
+                "msg": "Переработка успешно создана!",
+                "is_authenticated": current_user,
+            },
         )
     except Exception as e:
         return templates.TemplateResponse(
@@ -68,8 +79,6 @@ async def create_overtime(
             name="overtimes/create.html",
             context={"error": str(e)},
         )
-
-
 
 
 @router.get(
@@ -109,6 +118,7 @@ async def get_all_overtimes(
             "current_page": current_page,
             "limit": limit,
             "offset": offset,
+            "is_authenticated": current_user,
         },
     )
 
