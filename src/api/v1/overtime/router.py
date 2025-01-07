@@ -1,5 +1,6 @@
-from fastapi import APIRouter, status, Depends, Query, Request
+from fastapi import APIRouter, HTTPException, status, Depends, Query, Request
 from fastapi.responses import HTMLResponse, RedirectResponse
+from fastapi.exception_handlers import http_exception_handler, request_validation_exception_handler
 from typing import Annotated
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -23,6 +24,7 @@ from .dependencies import overtime_by_oid
 router = APIRouter(
     prefix="/overtime",
     tags=["overtime"],
+    dependencies=[Depends(get_current_user)]
 )
 
 
@@ -41,7 +43,7 @@ async def create_overtime_page(request: Request):
     )
 
 @router.post(
-    "/",
+    "/create",
     response_class=HTMLResponse,
     status_code=status.HTTP_201_CREATED,
     dependencies=[Depends(RoleRequired([Role.SUPERUSER, Role.MODERATOR, Role.USER]))],
@@ -50,22 +52,23 @@ async def create_overtime_page(request: Request):
 )
 async def create_overtime(
     request: Request,
-    session: Annotated[
-        AsyncSession,
-        Depends(get_async_session),
-    ],
+    session: Annotated[AsyncSession, Depends(get_async_session)],
     current_user: User = Depends(get_current_user),
     overtime_create: OvertimeCreate = Depends(OvertimeCreate.as_form),
 ):
     try:
         await OvertimeService(session).create(current_user=current_user, overtime_create=overtime_create)
-        return RedirectResponse(url="/overtime/create", status_code=status.HTTP_302_FOUND)
+        return templates.TemplateResponse(
+            "overtimes/create.html", 
+            {"request": request, "msg": "Переработка успешно создана!"}
+        )
     except Exception as e:
         return templates.TemplateResponse(
             request=request,
             name="overtimes/create.html",
             context={"error": str(e)},
         )
+
 
 
 

@@ -5,35 +5,13 @@ import uvicorn
 import logging
 import betterlogging as bl
 
-from fastapi import FastAPI
+from fastapi import FastAPI, Request, status
+from fastapi.exceptions import HTTPException
+from fastapi.responses import RedirectResponse
 from api.v1.router_registration import register_routers
+from api.error_handlers import http_exception_handler
 from core.config import settings
-
-
-logger = logging.getLogger("my_app")
-
-
-def setup_logging() -> None:
-    """
-    Set up logging configuration for the application.
-
-    This method initializes the logging configuration for the application.
-    """
-    log_level = logging.INFO
-    
-    bl.basic_colorized_config(level=log_level)
-
-    file_handler = logging.FileHandler("app.log")
-    file_handler.setLevel(log_level)
-    formatter = logging.Formatter(
-        "%(filename)s:%(lineno)d #%(levelname)-8s [%(asctime)s] - %(name)s - %(message)s"
-    )
-    file_handler.setFormatter(formatter)
-    
-    logger.addHandler(file_handler)
-    logger.setLevel(log_level)
-
-    logger.info("Логирование настроено и приложение запускается...")
+from core.logging import setup_logging
 
 
 app = FastAPI(
@@ -42,26 +20,24 @@ app = FastAPI(
     version="1.0",
 )
 
+@app.exception_handler(HTTPException)
+async def validation_exception_handler(request: Request, exc: HTTPException):
+    return RedirectResponse("/auth/", status_code=status.HTTP_307_TEMPORARY_REDIRECT)
+
 
 register_routers(app)
 
+app.add_exception_handler(HTTPException, http_exception_handler)
 
-@app.get("/")
-def read_root() -> dict:
-    """Read root."""
-    logger.info("Обработан запрос к корневому маршруту")
-    return {"Hello": "World"}
 
 
 if __name__ == "__main__":
     try:
         setup_logging()
-
         uvicorn.run(
             app=app,
-            host=settings.api.host, # type: ignore
-            port=settings.api.port, # type: ignore
+            host=settings.api.host,  
+            port=settings.api.port,  
         )
-
     except KeyboardInterrupt:
-        logger.info("Программа завершена пользователем")
+        print("Программа завершена пользователем")

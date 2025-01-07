@@ -1,32 +1,39 @@
 {% extends "base.html" %}
 
 {% block content %}
-    <div class="container mt-5">
-        <h1 class="mb-4">Создание переработки</h1>
-        
-        {% if msg %}
-            <div class="alert alert-warning fade show" role="alert">
-                {{ msg }}
-            </div>
-        {% endif %}
+<div class="container mt-5">
+    <h1 class="mb-4">Создание переработки</h1>
 
-        <form method="post" action="/overtime/" class="form-group">
-            <div class="mb-3">
-                <label for="o_date" class="form-label">Дата переработки:</label>
-                <input type="date" id="o_date" name="o_date" class="form-control" required>
-            </div>
-
-            <div class="mb-3">
-                <label for="hours" class="form-label">Часы переработки:</label>
-                <input type="number" id="hours" name="hours" min="1" max="24" class="form-control" required>
-            </div>
-
-            <div class="mb-3">
-                <label for="description" class="form-label">Описание:</label>
-                <textarea id="description" name="description" maxlength="500" class="form-control" rows="4" required></textarea>
-            </div>
-
-            <button type="submit" class="btn btn-primary w-100">Создать</button>
-        </form>
+    {% if msg %}
+    <div class="alert alert-success fade show" role="alert">
+        {{ msg }}
     </div>
+    {% endif %}
+
+    {% if error %}
+    <div class="alert alert-danger fade show" role="alert">
+        {{ error }}
+    </div>
+    {% endif %}
+
+    <form method="post" action="/overtime/create" class="form-group">
+        <div class="mb-3">
+            <label for="o_date" class="form-label">Дата переработки:</label>
+            <input type="date" id="o_date" name="o_date" class="form-control" required>
+        </div>
+
+        <div class="mb-3">
+            <label for="hours" class="form-label">Часы переработки:</label>
+            <input type="number" id="hours" name="hours" min="1" max="24" class="form-control" required>
+        </div>
+
+        <div class="mb-3">
+            <label for="description" class="form-label">Описание:</label>
+            <textarea id="description" name="description" maxlength="500" class="form-control" rows="4"
+                required></textarea>
+        </div>
+
+        <button type="submit" class="btn btn-primary w-100">Создать</button>
+    </form>
+</div>
 {% endblock %}

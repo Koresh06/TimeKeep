@@ -2,6 +2,7 @@ from typing import Annotated
 from jose import jwt, JWTError
 from fastapi import Depends, HTTPException, Security, status
 from fastapi.security import APIKeyCookie
+from fastapi.responses import RedirectResponse
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from core.config import settings
@@ -40,7 +41,7 @@ async def get_current_user(
         raise credentials_exception
 
     user: User = await AuthService(session).get_user_by_id(user_oid=token_data.user_oid)
-    if not user or not user.is_active:
+    if not user:
         raise credentials_exception
 
     return user
