@@ -8,7 +8,7 @@
 }
 
 /* Стили для navbar */
-header {
+nav {
     position: fixed;
     width: 100%;
     background-color: #333;
@@ -23,14 +23,16 @@ header {
     box-shadow: 0 0.5rem 1.5rem rgba(0, 0, 0, 0.2);
 }
 
-header .logo {
+
+
+nav img {
     width: 80px;
     height: 80px;
     border-radius: 50%;
 }
 
-/* Стили для меню */
-header .nav-links {
+
+nav .nav-container {
     display: flex;
     justify-content: space-between;
     align-items: center;
@@ -40,7 +42,7 @@ header .nav-links {
     letter-spacing: 0.5px;
 }
 
-header .nav-links a {
+nav .nav-container a {
     color: #fff;
     font-size: 18px;
     font-weight: 500;
@@ -49,27 +51,31 @@ header .nav-links a {
     background-color: #4caf50;
     border-radius: 20px;
     transition: background-color 0.3s ease, transform 0.3s ease;
+    position: relative; /* Добавим relative */
+    text-decoration: none;
 }
 
-header .nav-links a:hover {
+nav .nav-container a:hover {
     background-color: #388e3c;
-    transform: translateY(-2px);
 }
 
-header .logout {
-    background-color: #f44336;
+nav .logout a {
     color: #fff;
     font-size: 18px;
     font-weight: 500;
     letter-spacing: 0.5px;
     padding: 12px 20px;
+    background-color: #f44336;
     border-radius: 20px;
     transition: background-color 0.3s ease, transform 0.3s ease;
+    position: relative; /* Добавим relative */
+    text-decoration: none;
 }
 
-header .nav-links a:active {
-    transform: translateY(0);
+nav .logout a:hover {
+    background-color: #d32f2f;
 }
+
 
 /* Мобильная версия: скрываем навигацию по умолчанию */
 @media screen and (max-width: 768px) {

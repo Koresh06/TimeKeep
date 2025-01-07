@@ -31,6 +31,13 @@ register_routers(app)
 app.add_exception_handler(HTTPException, http_exception_handler)
 
 
+@app.get("/")
+async def root():
+    return RedirectResponse(
+        url="/auth/",
+        status_code=status.HTTP_302_FOUND,
+    )
+
 
 if __name__ == "__main__":
     try:

@@ -5,7 +5,7 @@ CREATE_SUPERUSER_SCRIPT = scripts.create_superuser
 
 # Запуск FastAPI
 start:
-	$(PYTHON_CMD) $(MAIN_SCRIPT)
+	$(PYTHON_CMD) $(MAIN_SCRIPT) --reload
 
 # Создание суперпользователя
 create-superuser:
