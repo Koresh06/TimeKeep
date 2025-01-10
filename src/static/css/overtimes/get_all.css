@@ -14,6 +14,28 @@ h1 {
     margin-bottom: 20px;
 }
 
+.create-btn-overtime {
+    padding: 10px 20px;
+    font-size: 16px;
+    font-weight: 600;
+    border-radius: 5px;
+    text-decoration: none;
+    background: linear-gradient(135deg, rgb(92, 230, 198), rgb(150, 150, 3));
+    color: white;
+    transition: background 0.5s ease, transform 0.3s ease, box-shadow 0.3s ease; /* Плавный переход фона */
+    display: inline-block;
+}
+
+.create-btn-overtime:hover {
+    background: linear-gradient(135deg, rgb(150, 150, 3), rgb(92, 230, 198)); /* Изменение градиента на обратный */
+    transform: translateY(-5px); /* Поднятие кнопки вверх */
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); /* Добавление тени для эффекта приподнимания */
+}
+
+
+
+
+
 /* Кнопка создания переработки */
 .mb-4 {
     margin-bottom: 20px;
@@ -109,6 +131,3 @@ tr:hover {
     border-radius: 5px;
 }
 
-.create-button {
-    text-align: center;
-}
