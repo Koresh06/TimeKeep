@@ -2,7 +2,7 @@ import uuid
 from typing import List, TypeVar, Generic
 from fastapi import Form
 from pydantic import BaseModel, ConfigDict, Field
-from datetime import date
+from datetime import date, datetime
 
 from api.v1.user.schemas import UserOut
 
@@ -21,6 +21,7 @@ class OvertimeBase(BaseModel):
     o_date: date
     hours: int = Field(..., ge=1, le=24)
     description: str | None
+    create_at: datetime
 
 
 class OvertimeCreate(OvertimeBase):

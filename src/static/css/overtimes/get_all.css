@@ -1,0 +1,114 @@
+/* Общие стили */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: "Poppins", sans-serif;
+}
+
+/* Заголовок */
+h1 {
+    font-size: 2rem;
+    font-weight: bold;
+    color: #333;
+    margin-bottom: 20px;
+}
+
+/* Кнопка создания переработки */
+.mb-4 {
+    margin-bottom: 20px;
+}
+
+.btn {
+    padding: 10px 20px;
+    font-size: 16px;
+    font-weight: 600;
+    border-radius: 5px;
+    text-decoration: none;
+    background-color: #4CAF50;
+    color: white;
+    transition: background-color 0.3s ease;
+}
+
+.btn:hover {
+    background-color: #388E3C;
+}
+
+/* Стили для таблицы */
+table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 20px;
+    box-shadow: 0 0.5rem 1.5rem rgba(0, 0, 0, 0.1);
+}
+
+th, td {
+    padding: 12px 15px;
+    text-align: center;
+    border: 1px solid #ddd;
+}
+
+th {
+    background-color: #4CAF50;
+    color: white;
+}
+
+tr:nth-child(even) {
+    background-color: #f9f9f9;
+}
+
+tr:hover {
+    background-color: #f1f1f1;
+}
+
+/* Пагинация */
+.pagination-container {
+    margin-top: 20px;
+    display: flex;
+    justify-content: center;
+}
+
+.pagination {
+    display: flex;
+    gap: 10px;
+}
+
+.pagination-btn {
+    padding: 10px 15px;
+    font-size: 16px;
+    font-weight: 600;
+    color: #4CAF50;
+    background-color: white;
+    border: 1px solid #4CAF50;
+    border-radius: 5px;
+    text-decoration: none;
+    transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+.pagination-btn:hover {
+    background-color: #4CAF50;
+    color: white;
+}
+
+.current-page {
+    padding: 10px 15px;
+    font-size: 16px;
+    font-weight: 600;
+    color: #388E3C;
+    background-color: #e0f7e0;
+    border-radius: 5px;
+}
+
+/* Сообщение об отсутствии данных */
+.alert {
+    padding: 15px;
+    margin-top: 20px;
+    background-color: #f8d7da;
+    color: #721c24;
+    border: 1px solid #f5c6cb;
+    border-radius: 5px;
+}
+
+.create-button {
+    text-align: center;
+}

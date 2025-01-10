@@ -2,7 +2,7 @@ import uuid
 
 from typing import List, Optional
 from fastapi import HTTPException
-from sqlalchemy import Select, select, Result
+from sqlalchemy import Select, func, select, Result
 from sqlalchemy.orm import joinedload
 from sqlalchemy.exc import IntegrityError, SQLAlchemyError
 
@@ -89,11 +89,14 @@ class OvertimeRepository(BaseRepo):
         offset: int,
     ) -> List[Overtime]:
         try:
+            stmt_count = select(func.count()).select_from(Overtime)
+            total_count = await self.session.scalar(stmt_count)
+
             stmt = select(Overtime).limit(limit).offset(offset)
             stmt = await self._build_stmt_for_role(current_user, stmt)
-            
             result: Result = await self.session.scalars(stmt)
-            return result
+            
+            return result.all(), total_count
         
         except SQLAlchemyError as e:
             raise HTTPException(status_code=500, detail=f"Database error: {str(e)}")

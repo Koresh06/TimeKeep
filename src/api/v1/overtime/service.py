@@ -34,7 +34,7 @@ class OvertimeService:
         limit: int,
         offset: int,
     ) -> PaginatedResponse[OvertimeOut | OvertimeExtendedOut]:
-        overtimes = await self.repository.get_all(
+        overtimes, total_count = await self.repository.get_all(
             current_user=current_user,
             limit=limit,
             offset=offset,
@@ -46,10 +46,10 @@ class OvertimeService:
                 OvertimeOut.model_validate(overtime).model_dump()
                 for overtime in overtimes
             ]
-            return PaginatedResponse(count=len(overtimes_data), items=overtimes_data)
+            return PaginatedResponse(count=total_count, items=overtimes_data)
 
-        # Если роль - администратор, возвращаем расширенные данные
-        elif current_user.role == Role.ADMIN:
+        # Если роль - модератор или суперюйзер, возвращаем расширенные данные
+        else:
             extended_overtimes_data = [
                 OvertimeExtendedOut.model_validate(
                     {
@@ -63,9 +63,6 @@ class OvertimeService:
                 count=len(extended_overtimes_data), items=extended_overtimes_data
             )
 
-        # Если роль не поддерживается, можно выбросить исключение или вернуть пустой результат
-        else:
-            return PaginatedResponse(count=0, items=[])
 
 
     async def get_one(self, oid: uuid.UUID) -> Overtime:

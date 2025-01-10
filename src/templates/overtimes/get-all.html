@@ -1,58 +1,80 @@
 {% extends 'base.html' %}
 
+{% block styles %}
+<link rel="stylesheet" href="{{ url_for('static', path='css/overtimes/get_all.css') }}">
+{% endblock %}
+
 {% block content %}
-    <h1>Overtime Records</h1>
+    <h1>Переработки</h1>
 
     <!-- Кнопка для создания нового отгула -->
-    <div class="create-overtime-button">
-        <a href="/overtime/create" class="btn btn-primary">Создать переработку</a>
+    <div class="create-button">
+        <a href="/overtime/create" class="">Создать переработку</a>
     </div>
 
     <!-- Проверка на наличие данных -->
     {% if overtimes %}
-        <table>
+        <table class="table table-striped table-bordered">
             <thead>
                 <tr>
                     <th>ID</th>
-                    <th>Date</th>
-                    <th>Hours</th>
-                    <th>Remaining Hours</th>
-                    <th>Description</th>
-                    <th>Is-Used</th>
+                    <th>Дата</th>
+                    <th>Часы</th>
+                    <th>Оставшиеся часы</th>
+                    <th>Описание</th>
+                    <th>Использовано</th>
+                    <th>Дата создания</th>
                 </tr>
             </thead>
             <tbody>
                 {% for overtime in overtimes %}
                     <tr>
-                        <td>{{ overtime.id }}</td>
+                        <td>{{ loop.index + (current_page - 1) * limit }}</td>
                         <td>{{ overtime.o_date }}</td>
                         <td>{{ overtime.hours }}</td>
                         <td>{{ overtime.remaining_hours }}</td>
                         <td>{{ overtime.description }}</td>
-                        <td>{{ overtime.is_used }}</td>
+                        <td>{% if overtime.is_used %}Да{% else %}Нет{% endif %}</td>
+                        <td>{{ overtime.create_at.strftime('%d.%m.%Y') }}</td>
                     </tr>
                 {% endfor %}
             </tbody>
         </table>
 
-        <!-- Пагинация -->
-        <div class="pagination">
-            {% if current_page > 1 %}
-                <a href="/?limit={{ limit }}&offset={{ (current_page - 2) * limit }}">Prev</a>
-            {% endif %}
-            
-            {% for page in range(1, total_pages + 1) %}
-                {% if page == current_page %}
-                    <span class="current-page">{{ page }}</span>
-                {% else %}
-                    <a href="/?limit={{ limit }}&offset={{ (page - 1) * limit }}">{{ page }}</a>
+        <div class="pagination-container">
+            <div class="pagination">
+                {% if current_page > 1 %}
+                    <a class="pagination-btn" href="/overtime/?limit={{ limit }}&offset={{ (current_page - 2) * limit }}">Предыдущая</a>
                 {% endif %}
-            {% endfor %}
-            
-            {% if current_page < total_pages %}
-                <a href="/?limit={{ limit }}&offset={{ current_page * limit }}">Next</a>
-            {% endif %}
+        
+                {% if current_page > 3 %}
+                    <a class="pagination-btn" href="/overtime/?limit={{ limit }}&offset=0">1</a>
+                    <span class="ellipsis">...</span>
+                {% endif %}
+        
+                {% set start_page = 1 if current_page - 2 < 1 else current_page - 2 %}
+                {% set end_page = total_pages if current_page + 2 > total_pages else current_page + 2 %}
+        
+                {% for page in range(start_page, end_page + 1) %}
+                    {% if page == current_page %}
+                        <span class="current-page">{{ page }}</span>
+                    {% else %}
+                        <a class="pagination-btn" href="/overtime/?limit={{ limit }}&offset={{ (page - 1) * limit }}">{{ page }}</a>
+                    {% endif %}
+                {% endfor %}
+        
+                {% if current_page < total_pages - 2 %}
+                    <span class="ellipsis">...</span>
+                    <a class="pagination-btn" href="/overtime/?limit={{ limit }}&offset={{ (total_pages - 1) * limit }}">{{ total_pages }}</a>
+                {% endif %}
+        
+                {% if current_page < total_pages %}
+                    <a class="pagination-btn" href="/overtime/?limit={{ limit }}&offset={{ current_page * limit }}">Следующая</a>
+                {% endif %}
+            </div>
         </div>
+        
+        
     {% else %}
         <!-- Сообщение об отсутствии данных -->
         <div class="alert alert-warning" role="alert">
