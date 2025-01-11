@@ -33,11 +33,13 @@ class OvertimeService:
         current_user: User,
         limit: int,
         offset: int,
+        is_used: bool,
     ) -> PaginatedResponse[OvertimeOut | OvertimeExtendedOut]:
         overtimes, total_count = await self.repository.get_all(
             current_user=current_user,
             limit=limit,
             offset=offset,
+            is_used=is_used,
         )
 
         # Если роль пользователя - обычный пользователь, возвращаем стандартные данные

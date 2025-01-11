@@ -1,5 +1,7 @@
+from datetime import date, datetime
+from uuid import UUID
 from fastapi import APIRouter, HTTPException, Response, status, Depends, Query, Request
-from fastapi.responses import HTMLResponse, RedirectResponse
+from fastapi.responses import HTMLResponse, JSONResponse, RedirectResponse
 from typing import Annotated
 from sqlalchemy.ext.asyncio import AsyncSession
 from urllib.parse import quote, unquote
@@ -78,9 +80,9 @@ async def create_overtime(
             status_code=status.HTTP_303_SEE_OTHER,
         )
         success_message = quote("✔️ Переработка успешно создана!")
-        response.set_cookie(key="success_message", value=success_message) 
+        response.set_cookie(key="success_message", value=success_message)
         return response
-    
+
     except Exception as e:
         return templates.TemplateResponse(
             request=request,
@@ -88,6 +90,21 @@ async def create_overtime(
             context={"error": str(e)},
         )
 
+
+def serialize_data(data):
+    if isinstance(data, (datetime, date)):  # Проверяем на datetime или date
+        return data.strftime("%Y-%m-%d")  # Преобразуем в строку в формате 'YYYY-MM-DD'
+    elif isinstance(data, UUID):  # Проверяем на UUID
+        return str(data)  # Преобразуем UUID в строку
+    return data  # Если тип данных не подходит, возвращаем его как есть
+
+
+# Применим сериализацию ко всем полям данных
+def serialize_overtimes(overtimes):
+    return [
+        {key: serialize_data(value) for key, value in overtime.items()}
+        for overtime in overtimes
+    ]
 
 
 @router.get(
@@ -104,22 +121,26 @@ async def get_all_overtimes(
     current_user: User = Depends(get_current_user),
     limit: int = Query(10, ge=1, le=100),
     offset: int = Query(0, ge=0),
+    is_used: bool = Query(None),
 ):
     # Получаем все овертаймы и общее количество записей
     data = await OvertimeService(session).get_all(
         current_user=current_user,
         limit=limit,
         offset=offset,
+        is_used=is_used,
     )
+
+    # Сериализуем данные
+    # serialized_overtimes = serialize_overtimes(data.items)
 
     # Вычисляем количество страниц
     total_pages = (data.count + limit - 1) // limit  # Округляем вверх
     current_page = (offset // limit) + 1  # Текущая страница
 
-    # Возвращаем шаблон с данными
     return templates.TemplateResponse(
         request=request,
-        name="overtimes/get-all.html",
+        name="overtimes/get-all.html",  # Путь к частичному шаблону таблицы
         context={
             "overtimes": data.items,
             "total_count": data.count,

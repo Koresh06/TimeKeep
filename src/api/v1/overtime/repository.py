@@ -87,19 +87,26 @@ class OvertimeRepository(BaseRepo):
         current_user: User,
         limit: int,
         offset: int,
+        is_used: bool = None,
     ) -> List[Overtime]:
         try:
             stmt_count = select(func.count()).select_from(Overtime)
+            if is_used is not None:
+                stmt_count = stmt_count.filter(Overtime.is_used == is_used)
             total_count = await self.session.scalar(stmt_count)
 
             stmt = select(Overtime).limit(limit).offset(offset)
+            if is_used is not None:
+                stmt = stmt.filter(Overtime.is_used == is_used)
+
             stmt = await self._build_stmt_for_role(current_user, stmt)
             result: Result = await self.session.scalars(stmt)
-            
+
             return result.all(), total_count
         
         except SQLAlchemyError as e:
             raise HTTPException(status_code=500, detail=f"Database error: {str(e)}")
+
 
     async def get_one(
         self,
