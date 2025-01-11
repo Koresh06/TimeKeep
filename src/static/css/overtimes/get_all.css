@@ -24,6 +24,7 @@ h1 {
     color: white;
     transition: background 0.5s ease, transform 0.3s ease, box-shadow 0.3s ease; /* Плавный переход фона */
     display: inline-block;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
 }
 
 .create-btn-overtime:hover {
@@ -31,9 +32,6 @@ h1 {
     transform: translateY(-5px); /* Поднятие кнопки вверх */
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); /* Добавление тени для эффекта приподнимания */
 }
-
-
-
 
 
 /* Кнопка создания переработки */
@@ -82,6 +80,22 @@ tr:nth-child(even) {
 tr:hover {
     background-color: #f1f1f1;
 }
+
+/* Строка с подтвержденным отгулом */
+.row-confirmed {
+    background-color: rgba(76, 175, 80, 0.2); /* Зеленоватый фон с небольшой прозрачностью */
+}
+
+/* Строка с не подтвержденным отгулом */
+.row-pending {
+    background-color: rgba(255, 165, 0, 0.2); /* Оранжевый фон с прозрачностью */
+}
+
+/* Строка с нулевыми оставшимися часами */
+.row-completed {
+    background-color: rgba(255, 0, 0, 0.2); /* Красный фон с прозрачностью */
+}
+
 
 /* Пагинация */
 .pagination-container {

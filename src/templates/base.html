@@ -16,9 +16,10 @@
 
 <body>
     <header>
-        {% if is_authenticated %}
+        {% if request.cookies.get('access_token') %}
             {% include 'navbar.html' %}
         {% endif %}
+
     </header>
 
     <div class="container">

@@ -1,5 +1,5 @@
 import uuid
-from typing import List, TypeVar, Generic
+from typing import List, TypeVar, Generic, Optional
 from fastapi import Form
 from pydantic import BaseModel, ConfigDict, Field
 from datetime import date, datetime
@@ -20,8 +20,10 @@ class PaginatedResponse(BaseModel, Generic[M]):
 class OvertimeBase(BaseModel):
     o_date: date
     hours: int = Field(..., ge=1, le=24)
-    description: str | None
-    create_at: datetime
+    description: Optional[str] = None
+    remaining_hours: Optional[int] = None
+    is_used: bool = False
+    create_at: Optional[datetime] = None
 
 
 class OvertimeCreate(OvertimeBase):

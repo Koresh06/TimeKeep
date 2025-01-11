@@ -28,7 +28,15 @@
             </thead>
             <tbody>
                 {% for overtime in overtimes %}
-                    <tr>
+                    <tr class="
+                        {% if overtime.is_used %}
+                            row-confirmed
+                        {% elif overtime.remaining_hours == 0 %}
+                            row-completed
+                        {% else %}
+                            row-pending
+                        {% endif %}
+                    ">
                         <td>{{ loop.index + (current_page - 1) * limit }}</td>
                         <td>{{ overtime.o_date }}</td>
                         <td>{{ overtime.hours }}</td>
@@ -38,7 +46,7 @@
                         <td>{{ overtime.create_at.strftime('%d.%m.%Y') }}</td>
                     </tr>
                 {% endfor %}
-            </tbody>
+            </tbody>            
         </table>
 
         <div class="pagination-container">

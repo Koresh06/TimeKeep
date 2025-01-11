@@ -1,7 +1,8 @@
-from fastapi import APIRouter, HTTPException, status, Depends, Query, Request
+from fastapi import APIRouter, HTTPException, Response, status, Depends, Query, Request
 from fastapi.responses import HTMLResponse, RedirectResponse
 from typing import Annotated
 from sqlalchemy.ext.asyncio import AsyncSession
+from urllib.parse import quote, unquote
 
 from api.conf_static import templates
 from api.v1.auth.dependencies import get_current_user, get_is_authenticated
@@ -34,13 +35,23 @@ router = APIRouter(
     description="Create overtime",
 )
 async def create_overtime_page(
-    request: Request, current_user: User = Depends(get_current_user)
+    request: Request,
 ):
-    return templates.TemplateResponse(
-        request=request,
-        name="overtimes/create.html",
-        context={"is_authenticated": current_user},
+    success_message = request.cookies.get("success_message")
+    # Декодируем сообщение из куки
+    if success_message:
+        success_message = unquote(success_message)
+    response = templates.TemplateResponse(
+        "overtimes/create.html",
+        {
+            "request": request,
+            "msg": success_message,
+        },
     )
+    # Удаляем cookie, чтобы сообщение не отображалось снова
+    if success_message:
+        response.delete_cookie("success_message")
+    return response
 
 
 @router.post(
@@ -59,22 +70,24 @@ async def create_overtime(
 ):
     try:
         await OvertimeService(session).create(
-            current_user=current_user, overtime_create=overtime_create
+            current_user=current_user,
+            overtime_create=overtime_create,
         )
-        return templates.TemplateResponse(
-            "overtimes/create.html",
-            {
-                "request": request,
-                "msg": "Переработка успешно создана!",
-                "is_authenticated": current_user,
-            },
+        response = RedirectResponse(
+            url="/overtime/create",
+            status_code=status.HTTP_303_SEE_OTHER,
         )
+        success_message = quote("✔️ Переработка успешно создана!")
+        response.set_cookie(key="success_message", value=success_message)  # Установим куку на 10 минут
+        return response
+    
     except Exception as e:
         return templates.TemplateResponse(
             request=request,
             name="overtimes/create.html",
             context={"error": str(e)},
         )
+
 
 
 @router.get(

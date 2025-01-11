@@ -9,7 +9,7 @@ from models import User
 from core.session import get_async_session
 from core.config import settings
 
-from api.v1.auth.dependencies import get_current_user, get_is_authenticated
+from api.v1.auth.dependencies import get_current_user
 from api.conf_static import templates
 from .schemas import Token, LoginForm
 from .service import AuthService
@@ -24,14 +24,13 @@ router = APIRouter(
 @router.get("/", response_class=HTMLResponse)
 async def authentication_page(
     request: Request,
-    is_authenticated: bool = Depends(get_is_authenticated),
 ):
     if "access_token" in request.cookies:
         redirect_response = RedirectResponse(url="/auth/", status_code=status.HTTP_302_FOUND)
         redirect_response.delete_cookie(key="access_token", httponly=True)
         return redirect_response
     else:
-        return templates.TemplateResponse("auth.html", {"request": request, "is_authenticated": is_authenticated})
+        return templates.TemplateResponse("auth.html", {"request": request})
 
 
 
