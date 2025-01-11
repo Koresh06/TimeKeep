@@ -78,7 +78,7 @@ async def create_overtime(
             status_code=status.HTTP_303_SEE_OTHER,
         )
         success_message = quote("✔️ Переработка успешно создана!")
-        response.set_cookie(key="success_message", value=success_message)  # Установим куку на 10 минут
+        response.set_cookie(key="success_message", value=success_message) 
         return response
     
     except Exception as e:
