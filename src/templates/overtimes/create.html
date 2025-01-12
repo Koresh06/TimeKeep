@@ -5,7 +5,7 @@
 {% endblock %}
 
 {% block content %}
-<div class="container mt-6">
+<div class="container mt-6 ">
     <div class="d-flex justify-content-center align-items-center">
         <h1 class="mb-4 overtime-title">Создание переработки</h1>
         <!-- Иконка для модального окна -->
@@ -48,24 +48,26 @@
     {% endif %}
 
     <!-- Форма создания переработки -->
-    <form method="post" action="/overtime/create" class="form-group">
-        <div class="mb-3">
-            <label for="o_date" class="form-label">Дата переработки:</label>
-            <input type="date" id="o_date" name="o_date" class="form-control" required>
-        </div>
-
-        <div class="mb-3">
-            <label for="hours" class="form-label">Часы переработки:</label>
-            <input type="number" id="hours" name="hours" min="1" max="24" class="form-control" required>
-        </div>
-
-        <div class="mb-3">
-            <label for="description" class="form-label">Описание:</label>
-            <textarea id="description" name="description" maxlength="500" class="form-control" rows="4" required></textarea>
-        </div>
-
-        <button type="submit" class="btn btn-primary w-100">Создать</button>
-    </form>
+    <div class="create-overtime-container w-50 mx-auto">
+        <form method="post" action="/overtime/create" class="form-group">
+            <div class="mb-3">
+                <label for="o_date" class="form-label">Дата переработки:</label>
+                <input type="date" id="o_date" name="o_date" class="form-control" required>
+            </div>
+    
+            <div class="mb-3">
+                <label for="hours" class="form-label">Часы переработки:</label>
+                <input type="number" id="hours" name="hours" min="1" max="24" class="form-control" required>
+            </div>
+    
+            <div class="mb-3">
+                <label for="description" class="form-label">Описание:</label>
+                <textarea id="description" name="description" maxlength="500" class="form-control" rows="4" required></textarea>
+            </div>
+    
+            <button type="submit" class="btn btn-primary w-100">Создать</button>
+        </form>
+    </div>
 </div>
 
 <!-- Модальное окно с пояснением -->

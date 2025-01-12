@@ -45,7 +45,7 @@ class OvertimeCreate(OvertimeBase):
         )
 
 
-class OvertimeUpdate(OvertimeBase):
+class OvertimeUpdate(OvertimeCreate):
     o_date: date | None = None
     hours: int | None = None
     description: str | None = None

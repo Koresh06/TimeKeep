@@ -107,14 +107,9 @@ async def get_all_overtimes(
     offset: int = Query(0, ge=0),
     filter: str = Query(None),
 ):
-    if filter == 'true':
-        filter = True
-    elif filter == 'false':
-        filter = False
-    else:
-        filter = None 
 
-    # Получаем данные
+    filter = True if filter == "true" else False
+
     data = await OvertimeService(session).get_all(
         current_user=current_user,
         limit=limit,
@@ -122,16 +117,14 @@ async def get_all_overtimes(
         filter=filter,
     )
 
-    # Вычисляем количество страниц
-    total_pages = (data.count + limit - 1) // limit  # Округляем вверх
-    current_page = (offset // limit) + 1  # Текущая страница
+    total_pages = (data.count + limit - 1) // limit
+    current_page = (offset // limit) + 1
 
-    # Преобразуем filter в строку для отображения в шаблоне
-    filter_value = "true" if filter else "false" if filter is not None else ""
+    filter_value = "true" if filter else "false"
 
     return templates.TemplateResponse(
         request=request,
-        name="overtimes/get-all.html", 
+        name="overtimes/get-all.html",
         context={
             "overtimes": data.items,
             "total_count": data.count,
@@ -142,7 +135,6 @@ async def get_all_overtimes(
             "filter": filter_value,
         },
     )
-
 
 
 @router.get(
@@ -159,8 +151,29 @@ async def get_one_overtime(
     return overtime
 
 
-@router.patch(
-    "/{oid}",
+@router.get(
+    "/edit/{oid}",
+    response_class=HTMLResponse,
+    status_code=status.HTTP_200_OK,
+    dependencies=[Depends(RoleRequired([Role.SUPERUSER, Role.MODERATOR, Role.USER]))],
+    name="overtime:modify",
+    description="Modify overtime",
+)
+async def edit_overtime_page(
+    request: Request,
+    overtime: Overtime = Depends(overtime_by_oid),
+):
+    return templates.TemplateResponse(
+        "overtimes/edit.html",
+        {
+            "request": request,
+            "overtime": overtime,
+        },
+    )
+
+
+@router.post(
+    "/edit/{oid}",
     response_model=OvertimeOut,
     status_code=status.HTTP_200_OK,
     dependencies=[Depends(RoleRequired([Role.SUPERUSER, Role.MODERATOR]))],
@@ -172,42 +185,44 @@ async def modify_overtime(
         AsyncSession,
         Depends(get_async_session),
     ],
-    overtime_update: OvertimeUpdatePartial,
+    overtime_update: OvertimeUpdatePartial = Depends(OvertimeUpdatePartial.as_form),
     overtime: Overtime = Depends(overtime_by_oid),
 ):
-    return await OvertimeService(session).modify(
+    await OvertimeService(session).modify(
         overtime=overtime,
         overtime_update=overtime_update,
         partial=True,
     )
 
-
-@router.put(
-    "/{oid}",
-    response_model=OvertimeOut,
-    status_code=status.HTTP_200_OK,
-    dependencies=[Depends(RoleRequired([Role.SUPERUSER, Role.MODERATOR]))],
-    name="overtime:replace",
-    description="Replace overtime",
-)
-async def replace_overtime(
-    session: Annotated[
-        AsyncSession,
-        Depends(get_async_session),
-    ],
-    overtime_update: OvertimeUpdate,
-    overtime: Overtime = Depends(overtime_by_oid),
-):
-    return await OvertimeService(session).replace(
-        overtime=overtime,
-        overtime_update=overtime_update,
-    )
+    return RedirectResponse(url="/overtime/", status_code=status.HTTP_302_FOUND)
 
 
-@router.delete(
-    "/{oid}",
+# @router.put(
+#     "/{oid}",
+#     response_model=OvertimeOut,
+#     status_code=status.HTTP_200_OK,
+#     dependencies=[Depends(RoleRequired([Role.SUPERUSER, Role.MODERATOR]))],
+#     name="overtime:replace",
+#     description="Replace overtime",
+# )
+# async def replace_overtime(
+#     session: Annotated[
+#         AsyncSession,
+#         Depends(get_async_session),
+#     ],
+#     overtime_update: OvertimeUpdate,
+#     overtime: Overtime = Depends(overtime_by_oid),
+# ):
+#     return await OvertimeService(session).replace(
+#         overtime=overtime,
+#         overtime_update=overtime_update,
+#     )
+
+
+@router.post(
+    "/delete/{oid}",
     status_code=status.HTTP_204_NO_CONTENT,
-    dependencies=[Depends(RoleRequired([Role.SUPERUSER, Role.MODERATOR]))],
+    dependencies=[Depends(RoleRequired([Role.SUPERUSER, Role.MODERATOR, Role.USER]))],
     name="overtime:delete",
     description="Delete overtime",
 )
@@ -219,3 +234,5 @@ async def delete_overtime(
     overtime: Overtime = Depends(overtime_by_oid),
 ):
     await OvertimeService(session).delete(overtime=overtime)
+
+    return RedirectResponse(url="/overtime/", status_code=status.HTTP_303_SEE_OTHER)

@@ -95,7 +95,7 @@ class OvertimeRepository(BaseRepo):
                 stmt_count = stmt_count.filter(Overtime.is_used == filter)
             total_count = await self.session.scalar(stmt_count)
 
-            stmt = select(Overtime).limit(limit).offset(offset)
+            stmt = select(Overtime).limit(limit).offset(offset).order_by(Overtime.create_at.desc())
             if filter is not None:
                 stmt = stmt.filter(Overtime.is_used == filter)
 
