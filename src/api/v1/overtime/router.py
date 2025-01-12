@@ -91,22 +91,6 @@ async def create_overtime(
         )
 
 
-def serialize_data(data):
-    if isinstance(data, (datetime, date)):  # Проверяем на datetime или date
-        return data.strftime("%Y-%m-%d")  # Преобразуем в строку в формате 'YYYY-MM-DD'
-    elif isinstance(data, UUID):  # Проверяем на UUID
-        return str(data)  # Преобразуем UUID в строку
-    return data  # Если тип данных не подходит, возвращаем его как есть
-
-
-# Применим сериализацию ко всем полям данных
-def serialize_overtimes(overtimes):
-    return [
-        {key: serialize_data(value) for key, value in overtime.items()}
-        for overtime in overtimes
-    ]
-
-
 @router.get(
     "/",
     response_class=HTMLResponse,
@@ -121,26 +105,33 @@ async def get_all_overtimes(
     current_user: User = Depends(get_current_user),
     limit: int = Query(10, ge=1, le=100),
     offset: int = Query(0, ge=0),
-    is_used: bool = Query(None),
+    filter: str = Query(None),
 ):
-    # Получаем все овертаймы и общее количество записей
+    if filter == 'true':
+        filter = True
+    elif filter == 'false':
+        filter = False
+    else:
+        filter = None 
+
+    # Получаем данные
     data = await OvertimeService(session).get_all(
         current_user=current_user,
         limit=limit,
         offset=offset,
-        is_used=is_used,
+        filter=filter,
     )
-
-    # Сериализуем данные
-    # serialized_overtimes = serialize_overtimes(data.items)
 
     # Вычисляем количество страниц
     total_pages = (data.count + limit - 1) // limit  # Округляем вверх
     current_page = (offset // limit) + 1  # Текущая страница
 
+    # Преобразуем filter в строку для отображения в шаблоне
+    filter_value = "true" if filter else "false" if filter is not None else ""
+
     return templates.TemplateResponse(
         request=request,
-        name="overtimes/get-all.html",  # Путь к частичному шаблону таблицы
+        name="overtimes/get-all.html", 
         context={
             "overtimes": data.items,
             "total_count": data.count,
@@ -148,9 +139,10 @@ async def get_all_overtimes(
             "current_page": current_page,
             "limit": limit,
             "offset": offset,
-            "is_authenticated": current_user,
+            "filter": filter_value,
         },
     )
+
 
 
 @router.get(
