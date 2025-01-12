@@ -138,20 +138,6 @@ async def get_all_overtimes(
 
 
 @router.get(
-    "/{oid}",
-    response_model=OvertimeOut,
-    status_code=status.HTTP_200_OK,
-    dependencies=[Depends(RoleRequired([Role.SUPERUSER, Role.MODERATOR, Role.USER]))],
-    name="overtime:get_one",
-    description="Get one overtime by id",
-)
-async def get_one_overtime(
-    overtime: OvertimeOut = Depends(overtime_by_oid),
-):
-    return overtime
-
-
-@router.get(
     "/edit/{oid}",
     response_class=HTMLResponse,
     status_code=status.HTTP_200_OK,
@@ -164,9 +150,9 @@ async def edit_overtime_page(
     overtime: Overtime = Depends(overtime_by_oid),
 ):
     return templates.TemplateResponse(
-        "overtimes/edit.html",
-        {
-            "request": request,
+        request=request,
+        name="overtimes/edit.html",
+        context={
             "overtime": overtime,
         },
     )
@@ -174,7 +160,7 @@ async def edit_overtime_page(
 
 @router.post(
     "/edit/{oid}",
-    response_model=OvertimeOut,
+    response_class=RedirectResponse,
     status_code=status.HTTP_200_OK,
     dependencies=[Depends(RoleRequired([Role.SUPERUSER, Role.MODERATOR]))],
     name="overtime:modify",
@@ -195,28 +181,6 @@ async def modify_overtime(
     )
 
     return RedirectResponse(url="/overtime/", status_code=status.HTTP_302_FOUND)
-
-
-# @router.put(
-#     "/{oid}",
-#     response_model=OvertimeOut,
-#     status_code=status.HTTP_200_OK,
-#     dependencies=[Depends(RoleRequired([Role.SUPERUSER, Role.MODERATOR]))],
-#     name="overtime:replace",
-#     description="Replace overtime",
-# )
-# async def replace_overtime(
-#     session: Annotated[
-#         AsyncSession,
-#         Depends(get_async_session),
-#     ],
-#     overtime_update: OvertimeUpdate,
-#     overtime: Overtime = Depends(overtime_by_oid),
-# ):
-#     return await OvertimeService(session).replace(
-#         overtime=overtime,
-#         overtime_update=overtime_update,
-#     )
 
 
 @router.post(

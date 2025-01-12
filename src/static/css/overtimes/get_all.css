@@ -112,11 +112,6 @@ th, td {
     border: 1px solid #ddd;
 }
 
-th {
-    background-color: #4CAF50;
-    color: white;
-}
-
 tr:nth-child(even) {
     background-color: #f9f9f9;
 }
@@ -125,6 +120,10 @@ tr:hover {
     background-color: #f1f1f1;
 }
 
+th {
+    background-color: #4CAF50;
+    color: white;
+}
 
 /* Пагинация */
 .pagination-container {
