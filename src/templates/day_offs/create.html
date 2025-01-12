@@ -1,13 +1,13 @@
 {% extends "base.html" %}
 
 {% block styles %}
-    <link rel="stylesheet" href="{{ url_for('static', path='css/overtimes/create.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', path='css/day_offs/create.css') }}">
 {% endblock %}
 
 {% block content %}
 <div class="container mt-6 ">
     <div class="d-flex justify-content-center align-items-center">
-        <h1 class="mb-4 overtime-title">Создание переработки</h1>
+        <h1 class="mb-4 overtime-title">Создание отгула</h1>
         <!-- Иконка для модального окна -->
         <div class="info-icon-container ms-2">
             <i class="bi bi-info-circle-fill" data-bs-toggle="modal" data-bs-target="#infoModal"></i>
@@ -46,22 +46,17 @@
     </script>
     {% endif %}
 
-    <!-- Форма создания переработки -->
-    <div class="create-overtime-container w-50 mx-auto">
-        <form method="post" action="/overtime/create" class="form-group">
+    <!-- Форма создания отгула -->
+    <div class="create-day_off-container w-50 mx-auto">
+        <form method="post" action="/day_off/create" class="form-group">
             <div class="mb-3">
-                <label for="o_date" class="form-label">Дата переработки:</label>
+                <label for="o_date" class="form-label">Дата отгула:</label>
                 <input type="date" id="o_date" name="o_date" class="form-control" required>
             </div>
-    
+
             <div class="mb-3">
-                <label for="hours" class="form-label">Часы переработки:</label>
-                <input type="number" id="hours" name="hours" min="1" max="24" class="form-control" required>
-            </div>
-    
-            <div class="mb-3">
-                <label for="description" class="form-label">Описание:</label>
-                <textarea id="description" name="description" maxlength="500" class="form-control" rows="4" required></textarea>
+                <label for="reason" class="form-label">Причина:</label>
+                <textarea id="reason" name="reason" maxlength="500" class="form-control" rows="4" required></textarea>
             </div>
     
             <button type="submit" class="btn btn-primary w-100">Создать</button>
@@ -74,11 +69,21 @@
     <div class="modal-dialog">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title" id="infoModalLabel">Как работает создание переработки</h5>
+                <h5 class="modal-title" id="infoModalLabel">Как работает создание отгула</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
-                <p>Для создания переработки выберите дату, укажите количество часов, которое вы работали сверх нормы, и добавьте описание. После этого нажмите кнопку "Создать", чтобы сохранить информацию.</p>
+                <p>
+                    Отгул создается в зависимости от режима работы. В зависимости от выбранного режима (сменный или ежедневный) происходит автоматический расчет времени для отгула.
+                    <br>
+                    &nbsp;&nbsp;&nbsp;&nbsp;• В сменном режиме для одного отгула необходимо 24 часа. Система автоматически распределит часы в соответствии с вашим графиком работы.
+                    <br>
+                    &nbsp;&nbsp;&nbsp;&nbsp;• В ежедневном режиме каждый день автоматически назначается 8 часов отгула, чтобы в сумме было 24 часа. Система сама выберет подходящие часы для отгула.
+                    <br>
+                    <br>
+                    При создании отгула вам нужно будет указать только дату и причину отгула. Система автоматически выберет подходящие часы и рассчитает время отгула.
+                </p>
+                
             </div>
         </div>
     </div>

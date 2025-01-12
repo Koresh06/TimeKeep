@@ -2,7 +2,7 @@ import uuid
 
 from typing import List
 from fastapi import HTTPException, status
-from sqlalchemy import Result, select, Select
+from sqlalchemy import Result, func, select, Select
 from sqlalchemy.orm import joinedload, selectinload
 from sqlalchemy.exc import IntegrityError, SQLAlchemyError
 
@@ -34,10 +34,14 @@ class DayOffRepository(BaseRepo):
         except SQLAlchemyError as e:
             raise HTTPException(status_code=500, detail=f"Database error: {str(e)}")
 
-    async def create_day_off(self, day_off_create: DayOffCreate) -> DayOff:
+    async def create_day_off(self, day_off_create: DayOffCreate, current_user: User) -> DayOff:
         """Создание нового отгула."""
         try:
-            new_day_off = DayOff(**day_off_create.model_dump())
+            new_day_off = DayOff(
+                user_oid=current_user.oid,
+                o_date=day_off_create.o_date,
+                reason=day_off_create.reason,
+            )
             self.session.add(new_day_off)
             await self.session.commit()
             await self.session.refresh(new_day_off)
@@ -118,14 +122,32 @@ class DayOffRepository(BaseRepo):
         current_user: User,
         limit: int,
         offset: int,
+        filter: bool = None,
     ) -> List[DayOff]:
-        """Получение всех отгулов."""
+        """Получение всех отгулов с фильтрацией по дате и статусу."""
         try:
-            stmt = select(DayOff).limit(limit).offset(offset)
-            stmt = await self._build_stmt_for_role(current_user, stmt)
+            stmt_count = select(func.count()).select_from(DayOff)
 
+            if filter is not None:
+                if filter: 
+                    stmt_count = stmt_count.filter(DayOff.o_date < func.current_date())
+                else: 
+                    stmt_count = stmt_count.filter(DayOff.o_date >= func.current_date())
+
+            total_count = await self.session.scalar(stmt_count)
+
+            stmt = select(DayOff).limit(limit).offset(offset).order_by(DayOff.create_at.desc())
+
+            if filter is not None:
+                if filter: 
+                    stmt = stmt.filter(DayOff.o_date < func.current_date())
+                else:
+                    stmt = stmt.filter(DayOff.o_date >= func.current_date())
+
+            stmt = await self._build_stmt_for_role(current_user, stmt)
             result: Result = await self.session.scalars(stmt)
-            return result
+
+            return result.all(), total_count
 
         except SQLAlchemyError as e:
             raise HTTPException(status_code=500, detail=f"Database error: {str(e)}")

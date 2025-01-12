@@ -25,7 +25,9 @@ class OvertimeService:
         current_user: User,
         overtime_create: OvertimeCreate,
     ) -> OvertimeOut:
-        overtime = await self.repository.create(current_user=current_user, overtime_create=overtime_create)
+        overtime = await self.repository.create(
+            current_user=current_user, overtime_create=overtime_create
+        )
         return OvertimeOut.model_validate(overtime)
 
     async def get_all(
@@ -48,7 +50,10 @@ class OvertimeService:
                 OvertimeOut.model_validate(overtime).model_dump()
                 for overtime in overtimes
             ]
-            return PaginatedResponse(count=total_count, items=overtimes_data)
+            return PaginatedResponse(
+                count=total_count,
+                items=overtimes_data,
+            )
 
         # Если роль - модератор или суперюйзер, возвращаем расширенные данные
         else:
@@ -62,10 +67,9 @@ class OvertimeService:
                 for overtime in overtimes
             ]
             return PaginatedResponse(
-                count=len(extended_overtimes_data), items=extended_overtimes_data
+                count=total_count,
+                items=extended_overtimes_data,
             )
-
-
 
     async def get_one(self, oid: uuid.UUID) -> Overtime:
         overtime = await self.repository.get_one(oid=oid)
@@ -94,6 +98,6 @@ class OvertimeService:
             overtime_update=overtime_update,
         )
         return OvertimeOut.model_validate(overtime)
-    
+
     async def delete(self, overtime: Overtime):
         await self.repository.delete(overtime=overtime)

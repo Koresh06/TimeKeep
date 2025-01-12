@@ -40,7 +40,8 @@ class DayOffService:
 
         # Создаем новый отгул
         new_day_off = await self.repository.create_day_off(
-            day_off_create=day_off_create
+            day_off_create=day_off_create,
+            current_user=current_user,
         )
 
         # Создаем связи между отгулом и овертаймами
@@ -70,17 +71,22 @@ class DayOffService:
         current_user: User,
         limit: int,
         offset: int,
+        filter: bool,
     ) -> PaginatedResponse[DayOffOut | DayOffExtendedOut]:
-        day_offs = await self.repository.get_all(
+        day_offs, total_count = await self.repository.get_all(
             current_user=current_user,
             limit=limit,
             offset=offset,
+            filter=filter,
         )
         if current_user.role == Role.USER:
             day_offs_data = [
                 DayOffOut.model_validate(day_off).model_dump() for day_off in day_offs
             ]
-            return PaginatedResponse(count=len(day_offs_data), items=day_offs_data)
+            return PaginatedResponse(
+                count=total_count,
+                items=day_offs_data,
+            )
 
         else:
             extended_day_offs_data = [
@@ -93,7 +99,8 @@ class DayOffService:
                 for day_off in day_offs
             ]
             return PaginatedResponse(
-                count=len(extended_day_offs_data), items=extended_day_offs_data
+                count=total_count,
+                items=extended_day_offs_data,
             )
 
     async def get_day_off_oid(
@@ -136,15 +143,13 @@ class DayOffService:
         )
         return DayOffOut.model_validate(day_off)
 
-
     async def delete(self, current_user: User, day_off: DayOff):
         await self.repository.delete(current_user=current_user, day_off=day_off)
-
 
     async def approve(self, current_user: User, day_off: DayOff, is_approved: bool):
         day_off = await self.repository.approve(
             current_user=current_user,
             day_off=day_off,
-            is_approved=is_approved, 
+            is_approved=is_approved,
         )
-        return DayOffOut.model_validate(day_off)    
+        return DayOffOut.model_validate(day_off)

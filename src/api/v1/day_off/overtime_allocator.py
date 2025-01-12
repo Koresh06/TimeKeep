@@ -1,6 +1,7 @@
 from typing import List
 from models import Overtime
-from fastapi import HTTPException
+
+from .errors import InsufficientOvertimeHours
 
 class OvertimeAllocator:
 
@@ -33,10 +34,7 @@ class OvertimeAllocator:
                 })
 
         if total_hours < required_hours:
-            raise HTTPException(
-                status_code=400,
-                detail=f"Недостаточно часов для отгула. Ваше минимальное количество: {required_hours}"
-            )
+            raise InsufficientOvertimeHours(required_hours, total_hours)
 
         return selected_overtimes
 

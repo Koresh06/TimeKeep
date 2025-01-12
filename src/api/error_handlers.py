@@ -19,6 +19,7 @@ async def http_exception_handler(request: Request, exc: HTTPException):
         return RedirectResponse("/not-found/", status_code=status.HTTP_307_TEMPORARY_REDIRECT)
     
     elif exc.status_code == status.HTTP_500_INTERNAL_SERVER_ERROR:
+        print(exc.detail)
         # Внутренняя ошибка сервера - кастомная страница
         return RedirectResponse("/server-error/", status_code=status.HTTP_307_TEMPORARY_REDIRECT)
     

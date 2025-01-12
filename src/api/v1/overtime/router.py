@@ -44,11 +44,9 @@ async def create_overtime_page(
     if success_message:
         success_message = unquote(success_message)
     response = templates.TemplateResponse(
-        "overtimes/create.html",
-        {
-            "request": request,
-            "msg": success_message,
-        },
+        request=request,
+        name="overtimes/create.html",
+        context={"msg": success_message},
     )
     # Удаляем cookie, чтобы сообщение не отображалось снова
     if success_message:
