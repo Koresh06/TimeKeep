@@ -35,4 +35,4 @@ class Overtime(Base):
 
 
     def __repr__(self):
-        return f"Overtime(oid={self.oid}, user_id={self.user_oid}, date={self.o_date}, hours={self.hours}, description={self.description})"
+        return f"Overtime(oid={self.oid}, user_oid={self.user_oid}, o_date={self.o_date}, hours={self.hours}, remaining_hours={self.remaining_hours}, description={self.description})"

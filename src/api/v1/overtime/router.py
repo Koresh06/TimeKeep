@@ -38,6 +38,7 @@ router = APIRouter(
 )
 async def create_overtime_page(
     request: Request,
+    current_user: User = Depends(get_current_user),
 ):
     success_message = request.cookies.get("success_message")
     # Декодируем сообщение из куки
@@ -46,7 +47,10 @@ async def create_overtime_page(
     response = templates.TemplateResponse(
         request=request,
         name="overtimes/create.html",
-        context={"msg": success_message},
+        context={
+            "msg": success_message,
+            "current_user": current_user
+        },
     )
     # Удаляем cookie, чтобы сообщение не отображалось снова
     if success_message:
@@ -85,7 +89,10 @@ async def create_overtime(
         return templates.TemplateResponse(
             request=request,
             name="overtimes/create.html",
-            context={"error": str(e)},
+            context={
+                "error": str(e),
+                "current_user": current_user
+            },
         )
 
 
@@ -124,6 +131,7 @@ async def get_all_overtimes(
         request=request,
         name="overtimes/get-all.html",
         context={
+            "current_user": current_user,
             "overtimes": data.items,
             "total_count": data.count,
             "total_pages": total_pages,
@@ -146,11 +154,13 @@ async def get_all_overtimes(
 async def edit_overtime_page(
     request: Request,
     overtime: Overtime = Depends(overtime_by_oid),
+    current_user: User = Depends(get_current_user),
 ):
     return templates.TemplateResponse(
         request=request,
         name="overtimes/edit.html",
         context={
+            "current_user": current_user,
             "overtime": overtime,
         },
     )

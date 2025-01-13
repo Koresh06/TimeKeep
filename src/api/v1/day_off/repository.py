@@ -116,41 +116,56 @@ class DayOffRepository(BaseRepo):
                 stmt = stmt.options(joinedload(DayOff.user_rel))
 
         return stmt
+    
 
     async def get_all(
-        self,
-        current_user: User,
-        limit: int,
-        offset: int,
-        filter: bool = None,
-    ) -> List[DayOff]:
-        """Получение всех отгулов с фильтрацией по дате и статусу."""
-        try:
-            stmt_count = select(func.count()).select_from(DayOff)
+            self,
+            current_user: User,
+            limit: int,
+            offset: int,
+            filter: bool = None,
+        ) -> List[DayOff]:
+            """Получение всех отгулов с фильтрацией по дате и статусу, включая переработки."""
 
-            if filter is not None:
-                if filter: 
-                    stmt_count = stmt_count.filter(DayOff.o_date < func.current_date())
-                else: 
-                    stmt_count = stmt_count.filter(DayOff.o_date >= func.current_date())
+            try:
+                stmt_count = select(func.count()).select_from(DayOff)
 
-            total_count = await self.session.scalar(stmt_count)
+                if filter is not None:
+                    if filter: 
+                        stmt_count = stmt_count.filter(DayOff.o_date < func.current_date())
+                    else: 
+                        stmt_count = stmt_count.filter(DayOff.o_date >= func.current_date())
 
-            stmt = select(DayOff).limit(limit).offset(offset).order_by(DayOff.create_at.desc())
+                total_count = await self.session.scalar(stmt_count)
 
-            if filter is not None:
-                if filter: 
-                    stmt = stmt.filter(DayOff.o_date < func.current_date())
-                else:
-                    stmt = stmt.filter(DayOff.o_date >= func.current_date())
+                stmt = (
+                    select(DayOff)
+                    .limit(limit)
+                    .offset(offset)
+                    .options(
+                        selectinload(DayOff.links).selectinload(OvertimeDayOffLink.day_off_rel)
+                    )
+                    .order_by(DayOff.create_at.desc())
+                )
 
-            stmt = await self._build_stmt_for_role(current_user, stmt)
-            result: Result = await self.session.scalars(stmt)
+                if filter is not None:
+                    if filter: 
+                        stmt = stmt.filter(DayOff.o_date < func.current_date())
+                    else:
+                        stmt = stmt.filter(DayOff.o_date >= func.current_date())
 
-            return result.all(), total_count
+                stmt = await self._build_stmt_for_role(current_user, stmt)
+                result: Result = await self.session.scalars(stmt)
 
-        except SQLAlchemyError as e:
-            raise HTTPException(status_code=500, detail=f"Database error: {str(e)}")
+                # for item in result.all():
+                #     for link in item.links:
+                #         print(link.hours_used, link.overtime_rel.o_date)
+
+                return result.all(), total_count
+
+            except SQLAlchemyError as e:
+                raise HTTPException(status_code=500, detail=f"Database error: {str(e)}")
+
 
     async def get_day_off_oid(
         self,

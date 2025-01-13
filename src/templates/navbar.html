@@ -5,9 +5,17 @@
         </a>
     </div>
     <div class="nav-container">
-        <div><a href="/overtime/">Переработки</a></div>
-        <div><a href="/day_off/">Отгулы</a></div>
-        <div><a href="#">Профиль</a></div>
+        <a href="/overtime/">Переработки</a>
+        <a href="/day_off/">Отгулы</a>
+        <a href="#">Профиль</a>
+        {%  if current_user.role.value == 'moderator' or current_user.role.value == 'superuser' %}
+        <a href="/moderator/day_offs/" class="notification-link">
+            <div class="notification-icon">
+                <i class="bi bi-bell-fill"></i>
+                <span id="pending-day-offs-count" class="notification-count">0</span>
+            </div>
+        </a>
+        {% endif %}
     </div>
     <div class="logout">
         <a href="/auth/logout">Выход</a>

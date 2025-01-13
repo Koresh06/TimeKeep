@@ -29,4 +29,4 @@ class OvertimeDayOffLink(Base):
 
 
     def __repr__(self):
-        return f"OvertimeDayOffLink(oid={self.oid}, overtime_oid={self.overtime_oid}, day_off_oid={self.day_off_oid})"
+        return f"OvertimeDayOffLink(oid={self.oid}, overtime_oid={self.overtime_oid}, day_off_oid={self.day_off_oid}, hours_used={self.hours_used})"

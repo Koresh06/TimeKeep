@@ -26,6 +26,5 @@ class DayOff(Base):
     links: Mapped[List["OvertimeDayOffLink"]] = relationship("OvertimeDayOffLink", back_populates="day_off_rel", cascade="all, delete")
 
 
-
     def __repr__(self):
         return f"DayOff({self.oid}, {self.user_oid}, {self.o_date}, {self.reason}, {self.is_approved}, {self.create_at}, {self.update_at})"

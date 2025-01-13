@@ -30,7 +30,7 @@ async def authentication_page(
         redirect_response.delete_cookie(key="access_token", httponly=True)
         return redirect_response
     else:
-        return templates.TemplateResponse("auth.html", {"request": request})
+        return templates.TemplateResponse(request=request, name="auth.html")
 
 
 

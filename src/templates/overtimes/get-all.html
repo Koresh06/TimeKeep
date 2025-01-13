@@ -31,7 +31,7 @@
         {% if overtimes %}
         <table class="table table-striped table-bordered">
             <thead>
-                <tr>
+                <tr class="text-center">
                     <th>ID</th>
                     <th>Дата</th>
                     <th>Часы</th>
@@ -46,7 +46,7 @@
             </thead>
             <tbody>
                 {% for overtime in overtimes %}
-                <tr>
+                <tr class="text-center">
                     <td>{{ loop.index + (current_page - 1) * limit }}</td>
                     <td>{{ overtime.o_date.strftime('%d.%m.%Y') }}</td>
                     <td>{{ overtime.hours }}</td>

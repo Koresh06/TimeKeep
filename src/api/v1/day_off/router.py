@@ -38,7 +38,10 @@ router = APIRouter(
     name="day_off:create",
     description="Create day_off",
 )
-async def create_day_off_page(request: Request):
+async def create_day_off_page(
+    request: Request,
+    current_user: User = Depends(get_current_user),
+):
     success_message = request.cookies.get("success_message")
     # Декодируем сообщение из куки
     if success_message:
@@ -46,7 +49,10 @@ async def create_day_off_page(request: Request):
     response = templates.TemplateResponse(
         request=request,
         name="day_offs/create.html",
-        context={"msg": success_message},
+        context={
+            "msg": success_message,
+            "current_user": current_user
+        },
     )
 
     # Удаляем cookie, чтобы сообщение не отображалось снова
@@ -89,7 +95,10 @@ async def create_day_off(
         return templates.TemplateResponse(
             request=request,
             name="day_offs/get-all.html",
-            context={"error": str(e)},
+            context={
+                "error": str(e),
+                "current_user": current_user
+            },
         )
     
 
@@ -130,6 +139,7 @@ async def get_all_day_offs(
         request=request,
         name="day_offs/get-all.html",
         context={
+            "current_user": current_user,
             "day_offs": data.items,
             "total_count": data.count,
             "total_pages": total_pages,

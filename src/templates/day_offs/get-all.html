@@ -39,13 +39,13 @@
         {% if day_offs %}
         <table class="table table-striped table-bordered">
             <thead>
-                <tr>
+                <tr class="text-center">
                     <th>№</th>
                     <th>Дата отгула</th>
                     <th>Причина</th>
                     <th>Статус</th>
                     <th>Дата создания</th>
-                    <th>Переработки</th>
+                    <th>Документ</th>
                     <th>Действия</th>
                 </tr>
             </thead>
@@ -65,25 +65,32 @@
                     
                     <td>{{ day_off.create_at.strftime('%d.%m.%Y') }}</td>
                     <td>
-                        <a href="/day_off/day_off_detail/{{ day_off.oid }}" class="btn btn-info">
-                            <i class="bi bi-eye-fill" style="font-size: 1.2rem; margin-right: 5px;"></i>
-                        </a>
-                        
-                    </td>
-                    <td>
                         {% if day_off.is_approved %}
                             <!-- Кнопка для скачивания отчета в Word с иконкой загрузки -->
                             <a href="/day_off/download_report/{{ day_off.oid }}" class="btn btn-success">
                                 <i class="bi bi-download"></i>
                             </a>
                         {% else %}
-                            <!-- Кнопка для удаления отгула с иконкой корзины -->
-                            <button class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#deleteModal{{ day_off.oid }}">
-                                <i class="bi bi-trash"></i>
+                            <!-- Кнопка для скачивания отчета в Word, но она неактивна -->
+                            <button class="btn btn-secondary" disabled>
+                                <i class="bi bi-download"></i>
                             </button>
                         {% endif %}
-
                     </td>
+                    <td>
+                        <div class="btn-group" role="group">
+                            <button class="btn btn-info me-2 rounded" data-bs-toggle="modal" data-bs-target="#dayOffDetailsModal{{ day_off.oid }}">
+                                <i class="bi bi-eye-fill"></i>
+                            </button>
+                            {% if filter == "false" %}
+                                <!-- Кнопка для удаления отгула с иконкой корзины -->
+                                <button class="btn btn-danger me-2 rounded" data-bs-toggle="modal" data-bs-target="#deleteModal{{ day_off.oid }}">
+                                    <i class="bi bi-trash"></i>
+                                </button>
+                            {% endif %}
+                        </div>
+                    </td>
+                     
                 </tr>
                 {% endfor %}
             </tbody>
@@ -168,6 +175,32 @@
         </div>
     </div>
 </div>
+
+{% for day_off in day_offs %}
+<div class="modal fade" id="dayOffDetailsModal{{ day_off.oid }}" tabindex="-1" aria-labelledby="dayOffDetailsModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="dayOffDetailsModalLabel">Детали отгула</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Закрыть"></button>
+            </div>
+            <div class="modal-body">
+                <p><strong>Дата отгула:</strong> {{ day_off.o_date.strftime('%d.%m.%Y') }}</p>
+                <p><strong>Причина:</strong> {{ day_off.reason }}</p>
+                <p><strong>Статус:</strong> {% if day_off.is_approved %}Одобрен{% else %}Не одобрен{% endif %}</p>
+
+                <!-- <h6>Переработки, использованные для отгула:</h6>
+                <ul>
+                    {% for link in day_off.links %}
+                        <li>Дата переработки: {{ link.overtime_rel.o_date }} | Часы: {{ link.hours_used }}</li>
+                    {% endfor %}
+                </ul> -->
+            </div>
+        </div>
+    </div>
+</div>
+{% endfor %}
+
 
 {% endfor %}
 

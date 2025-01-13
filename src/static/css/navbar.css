@@ -1,117 +1,81 @@
-/* Сброс для всех элементов */
-* {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
-    text-decoration: none;
-    font-family: "Poppins", sans-serif;
-}
-
-/* Стили для navbar */
+/* Общие стили для nav */
 nav {
     position: fixed;
     width: 100%;
-    background-color: #333;
-    z-index: 1000;
-    top: 0;
+    background: linear-gradient(135deg, #5ca9e6, #f0f8ff);
+    color: #333;
+    box-shadow: 0 0.5rem 1.5rem rgba(0, 0, 0, 0.2);
+    padding: 10px 50px;
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 10px 50px;
-    background: linear-gradient(135deg, #5ca9e6, #f0f8ff);  
-    color: #333;
-    box-shadow: 0 0.5rem 1.5rem rgba(0, 0, 0, 0.2);
+    z-index: 1000;
 }
 
-
+/* Логотип */
+nav .logo-container {
+    flex: 1;
+}
 
 nav img {
-    width: 80px;
-    height: 80px;
+    width: 60px;
+    height: 60px;
     border-radius: 50%;
 }
 
-
-nav .nav-container {
+/* Основные кнопки */
+.nav-container {
+    flex: 2;
     display: flex;
-    justify-content: space-between;
-    align-items: center;
+    justify-content: center;
     gap: 20px;
-    font-size: 18px;
-    font-weight: 500;
-    letter-spacing: 0.5px;
 }
 
-nav .nav-container a {
+.nav-container a {
     color: #fff;
     font-size: 18px;
     font-weight: 500;
-    letter-spacing: 0.5px;
-    padding: 12px 20px;
+    padding: 10px 20px;
     background-color: #4caf50;
     border-radius: 20px;
     transition: background-color 0.3s ease, transform 0.3s ease;
-    position: relative; /* Добавим relative */
     text-decoration: none;
 }
 
-nav .nav-container a:hover {
+.nav-container a:hover {
     background-color: #388e3c;
 }
 
-nav .logout a {
+/* Кнопка выхода */
+.logout a {
     color: #fff;
     font-size: 18px;
     font-weight: 500;
-    letter-spacing: 0.5px;
-    padding: 12px 20px;
+    padding: 10px 20px;
     background-color: #f44336;
     border-radius: 20px;
     transition: background-color 0.3s ease, transform 0.3s ease;
-    position: relative; /* Добавим relative */
     text-decoration: none;
 }
 
-nav .logout a:hover {
+.logout a:hover {
     background-color: #d32f2f;
 }
 
-
-/* Мобильная версия: скрываем навигацию по умолчанию */
+/* Адаптивность */
 @media screen and (max-width: 768px) {
-    .nav-links {
-        display: none; /* Меню скрыто по умолчанию */
-        flex-direction: column;
-        position: fixed;
-        top: 0;
-        right: 0;
-        background-color: #333;
-        width: 250px;
-        height: 100%;
-        padding: 20px;
-        z-index: 999;
+    nav {
+        flex-wrap: wrap;
+        padding: 10px 20px;
     }
-
-    /* Показываем меню при активном состоянии */
-    .nav-links.show {
-        display: flex;
+    .nav-container {
+        flex: 1 1 100%;
+        justify-content: center;
+        margin-bottom: 10px;
     }
-
-    /* Стили для ссылок в меню */
-    header .nav-links a {
-        padding: 15px;
-        text-align: center;
-        border-radius: 5px;
-        margin: 5px 0;
-    }
-
-    /* Стили для кнопки "закрыть" */
-    .close-btn {
-        color: white;
-        font-size: 30px;
-        position: absolute;
-        top: 20px;
-        right: 20px;
-        cursor: pointer;
+    .notification, .logout {
+        flex: 1 1 100%;
+        justify-content: center;
+        gap: 10px;
     }
 }

@@ -66,7 +66,6 @@ async def register(
     ],
     user_create: UserCreate = Depends(UserCreate.as_form),
 ):
-    print(user_create)
     try:
         await UserService(session).create(data=user_create)
 
