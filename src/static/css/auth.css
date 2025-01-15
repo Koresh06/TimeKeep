@@ -1,6 +1,5 @@
-/* Отступ для контента после navbar */
 body {
-    padding-top: 120px; /* Это добавит отступ сверху для всего контента */
+    padding-top: 120px; 
 }
 
 /* Стили для формы авторизации */
@@ -12,5 +11,5 @@ body {
 
 .auth-container form {
     width: 350px;
-    margin: auto;
+    margin: 0 auto;
 }

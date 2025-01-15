@@ -7,6 +7,7 @@
 }
 
 
+
 .overtime-title {
     font-size: 2.5rem; /* Размер шрифта */
     font-weight: 600; /* Полужирное начертание */
@@ -43,7 +44,7 @@
     border-radius: 5px;
     text-decoration: none;
     background: linear-gradient(135deg, rgb(92, 230, 198), rgb(150, 150, 3));
-    color: white;
+    color: #fff;
     transition: background 0.5s ease, transform 0.3s ease, box-shadow 0.3s ease; /* Плавный переход фона */
     display: inline-block;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
@@ -53,6 +54,7 @@
     background: linear-gradient(135deg, rgb(150, 150, 3), rgb(92, 230, 198)); /* Изменение градиента на обратный */
     transform: translateY(-5px); /* Поднятие кнопки вверх */
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); /* Добавление тени для эффекта приподнимания */
+    color: #fff
 }
 
 

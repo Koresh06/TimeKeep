@@ -21,6 +21,7 @@ from .schemas import (
     PaginatedResponse,
 )
 from .dependencies import overtime_by_oid
+from middlewares.notification.dependencies import get_unread_notifications_count
 
 
 router = APIRouter(
@@ -39,6 +40,7 @@ router = APIRouter(
 async def create_overtime_page(
     request: Request,
     current_user: User = Depends(get_current_user),
+    notifications_count: int = Depends(get_unread_notifications_count),
 ):
     success_message = request.cookies.get("success_message")
     # Декодируем сообщение из куки
@@ -49,7 +51,8 @@ async def create_overtime_page(
         name="overtimes/create.html",
         context={
             "msg": success_message,
-            "current_user": current_user
+            "current_user": current_user,
+            "notifications_count": notifications_count
         },
     )
     # Удаляем cookie, чтобы сообщение не отображалось снова
@@ -91,7 +94,7 @@ async def create_overtime(
             name="overtimes/create.html",
             context={
                 "error": str(e),
-                "current_user": current_user
+                "current_user": current_user,
             },
         )
 
@@ -111,7 +114,9 @@ async def get_all_overtimes(
     limit: int = Query(10, ge=1, le=100),
     offset: int = Query(0, ge=0),
     filter: str = Query(None),
+    notifications_count: int = Depends(get_unread_notifications_count),
 ):
+    
 
     filter = True if filter == "true" else False
 
@@ -139,6 +144,7 @@ async def get_all_overtimes(
             "limit": limit,
             "offset": offset,
             "filter": filter_value,
+            "notifications_count": notifications_count,
         },
     )
 
@@ -155,6 +161,7 @@ async def edit_overtime_page(
     request: Request,
     overtime: Overtime = Depends(overtime_by_oid),
     current_user: User = Depends(get_current_user),
+    notifications_count: int = Depends(get_unread_notifications_count),
 ):
     return templates.TemplateResponse(
         request=request,
@@ -162,6 +169,7 @@ async def edit_overtime_page(
         context={
             "current_user": current_user,
             "overtime": overtime,
+            "notifications_count": notifications_count
         },
     )
 

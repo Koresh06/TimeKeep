@@ -22,6 +22,7 @@ from api.v1.auth.dependencies import get_current_user
 from api.v1.auth.permissions import RoleRequired
 from .dependencies import day_off_by_oid
 from .errors import InsufficientOvertimeHours
+from middlewares.notification.dependencies import get_unread_notifications_count
 
 
 router = APIRouter(
@@ -41,6 +42,7 @@ router = APIRouter(
 async def create_day_off_page(
     request: Request,
     current_user: User = Depends(get_current_user),
+    notifications_count: int = Depends(get_unread_notifications_count),
 ):
     success_message = request.cookies.get("success_message")
     # Декодируем сообщение из куки
@@ -51,7 +53,8 @@ async def create_day_off_page(
         name="day_offs/create.html",
         context={
             "msg": success_message,
-            "current_user": current_user
+            "current_user": current_user,
+            "notifications_count": notifications_count
         },
     )
 
@@ -120,6 +123,7 @@ async def get_all_day_offs(
     limit: int = Query(10, ge=1, le=100),
     offset: int = Query(0, ge=0),
     filter: str = Query(None),
+    notifications_count: int = Depends(get_unread_notifications_count),
 ):
     filter = True if filter == "true" else False
 
@@ -147,6 +151,7 @@ async def get_all_day_offs(
             "limit": limit,
             "offset": offset,
             "filter": filter_value,
+            "notifications_count": notifications_count
         },
     )
 

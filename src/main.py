@@ -13,6 +13,7 @@ from api.v1.router_registration import register_routers
 from api.error_handlers import http_exception_handler
 from core.config import settings
 from core.logging import setup_logging
+from middlewares.notification.middleware import NotificationMiddleware
 # from api.v1.admin.admin_app import lifespan
 
 
@@ -28,6 +29,9 @@ def create_app():
     register_routers(app)
 
     app.add_exception_handler(HTTPException, http_exception_handler)
+
+    app.add_middleware(NotificationMiddleware)
+
 
     @app.get("/")
     async def index():

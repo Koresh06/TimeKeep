@@ -1,0 +1,64 @@
+<!-- modals.html -->
+
+<!-- Модальное окно для подтверждения удаления -->
+{% for day_off in day_offs %}
+<div class="modal fade" id="deleteModal{{ day_off.oid }}" tabindex="-1" aria-labelledby="deleteModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="deleteModalLabel">Подтверждение удаления</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        Вы уверены, что хотите удалить отгул № {{ loop.index + (current_page - 1) * limit }}?
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Отмена</button>
+        <form action="/day_off/delete/{{ day_off.oid }}" method="POST">
+          <button type="submit" class="btn btn-danger">Удалить</button>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+{% endfor %}
+
+<!-- Модальное окно с пояснением -->
+<div class="modal fade" id="infoModal" tabindex="-1" aria-labelledby="infoModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="infoModalLabel">Как работает создание переработки</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <p>Эта страница предназначена для просмотра всех созданных отгулов. Здесь вы можете увидеть текущие и использованные отгулы, а также удалить ненужные записи</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% for day_off in day_offs %}
+<div class="modal fade" id="dayOffDetailsModal{{ day_off.oid }}" tabindex="-1" aria-labelledby="dayOffDetailsModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="dayOffDetailsModalLabel">Детали отгула</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Закрыть"></button>
+            </div>
+            <div class="modal-body">
+                <p><strong>Дата отгула:</strong> {{ day_off.o_date.strftime('%d.%m.%Y') }}</p>
+                <p><strong>Причина:</strong> {{ day_off.reason }}</p>
+                <p><strong>Статус:</strong> {% if day_off.is_approved %}Одобрен{% else %}Не одобрен{% endif %}</p>
+
+                <!-- <h6>Переработки, использованные для отгула:</h6>
+                <ul>
+                    {% for link in day_off.links %}
+                        <li>Дата переработки: {{ link.overtime_rel.o_date }} | Часы: {{ link.hours_used }}</li>
+                    {% endfor %}
+                </ul> -->
+            </div>
+        </div>
+    </div>
+</div>
+{% endfor %}

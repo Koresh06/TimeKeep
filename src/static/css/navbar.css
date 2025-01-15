@@ -1,9 +1,10 @@
 /* Общие стили для nav */
 nav {
+    top: 0;
     position: fixed;
     width: 100%;
     background: linear-gradient(135deg, #5ca9e6, #f0f8ff);
-    color: #333;
+    color: #fff;
     box-shadow: 0 0.5rem 1.5rem rgba(0, 0, 0, 0.2);
     padding: 10px 50px;
     display: flex;
@@ -13,14 +14,10 @@ nav {
 }
 
 /* Логотип */
-nav .logo-container {
-    flex: 1;
-}
-
 nav img {
     width: 60px;
     height: 60px;
-    border-radius: 50%;
+    border-radius: 50%;  /* Круглый логотип */
 }
 
 /* Основные кнопки */
@@ -37,13 +34,26 @@ nav img {
     font-weight: 500;
     padding: 10px 20px;
     background-color: #4caf50;
-    border-radius: 20px;
+    border-radius: 50px;  /* Круглая форма */
     transition: background-color 0.3s ease, transform 0.3s ease;
     text-decoration: none;
 }
 
 .nav-container a:hover {
     background-color: #388e3c;
+    color: #fff;
+}
+
+.btn-notification {
+    position: relative;
+    color: #fff;
+    font-size: 18px;
+    font-weight: 500;
+    padding: 10px 20px;
+    background-color: #4caf50;
+    border-radius: 50px;  /* Круглая форма */
+    transition: background-color 0.3s ease, transform 0.3s ease;
+    text-decoration: none;
 }
 
 /* Кнопка выхода */
@@ -53,13 +63,14 @@ nav img {
     font-weight: 500;
     padding: 10px 20px;
     background-color: #f44336;
-    border-radius: 20px;
+    border-radius: 50px;  /* Круглая форма */
     transition: background-color 0.3s ease, transform 0.3s ease;
     text-decoration: none;
 }
 
 .logout a:hover {
     background-color: #d32f2f;
+    color: #fff;
 }
 
 /* Адаптивность */

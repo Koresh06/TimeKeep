@@ -8,13 +8,14 @@
         <a href="/overtime/">Переработки</a>
         <a href="/day_off/">Отгулы</a>
         <a href="#">Профиль</a>
-        {%  if current_user.role.value == 'moderator' or current_user.role.value == 'superuser' %}
-        <a href="/moderator/day_offs/" class="notification-link">
-            <div class="notification-icon">
+        {% if current_user.role.value == 'moderator' or current_user.role.value == 'superuser' %}
+            <button type="button" class="btn-notification" href="/moderator/day_offs/">
                 <i class="bi bi-bell-fill"></i>
-                <span id="pending-day-offs-count" class="notification-count">0</span>
-            </div>
-        </a>
+                <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
+                  {{ notifications_count }}+
+                  <span class="visually-hidden">непрочитанные сообщения</span>
+                </span>
+            </button>
         {% endif %}
     </div>
     <div class="logout">
