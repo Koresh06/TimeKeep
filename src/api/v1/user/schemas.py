@@ -1,9 +1,24 @@
 from datetime import datetime
+from typing import Generic, List, Optional, TypeVar
 import uuid
 from fastapi import Form
 from pydantic import BaseModel, ConfigDict, Field, field_validator
 
 from models import Role, WorkSchedule
+
+from api.v1.department.schemas import DepartmentOut
+
+
+M = TypeVar("M")
+
+
+class PaginatedResponse(BaseModel, Generic[M]):
+    count: int = Field(description="Number of items returned in the response")
+    items: List[M] = Field(
+        description="List of items returned in the response following given criteria"
+    )
+    total_pages: int = Field(description="Number of pages")
+    current_page: int = Field(description="Current page number")
 
 
 class UserBase(BaseModel):
@@ -63,6 +78,7 @@ class UserOut(UserBase):
     is_active: bool
     create_at: datetime
     update_at: datetime
+    # department_rel: Optional[DepartmentOut] = None
 
     model_config = ConfigDict(from_attributes=True)
 

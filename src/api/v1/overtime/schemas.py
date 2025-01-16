@@ -19,7 +19,7 @@ class PaginatedResponse(BaseModel, Generic[M]):
 
 class OvertimeBase(BaseModel):
     o_date: date
-    hours: int = Field(..., ge=1, le=24)
+    hours: int
     description: Optional[str] = None
     remaining_hours: Optional[int] = None
     is_used: bool = False
@@ -27,8 +27,8 @@ class OvertimeBase(BaseModel):
 
 
 class OvertimeCreate(OvertimeBase):
-    o_date: date = Form(...)
-    hours: int = Form(..., ge=1, le=24)
+    o_date: date
+    hours: int
     description: str
 
     @classmethod
@@ -37,7 +37,7 @@ class OvertimeCreate(OvertimeBase):
         o_date: date = Form(...),
         hours: int = Form(..., ge=1, le=24),
         description: str = Form(...),
-    ):
+    ) -> "OvertimeCreate":
         return cls(
             o_date=o_date,
             hours=hours,
@@ -47,12 +47,21 @@ class OvertimeCreate(OvertimeBase):
 
 class OvertimeUpdate(OvertimeCreate):
     o_date: date | None = None
-    hours: int | None = None
     description: str | None = None
 
 
-class OvertimeUpdatePartial(OvertimeUpdate):
-    pass
+class OvertimeUpdatePartial(BaseModel):
+    o_date: Optional[date] = None
+    description: Optional[str] = None
+
+    @classmethod
+    def as_form(
+        cls,
+        o_date: Optional[date] = Form(None),
+        description: Optional[str] = Form(None),
+    ) -> "OvertimeUpdatePartial":
+        return cls(o_date=o_date, description=description)
+
 
 
 class OvertimeOut(OvertimeBase):

@@ -1,0 +1,93 @@
+{% extends 'base.html' %}
+
+{% block styles %}
+    <link rel="stylesheet" href="{{ url_for('static', path='css/day_offs/notifications.css') }}">
+{% endblock %}
+
+
+{% block content %}
+
+    <h1 class="moderation-title">Модерация отгулов</h1>
+    
+    {% if day_offs %}
+    <div class="container my-5">
+        <table class="table table-striped table-bordered">
+            <thead class="table-dark">
+            <tr class="text-center">
+                <th>#</th>
+                <th>Имя сотрудника</th>
+                <th>Должность</th>
+                <th>График работы</th>
+                <th>Дата отгула</th>
+                <th>Причина</th>
+                <th>Дата создания</th>
+                <th></th>
+            </tr>
+            </thead>
+            <tbody>
+            {% for day_off in day_offs %}
+            <tr class="text-center">
+                <td>{{ loop.index + (current_page - 1) * limit }}</td>
+                <td>{{ day_off.user.full_name }}</td>
+                <td>{{ day_off.user.position }}</td>
+                <td>{{ "Ежедневник" if day_off.user.work_schedule.value == "daily" else "Смена" }}</td>
+                <td>{{ day_off.o_date.strftime('%d.%m.%Y') }}</td>
+                <td>{{ day_off.reason }}</td>
+                <td>{{ day_off.create_at.strftime('%d.%m.%Y %H:%M') }}</td>
+                <td class="text-center">
+                    <button class="btn btn-success me-2 rounded" data-bs-toggle="modal" data-bs-target="#confirmModal{{ day_off.oid }}">
+                        <i class="bi bi-check-circle-fill"></i>
+                    </button>
+                </td>
+            </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    <div class="pagination-container">
+        <div class="pagination">
+            {% if current_page > 1 %}
+            <a class="pagination-btn"
+                href="/day_off/notifications/?limit={{ limit }}&offset={{ (current_page  - 2) * limit }}">Предыдущая</a>
+            {% endif %}
+
+            {% if current_page > 3 %}
+            <a class="pagination-btn" href="/day_off/notifications/?limit={{ limit }}&offset=0">1</a>
+            <span class="ellipsis">...</span>
+            {% endif %}
+
+            {% set start_page = 1 if current_page - 2 < 1 else current_page - 2 %}
+            {% set end_page = total_pages if current_page + 2 > total_pages else current_page + 2 %}
+
+            {% for page in range(start_page, end_page + 1) %}
+            {% if page == current_page %}
+            <span class="current-page">{{ page }}</span>
+            {% else %}
+            <a class="pagination-btn" href="/day_off/notifications/?limit={{ limit }}&offset={{ (page - 1) * limit }}">{{ page }}</a>
+            {% endif %}
+            {% endfor %}
+
+            {% if current_page < total_pages - 2 %}
+            <span class="ellipsis">...</span>
+            <a class="pagination-btn" href="/day_off/notifications/?limit={{ limit }}&offset={{ (total_pages - 1) * limit }}">{{ total_pages }}</a>
+            {% endif %}
+
+            {% if current_page < total_pages %}
+            <a class="pagination-btn"
+                href="/day_off/notifications/?limit={{ limit }}&offset={{ current_page * limit }}">Следующая</a>
+            {% endif %}
+        </div>
+    </div>
+
+    {% else %}
+        <!-- Сообщение об отсутствии данных -->
+        <div class="alert alert-warning text-center" role="alert">
+            Нет данных для отображения.
+        </div>
+    {% endif %}
+
+
+    {% include 'day_offs/modals.html' %}    
+
+{% endblock %}

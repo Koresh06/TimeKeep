@@ -22,7 +22,8 @@ from api.v1.auth.dependencies import get_current_user
 from api.v1.auth.permissions import RoleRequired
 from .dependencies import day_off_by_oid
 from .errors import InsufficientOvertimeHours
-from middlewares.notification.dependencies import get_unread_notifications_count
+from .dependencies import count_notifications_day_offs
+from middlewares.notification.dependencies import get_unread_notifications_count_user
 
 
 router = APIRouter(
@@ -42,7 +43,8 @@ router = APIRouter(
 async def create_day_off_page(
     request: Request,
     current_user: User = Depends(get_current_user),
-    notifications_count: int = Depends(get_unread_notifications_count),
+    count_day_offs: int = Depends(count_notifications_day_offs),
+    notifications_count_user: int = Depends(get_unread_notifications_count_user),
 ):
     success_message = request.cookies.get("success_message")
     # Декодируем сообщение из куки
@@ -54,7 +56,8 @@ async def create_day_off_page(
         context={
             "msg": success_message,
             "current_user": current_user,
-            "notifications_count": notifications_count
+            "count_day_offs": count_day_offs,
+            "notifications_count_user": notifications_count_user
         },
     )
 
@@ -97,7 +100,7 @@ async def create_day_off(
     except InsufficientOvertimeHours as e:
         return templates.TemplateResponse(
             request=request,
-            name="day_offs/get-all.html",
+            name="day_offs/create.html",
             context={
                 "error": str(e),
                 "current_user": current_user
@@ -123,7 +126,8 @@ async def get_all_day_offs(
     limit: int = Query(10, ge=1, le=100),
     offset: int = Query(0, ge=0),
     filter: str = Query(None),
-    notifications_count: int = Depends(get_unread_notifications_count),
+    count_day_offs: int = Depends(count_notifications_day_offs),
+    notifications_count_user: int = Depends(get_unread_notifications_count_user),
 ):
     filter = True if filter == "true" else False
 
@@ -151,9 +155,78 @@ async def get_all_day_offs(
             "limit": limit,
             "offset": offset,
             "filter": filter_value,
-            "notifications_count": notifications_count
+            "count_day_offs": count_day_offs,
+            "notifications_count_user": notifications_count_user,
         },
     )
+
+
+@router.get(
+    '/notifications',
+    response_class=HTMLResponse,
+    status_code=status.HTTP_200_OK,
+    dependencies=[Depends(RoleRequired([Role.SUPERUSER, Role.MODERATOR]))],
+    name="users:notifications",
+    description="Notifications page",
+)
+async def notifications_page(
+    request: Request,
+    session: Annotated[
+        AsyncSession,
+        Depends(get_async_session),
+    ],
+    current_user: User = Depends(get_current_user),
+    limit: int = Query(10, ge=1, le=100),
+    offset: int = Query(0, ge=0),
+    count_day_offs: int = Depends(count_notifications_day_offs),
+    notifications_count_user: int = Depends(get_unread_notifications_count_user),
+):
+    day_offs = await DayOffService(session).get_all(
+        current_user=current_user,
+        limit=limit,
+        offset=offset,
+        is_approved=False,
+    )
+
+    total_pages = (day_offs.count + limit - 1) // limit
+    current_page = (offset // limit) + 1
+
+    return templates.TemplateResponse(
+        request=request,
+        name="/day_offs/notifications.html",
+        context={
+            "current_user": current_user,
+            "day_offs": day_offs.items,
+            "total_count": day_offs.count,
+            "total_pages": total_pages,
+            "current_page": current_page,
+            "limit": limit,
+            "offset": offset,
+            "count_day_offs": count_day_offs,
+            "notifications_count_user": notifications_count_user
+        }
+    )
+
+@router.post(
+    "/{oid}/approve",
+    response_class=RedirectResponse,
+    status_code=status.HTTP_200_OK,
+    dependencies=[Depends(RoleRequired([Role.SUPERUSER, Role.MODERATOR]))],
+    name="day_off:approve",
+    description="Approve day off by id",
+)
+async def approve_day_off(
+    session: Annotated[AsyncSession, Depends(get_async_session)],
+    day_off: DayOff = Depends(day_off_by_oid),
+    current_user: User = Depends(get_current_user),
+):
+    await DayOffService(session).approve(
+        current_user=current_user,
+        day_off=day_off,
+        is_approved=True,
+    )
+
+    return RedirectResponse(url="/day_off/notifications", status_code=status.HTTP_302_FOUND)
 
 
 @router.get(
@@ -208,24 +281,3 @@ async def delete_day_off(
     current_user: User = Depends(get_current_user),
 ):
     return await DayOffService(session).delete(current_user=current_user, day_off=day_off)
-
-
-@router.patch(
-    "/{oid}/approve",
-    response_model=DayOffOut,
-    status_code=status.HTTP_200_OK,
-    dependencies=[Depends(RoleRequired([Role.SUPERUSER, Role.MODERATOR]))],
-    name="day_off:approve",
-    description="Approve day off by id",
-)
-async def approve_day_off(
-    session: Annotated[AsyncSession, Depends(get_async_session)],
-    is_approved: bool,
-    day_off: DayOff = Depends(day_off_by_oid),
-    current_user: User = Depends(get_current_user),
-):
-    return await DayOffService(session).approve(
-        current_user=current_user,
-        day_off=day_off,
-        is_approved=is_approved,
-    )

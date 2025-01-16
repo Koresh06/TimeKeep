@@ -10,5 +10,5 @@ class DepartmentPermissionError(HTTPException):
 
 class InsufficientOvertimeHours(HTTPException):
     def __init__(self):
-        self.status_code = 400
         self.detail = f"Недостаточно часов для отгула!"
+        super().__init__(status_code=status.HTTP_400_BAD_REQUEST, detail=self.detail)

@@ -62,3 +62,26 @@
     </div>
 </div>
 {% endfor %}
+
+
+{% for day_off in day_offs %}
+<div class="modal fade" id="confirmModal{{ day_off.oid }}" tabindex="-1" aria-labelledby="modalLabel{{ day_off.oid }}" aria-hidden="true">
+  <div class="modal-dialog">
+      <div class="modal-content">
+          <div class="modal-header">
+              <h5 class="modal-title" id="modalLabel{{ day_off.oid }}">Подтвердить отгул</h5>
+              <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
+          <div class="modal-body">
+              Вы уверены, что хотите подтвердить отгул сотрудника: <strong><br>{{ day_off.user.full_name }}</strong> <br>на <strong>{{ day_off.o_date.strftime('%d.%m.%Y') }}</strong>?
+          </div>
+          <div class="modal-footer">
+              <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Отмена</button>
+              <form method="POST" action="{{ url_for('day_off:approve', oid=day_off.oid) }}">
+                  <button type="submit" class="btn btn-success">Подтвердить</button>
+              </form>
+          </div>
+      </div>
+  </div>
+</div>
+{% endfor %}

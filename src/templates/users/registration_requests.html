@@ -1,0 +1,94 @@
+{% extends 'base.html' %}
+
+{% block styles %}
+    <link rel="stylesheet" href="{{ url_for('static', path='css/users/approval.css') }}">
+{% endblock %}
+
+{% block content %}
+
+    <h1 class="moderation-title">Подтверждение новых пользователей</h1>
+    
+    {% if users %}
+    <div class="container my-5">
+        <table class="table table-striped table-bordered">
+            <thead class="table-dark">
+            <tr class="text-center">
+                <th>#</th>
+                <th>Имя</th>
+                <th>Должность</th>
+                <th>График работ</th>
+                <th>Дата регистрации</th>
+                <th></th>
+            </tr>
+            </thead>
+            <tbody>
+            {% for user in users %}
+                <tr class="text-center">
+                    <td>{{ loop.index + (current_page - 1) * limit }}</td>
+                    <td>{{ user.full_name }}</td>
+                    <td>{{ user.position }}</td>
+                    <td>{{ "Ежедневник" if user.work_schedule.value == "daily" else "Смена" }}</td>
+                    <td>{{ user.create_at.strftime('%d.%m.%Y') }}</td>
+                    <td class="text-center d-flex justify-content-around">
+                        <div class="btn-group" role="group">
+                            <button class="btn btn-success me-2 rounded" data-bs-toggle="modal" data-bs-target="#confirmModal{{ user.oid }}">
+                                <i class="bi bi-check-circle-fill"></i>
+                            </button>
+
+                            <button class="btn btn-danger me-2 rounded" data-bs-toggle="modal" data-bs-target="#deleteModal{{ user.oid }}">
+                                <i class="bi bi-trash"></i>
+                            </button>
+                        </div>
+                    </td>
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    <div class="pagination-container">
+        <div class="pagination">
+            {% if current_page > 1 %}
+            <a class="pagination-btn"
+               href="/users/approval/?limit={{ limit }}&offset={{ (current_page - 2) * limit }}">Предыдущая</a>
+            {% endif %}
+
+            {% if current_page > 3 %}
+            <a class="pagination-btn" href="/users/approval/?limit={{ limit }}&offset=0">1</a>
+            <span class="ellipsis">...</span>
+            {% endif %}
+
+            {% set start_page = 1 if current_page - 2 < 1 else current_page - 2 %}
+            {% set end_page = total_pages if current_page + 2 > total_pages else current_page + 2 %}
+
+            {% for page in range(start_page, end_page + 1) %}
+            {% if page == current_page %}
+            <span class="current-page">{{ page }}</span>
+            {% else %}
+            <a class="pagination-btn" href="/users/approval/?limit={{ limit }}&offset={{ (page - 1) * limit }}">{{ page }}</a>
+            {% endif %}
+            {% endfor %}
+
+            {% if current_page < total_pages - 2 %}
+            <span class="ellipsis">...</span>
+            <a class="pagination-btn" href="/users/approval/?limit={{ limit }}&offset={{ (total_pages - 1) * limit }}">{{ total_pages }}</a>
+            {% endif %}
+
+            {% if current_page < total_pages %}
+            <a class="pagination-btn"
+               href="/users/approval/?limit={{ limit }}&offset={{ current_page * limit }}">Следующая</a>
+            {% endif %}
+        </div>
+    </div>
+
+    {% else %}
+        <!-- Сообщение об отсутствии данных -->
+        <div class="alert alert-warning text-center" role="alert">
+            Нет данных для отображения.
+        </div>
+    {% endif %}
+
+
+    {% include 'users/modals.html' %}
+
+{% endblock %}

@@ -1,6 +1,6 @@
 import uuid
 
-from typing import List
+from typing import List, Tuple
 from fastapi import HTTPException, status
 from sqlalchemy import Result, func, select, Select
 from sqlalchemy.orm import joinedload, selectinload
@@ -76,95 +76,104 @@ class DayOffRepository(BaseRepo):
             raise HTTPException(status_code=500, detail=f"Database error: {str(e)}")
 
     async def _build_stmt_for_role(
-        self,
-        current_user: User,
-        stmt: Select,
-        oid: int = None,
+    self,
+    current_user: User,
+    stmt: Select,
+    oid: int = None,
     ) -> Select:
         """Общая логика для построения запроса в зависимости от роли пользователя."""
         if current_user.role == Role.USER:
+            stmt = stmt.where(DayOff.user_oid == current_user.oid)
             if oid:
-                stmt = stmt.where(
-                    (DayOff.oid == oid) & (DayOff.user_oid == current_user.oid)
-                )
-            else:
-                stmt = stmt.where(DayOff.user_oid == current_user.oid)
+                stmt = stmt.where(DayOff.oid == oid)
 
         elif current_user.role == Role.MODERATOR:
+            # Уточняем связь с User через `join` (явная связь через FK)
+            stmt = stmt.join(User, User.oid == DayOff.user_oid)
+            stmt = stmt.where(User.department_oid == current_user.department_oid)
             if oid:
-                stmt = (
-                    stmt.join(User)
-                    .where(
-                        (User.department_oid == current_user.department_oid)
-                        & (DayOff.oid == oid)
-                    )
-                    .options(joinedload(DayOff.user_rel))
-                )
-            else:
-                stmt = (
-                    stmt.join(User)
-                    .where(User.department_oid == current_user.department_oid)
-                    .options(joinedload(DayOff.user_rel))
-                )
+                stmt = stmt.where(DayOff.oid == oid)
 
         elif current_user.role == Role.SUPERUSER:
             if oid:
-                stmt = stmt.options(joinedload(DayOff.user_rel)).where(
-                    DayOff.oid == oid
-                )
-            else:
-                stmt = stmt.options(joinedload(DayOff.user_rel))
+                stmt = stmt.where(DayOff.oid == oid)
 
+        stmt = stmt.options(joinedload(DayOff.user_rel))  # Загрузка связанных пользователей
         return stmt
     
+    async def count_notifications_stmt_is_unapproved(
+        self,
+        current_user: User,
+    ) -> int:
+        stmt = select(func.count()).select_from(DayOff)
+        stmt = stmt.filter(DayOff.is_approved == False)
+
+        if current_user.role == Role.USER:
+            stmt = stmt.filter(DayOff.user_oid == current_user.oid)
+        elif current_user.role == Role.MODERATOR:
+            stmt = stmt.join(User, User.oid == DayOff.user_oid)
+            stmt = stmt.filter(User.department_oid == current_user.department_oid)
+        elif current_user.role == Role.SUPERUSER:
+            pass
+
+        result = await self.session.scalar(stmt)
+
+        return result
+
 
     async def get_all(
-            self,
-            current_user: User,
-            limit: int,
-            offset: int,
-            filter: bool = None,
-        ) -> List[DayOff]:
-            """Получение всех отгулов с фильтрацией по дате и статусу, включая переработки."""
+        self,
+        current_user: User,
+        limit: int,
+        offset: int,
+        filter: bool | None = None,
+        is_approved: bool | None = None,
+    ) -> Tuple[List[DayOff], int]:
+        """Получение всех отгулов с фильтрацией по дате и статусу, включая переработки."""
+    
+        try:
+            stmt_count = select(func.count()).select_from(DayOff)
+    
+            if filter is not None:
+                if filter: 
+                    stmt_count = stmt_count.filter(DayOff.o_date < func.current_date())
+                else: 
+                    stmt_count = stmt_count.filter(DayOff.o_date >= func.current_date())
+    
+            if is_approved is not None:
+                stmt_count = stmt_count.filter(DayOff.is_approved == is_approved)
 
-            try:
-                stmt_count = select(func.count()).select_from(DayOff)
-
-                if filter is not None:
-                    if filter: 
-                        stmt_count = stmt_count.filter(DayOff.o_date < func.current_date())
-                    else: 
-                        stmt_count = stmt_count.filter(DayOff.o_date >= func.current_date())
-
-                total_count = await self.session.scalar(stmt_count)
-
-                stmt = (
-                    select(DayOff)
-                    .limit(limit)
-                    .offset(offset)
-                    .options(
-                        selectinload(DayOff.links).selectinload(OvertimeDayOffLink.day_off_rel)
-                    )
-                    .order_by(DayOff.create_at.desc())
+            total_count = await self.session.scalar(stmt_count)
+    
+            stmt = (
+                select(DayOff)
+                .limit(limit)
+                .offset(offset)
+                .options(
+                    selectinload(DayOff.links).selectinload(OvertimeDayOffLink.day_off_rel)
                 )
+                .order_by(DayOff.create_at.desc())
+            )
+    
+            if filter is not None:
+                if filter: 
+                    stmt = stmt.filter(DayOff.o_date < func.current_date())
+                else:
+                    stmt = stmt.filter(DayOff.o_date >= func.current_date())
+    
+            if is_approved is not None:
+                stmt = stmt.filter(DayOff.is_approved == is_approved)
+    
+            # Добавляем фильтрацию в зависимости от роли
+            stmt = await self._build_stmt_for_role(current_user, stmt)
+            
+            result: Result = await self.session.scalars(stmt)
+    
+            return result.all(), total_count
+    
+        except SQLAlchemyError as e:
+            raise HTTPException(status_code=500, detail=f"Database error: {str(e)}")
 
-                if filter is not None:
-                    if filter: 
-                        stmt = stmt.filter(DayOff.o_date < func.current_date())
-                    else:
-                        stmt = stmt.filter(DayOff.o_date >= func.current_date())
-
-                stmt = await self._build_stmt_for_role(current_user, stmt)
-                result: Result = await self.session.scalars(stmt)
-
-                # for item in result.all():
-                #     for link in item.links:
-                #         print(link.hours_used, link.overtime_rel.o_date)
-
-                return result.all(), total_count
-
-            except SQLAlchemyError as e:
-                raise HTTPException(status_code=500, detail=f"Database error: {str(e)}")
 
 
     async def get_day_off_oid(

@@ -20,12 +20,12 @@ nav img {
     border-radius: 50%;  /* Круглый логотип */
 }
 
-/* Основные кнопки */
+/* Основные кнопки по центру */
 .nav-container {
-    flex: 2;
     display: flex;
     justify-content: center;
     gap: 20px;
+    flex-grow: 1;
 }
 
 .nav-container a {
@@ -44,11 +44,23 @@ nav img {
     color: #fff;
 }
 
+/* Контейнер для кнопок уведомлений и выхода */
+.right-buttons {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+}
+
+/* Кнопки уведомлений */
+.notification-buttons {
+    display: flex;
+    gap: 10px;
+}
+
 .btn-notification {
     position: relative;
     color: #fff;
     font-size: 18px;
-    font-weight: 500;
     padding: 10px 20px;
     background-color: #4caf50;
     border-radius: 50px;  /* Круглая форма */
@@ -56,11 +68,15 @@ nav img {
     text-decoration: none;
 }
 
+.btn-notification:hover {
+    background-color: #388e3c;
+    color: #fff;
+}
+
 /* Кнопка выхода */
 .logout a {
     color: #fff;
     font-size: 18px;
-    font-weight: 500;
     padding: 10px 20px;
     background-color: #f44336;
     border-radius: 50px;  /* Круглая форма */
@@ -84,9 +100,13 @@ nav img {
         justify-content: center;
         margin-bottom: 10px;
     }
-    .notification, .logout {
+    .right-buttons {
         flex: 1 1 100%;
         justify-content: center;
         gap: 10px;
+    }
+    .logout {
+        flex: 1 1 100%;
+        justify-content: center;
     }
 }

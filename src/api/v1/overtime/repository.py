@@ -1,6 +1,6 @@
 import uuid
 
-from typing import List, Optional
+from typing import List, Optional, Tuple
 from fastapi import HTTPException
 from sqlalchemy import Select, func, select, Result
 from sqlalchemy.orm import joinedload
@@ -88,7 +88,7 @@ class OvertimeRepository(BaseRepo):
         limit: int,
         offset: int,
         filter: bool = None,
-    ) -> List[Overtime]:
+    ) -> Tuple[List[Overtime], int]:
         try:
             stmt_count = select(func.count()).select_from(Overtime)
             if filter is not None:

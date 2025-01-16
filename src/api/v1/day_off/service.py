@@ -71,13 +71,15 @@ class DayOffService:
         current_user: User,
         limit: int,
         offset: int,
-        filter: bool,
+        filter: bool | None = None,
+        is_approved: bool | None = None,
     ) -> PaginatedResponse[DayOffOut | DayOffExtendedOut]:
         day_offs, total_count = await self.repository.get_all(
             current_user=current_user,
             limit=limit,
             offset=offset,
             filter=filter,
+            is_approved=is_approved,
         )
         if current_user.role == Role.USER:
             day_offs_data = [
@@ -146,6 +148,7 @@ class DayOffService:
     async def delete(self, current_user: User, day_off: DayOff):
         await self.repository.delete(current_user=current_user, day_off=day_off)
 
+
     async def approve(self, current_user: User, day_off: DayOff, is_approved: bool):
         day_off = await self.repository.approve(
             current_user=current_user,
@@ -153,3 +156,7 @@ class DayOffService:
             is_approved=is_approved,
         )
         return DayOffOut.model_validate(day_off)
+
+
+    async def count_notifications(self, current_user: User) -> int:
+        return await self.repository.count_notifications_stmt_is_unapproved(current_user=current_user)

@@ -1,8 +1,9 @@
 import uuid
 
-from typing import List, Optional
+from typing import List, Optional, Tuple
 from fastapi import HTTPException
 from sqlalchemy import and_, func, select, Result
+from sqlalchemy.orm import selectinload
 from sqlalchemy.exc import IntegrityError, SQLAlchemyError
 
 from core.repo.base import BaseRepo
@@ -17,13 +18,11 @@ class UserRepository(BaseRepo):
         stmt = select(User).where(User.username == username)
         result: Result = await self.session.scalar(stmt)
         return result
-    
 
     async def get_user_by_id(self, oid: uuid.UUID) -> Optional[User]:
         stmt = select(User).where(User.oid == oid)
         result: Result = await self.session.scalar(stmt)
         return result
-
 
     async def create(self, data: UserCreate) -> User:
         try:
@@ -39,32 +38,45 @@ class UserRepository(BaseRepo):
             return user
         except IntegrityError as e:
             raise HTTPException(status_code=500, detail=f"Database error: {str(e)}")
-        
 
     async def get_all(
         self,
-        filters_params: UserFilterParams,
-    ) -> List[User]:
-        filters = []
+        limit: int,
+        offset: int,
+        is_active: bool,
+    ) -> Tuple[List[User], int]:
         try:
-            if filters_params.is_active is not None:
-                filters.append(User.is_active == filters_params.is_active)
-            if filters_params.start_date is not None:
-                filters.append(User.create_at >= filters_params.start_date)
-            if filters_params.end_date is not None:
-                filters.append(User.create_at <= filters_params.end_date)
+            stmt_count = select(func.count()).where(User.is_active == is_active)
+            total_count = await self.session.scalar(stmt_count)
 
-            query = (
+            stmt = (
                 select(User)
-                .where(and_(*filters))
-                .offset((filters_params.page - 1) * filters_params.limit)
-                .limit(filters_params.limit)
+                .options(selectinload(User.department_rel))
+                .where(User.is_active == is_active)
+                .limit(limit)
+                .offset(offset)
                 .order_by(User.create_at.desc())
             )
+            result = await self.session.scalars(stmt)
 
-            result = await self.session.execute(query)
-            return result.scalars().all()
+            return result.all(), total_count
+
         except SQLAlchemyError as e:
+            raise HTTPException(status_code=500, detail=f"Database error: {str(e)}")
+
+    async def approve_or_reject_user(
+        self,
+        user: User,
+        is_active: bool,
+    ) -> User:
+        try:
+            user.is_active = is_active
+            await self.session.commit()
+            await self.session.refresh(user)
+            return user
+        
+        except SQLAlchemyError as e:
+            await self.session.rollback()
             raise HTTPException(status_code=500, detail=f"Database error: {str(e)}")
 
 
@@ -73,7 +85,6 @@ class UserRepository(BaseRepo):
         result = await self.session.execute(query)
         return result.scalar()
 
-
     async def get_one(self, oid: uuid.UUID) -> User:
         try:
             stmt = select(User).where(User.oid == oid)
@@ -81,7 +92,6 @@ class UserRepository(BaseRepo):
             return result
         except SQLAlchemyError as e:
             raise HTTPException(status_code=500, detail=f"Database error: {str(e)}")
-
 
     async def update(
         self,
@@ -99,7 +109,6 @@ class UserRepository(BaseRepo):
             await self.session.rollback()
             raise HTTPException(status_code=500, detail=f"Database error: {str(e)}")
 
-
     async def delete(self, user: User):
         try:
             await self.session.delete(user)
@@ -107,13 +116,14 @@ class UserRepository(BaseRepo):
         except SQLAlchemyError as e:
             await self.session.rollback()
             raise HTTPException(status_code=500, detail=f"Database error: {str(e)}")
-        
 
     async def toggle_role(self, user: User, role: Role) -> User:
         try:
             # user.role = Role.MODERATOR if user.role == Role.USER else Role.USER
             if user.role == role:
-                raise HTTPException(status_code=400, detail="User already has this role")
+                raise HTTPException(
+                    status_code=400, detail="User already has this role"
+                )
             user.role = role
             await self.session.commit()
             await self.session.refresh(user)

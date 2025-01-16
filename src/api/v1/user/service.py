@@ -11,6 +11,7 @@ from .schemas import (
     UserFilterParams,
     UserUpdatePartial,
     UserUpdate,
+    PaginatedResponse
 )
 
 
@@ -47,10 +48,30 @@ class UserService:
 
     async def get_all(
         self,
-        filters_params: UserFilterParams,
-    ) -> List[UserOut]:
-        users = await self.repository.get_all(filters_params=filters_params)
-        return [UserOut.model_validate(user) for user in users]
+        limit: int = None,
+        offset: int = None,
+        is_active: bool = None,
+    ) -> PaginatedResponse[UserOut]:
+        users, total_count = await self.repository.get_all(
+            limit=limit,
+            offset=offset,
+            is_active=is_active,
+        )
+
+        return PaginatedResponse(
+            count=total_count,
+            items=[UserOut.model_validate(user) for user in users],
+            total_pages=(total_count + limit - 1) // limit,
+            current_page=(offset // limit) + 1,
+        )
+    
+
+    async def approve_or_reject_user(
+            self,
+            user: User,
+            is_active: bool,
+    ):
+        await self.repository.approve_or_reject_user(user=user, is_active=is_active)
 
 
     async def get_one(self, oid: uuid.UUID) -> UserOut:

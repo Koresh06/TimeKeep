@@ -16,7 +16,7 @@
         <div class="filters-container">
             <select id="filter" class="filter-select">
                 <option value="false" {% if filter == "false" %}selected{% endif %}>Текущие</option>
-                <option value="true" {% if filter == "true" %}selected{% endif %}>Использованные</option>
+                <option value="true" {% if filter == "true" %}selected{% endif %}>История</option>
             </select>
         </div>
 
@@ -40,7 +40,7 @@
         <table class="table table-striped table-bordered">
             <thead>
                 <tr class="text-center">
-                    <th>№</th>
+                    <th>#</th>
                     <th>Дата отгула</th>
                     <th>Причина</th>
                     <th>Статус</th>
@@ -132,7 +132,7 @@
         
     {% else %}
         <!-- Сообщение об отсутствии данных -->
-        <div class="alert alert-warning" role="alert">
+        <div class="alert alert-warning text-center" role="alert">
             Нет данных для отображения.
         </div>
     {% endif %}

@@ -1,6 +1,6 @@
 from typing import Annotated, List
 from fastapi import APIRouter, Depends, Query, status, Request, HTTPException
-from fastapi.responses import HTMLResponse
+from fastapi.responses import HTMLResponse, RedirectResponse
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from models.user import Role, User
@@ -18,6 +18,8 @@ from .schemas import (
     UserUpdate,
 )
 from .dependencies import user_by_oid
+from api.v1.day_off.dependencies import count_notifications_day_offs
+from middlewares.notification.dependencies import get_unread_notifications_count_user
 
 
 router = APIRouter(
@@ -87,21 +89,90 @@ async def register(
 
 
 @router.get(
-    "/",
-    response_model=List[UserOut],
-    dependencies=[Depends(RoleRequired([Role.SUPERUSER, Role.MODERATOR]))],
+    "/registration-requests",
+    response_class=HTMLResponse,
     status_code=status.HTTP_200_OK,
-    name="users:get_all",
-    description="Get all users with filters and pagination",
+    name="users:register_requests",
+    description="Register requests page",
 )
-async def get_all(
+async def register_requests_page(
+    request: Request,
     session: Annotated[
         AsyncSession,
         Depends(get_async_session),
     ],
-    filters_params: UserFilterParams = Depends(),
+    current_user: User = Depends(get_current_user),
+    limit: int = Query(10, ge=1, le=100),
+    offset: int = Query(0, ge=0),
+    count_day_offs: int = Depends(count_notifications_day_offs),
+    notifications_count_user: int = Depends(get_unread_notifications_count_user),
 ):
-    return await UserService(session).get_all(filters_params=filters_params)
+    data = await UserService(session).get_all(
+        limit=limit,
+        offset=offset,
+        is_active=False,
+    )
+
+    return templates.TemplateResponse(
+        request=request,
+        name="users/registration_requests.html",
+        context={
+            "current_user": current_user,
+            "count_day_offs": count_day_offs,
+            "users": data.items,
+            "total_pages": data.total_pages,
+            "current_page": data.current_page,
+            "limit": limit,
+            "offset": offset,
+            "count_day_offs": count_day_offs,
+            "notifications_count_user": notifications_count_user,
+        },
+    )
+
+
+@router.post(
+    "/{oid}/approve",
+    response_class=RedirectResponse,
+    status_code=status.HTTP_200_OK,
+    name="user:approve",
+    description="Approve or reject user",
+)
+async def register_requests(
+    session: Annotated[
+        AsyncSession,
+        Depends(get_async_session),
+    ],
+    user: User = Depends(user_by_oid),
+):
+    await UserService(session).approve_or_reject_user(
+        user=user,
+        is_active=True,
+    )
+
+    return RedirectResponse(
+        url="/user/registration-requests",
+        status_code=status.HTTP_302_FOUND,
+    )
+
+
+@router.post(
+    "/delete/{oid}",
+    dependencies=[Depends(RoleRequired(Role.SUPERUSER))],
+    status_code=status.HTTP_204_NO_CONTENT,
+    name="user:delete",
+    description="Delete user by id",
+)
+async def delete(
+    session: Annotated[
+        AsyncSession,
+        Depends(get_async_session),
+    ],
+    user: User = Depends(user_by_oid),
+):
+    await UserService(session).delete(user=user)
+
+    return RedirectResponse(url="/user/registration-requests", status_code=status.HTTP_303_SEE_OTHER)
+
 
 
 @router.get(
@@ -181,21 +252,6 @@ async def replace(
     )
 
 
-@router.delete(
-    "/{oid}",
-    dependencies=[Depends(RoleRequired(Role.SUPERUSER))],
-    status_code=status.HTTP_204_NO_CONTENT,
-    name="users:delete",
-    description="Delete user by id",
-)
-async def delete(
-    session: Annotated[
-        AsyncSession,
-        Depends(get_async_session),
-    ],
-    user: User = Depends(user_by_oid),
-):
-    await UserService(session).delete(user=user)
 
 
 @router.post(

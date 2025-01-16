@@ -21,7 +21,8 @@ from .schemas import (
     PaginatedResponse,
 )
 from .dependencies import overtime_by_oid
-from middlewares.notification.dependencies import get_unread_notifications_count
+from api.v1.day_off.dependencies import count_notifications_day_offs
+from middlewares.notification.dependencies import get_unread_notifications_count_user
 
 
 router = APIRouter(
@@ -40,7 +41,8 @@ router = APIRouter(
 async def create_overtime_page(
     request: Request,
     current_user: User = Depends(get_current_user),
-    notifications_count: int = Depends(get_unread_notifications_count),
+    count_day_offs: int = Depends(count_notifications_day_offs),
+    notifications_count_user: int = Depends(get_unread_notifications_count_user),
 ):
     success_message = request.cookies.get("success_message")
     # Декодируем сообщение из куки
@@ -52,10 +54,11 @@ async def create_overtime_page(
         context={
             "msg": success_message,
             "current_user": current_user,
-            "notifications_count": notifications_count
+            "count_day_offs": count_day_offs,
+            "notifications_count_user": notifications_count_user
         },
     )
-    # Удаляем cookie, чтобы сообщение не отображалось снова
+
     if success_message:
         response.delete_cookie("success_message")
     return response
@@ -114,7 +117,8 @@ async def get_all_overtimes(
     limit: int = Query(10, ge=1, le=100),
     offset: int = Query(0, ge=0),
     filter: str = Query(None),
-    notifications_count: int = Depends(get_unread_notifications_count),
+    count_day_offs: int = Depends(count_notifications_day_offs),
+    notifications_count_user: int = Depends(get_unread_notifications_count_user),
 ):
     
 
@@ -144,7 +148,8 @@ async def get_all_overtimes(
             "limit": limit,
             "offset": offset,
             "filter": filter_value,
-            "notifications_count": notifications_count,
+            "count_day_offs": count_day_offs,
+            "notifications_count_user": notifications_count_user,
         },
     )
 
@@ -161,7 +166,8 @@ async def edit_overtime_page(
     request: Request,
     overtime: Overtime = Depends(overtime_by_oid),
     current_user: User = Depends(get_current_user),
-    notifications_count: int = Depends(get_unread_notifications_count),
+    count_day_offs: int = Depends(count_notifications_day_offs),
+    notifications_count_user: int = Depends(get_unread_notifications_count_user),
 ):
     return templates.TemplateResponse(
         request=request,
@@ -169,7 +175,8 @@ async def edit_overtime_page(
         context={
             "current_user": current_user,
             "overtime": overtime,
-            "notifications_count": notifications_count
+            "count_day_offs": count_day_offs,
+            "notifications_count_user": notifications_count_user
         },
     )
 
@@ -178,7 +185,7 @@ async def edit_overtime_page(
     "/edit/{oid}",
     response_class=RedirectResponse,
     status_code=status.HTTP_200_OK,
-    dependencies=[Depends(RoleRequired([Role.SUPERUSER, Role.MODERATOR]))],
+    dependencies=[Depends(RoleRequired([Role.SUPERUSER, Role.MODERATOR, Role.USER]))],
     name="overtime:modify",
     description="Modify overtime",
 )

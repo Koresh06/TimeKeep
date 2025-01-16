@@ -34,7 +34,7 @@ class OvertimeAllocator:
                 })
 
         if total_hours < required_hours:
-            raise InsufficientOvertimeHours(required_hours, total_hours)
+            raise InsufficientOvertimeHours()
 
         return selected_overtimes
 

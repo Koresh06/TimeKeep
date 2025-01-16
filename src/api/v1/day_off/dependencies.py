@@ -27,3 +27,10 @@ async def day_off_by_oid(
             status_code=status.HTTP_404_NOT_FOUND,
             detail=f"Day off with oid {oid} not found",
         )
+
+
+async def count_notifications_day_offs(
+    current_user: Annotated[User, Depends(get_current_user)],
+    session: Annotated[AsyncSession, Depends(get_async_session)],
+):
+    return await DayOffService(session).count_notifications(current_user=current_user)

@@ -15,9 +15,9 @@ class NotificationMiddleware(BaseHTTPMiddleware):
         call_next,
     ):
         async with async_session_maker() as session:
-            notifications_count = await NotificationService(session).get_inactive_users_count()
+            notifications_count_user = await NotificationService(session).get_inactive_users_count()
 
-            request.state.notifications_count = notifications_count
+            request.state.notifications_count_user = notifications_count_user
             response = await call_next(request)
 
             return response

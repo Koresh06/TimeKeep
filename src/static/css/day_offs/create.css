@@ -1,4 +1,4 @@
-.day_off-title {
+.create-ovetime-title {
   font-size: 2.5rem; /* Размер шрифта */
   font-weight: 600; /* Полужирное начертание */
   color: #388E3C; /* Темно-зеленый цвет для текста */
@@ -14,7 +14,7 @@
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Легкая тень для объема */
 }
 
-.day_off-title:hover {
+.create-ovetime-title:hover {
   color: #1B5E20; /* Более темный зеленый при наведении */
   transform: scale(1.05); /* Увеличение при наведении */
 }
@@ -34,18 +34,18 @@
     transition: opacity 0.5s ease, visibility 0.5s ease;
   }
   
-  .alert.show {
-    opacity: 1;
-    visibility: visible;
-  }
-  
-  .alert-success {
-    background-color: #28a745;
-  }
-  
-  .alert-error {
-    background-color: #dc3545;
-  }
+.alert.show {
+  opacity: 1;
+  visibility: visible;
+}
+
+#alertSuccess {
+  background-color: #28a745;
+}
+
+#alertError {
+  background-color: #dc3545;
+}
   
 
 /* Позиционирование контейнера для заголовка и иконки */
@@ -74,4 +74,3 @@
   transform: scale(1.1); /* Легкое увеличение при наведении */
   transition: transform 0.2s ease, color 0.2s ease; /* Плавный эффект */
 }
-
