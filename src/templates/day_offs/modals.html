@@ -63,7 +63,7 @@
 </div>
 {% endfor %}
 
-
+{% if not current_user.role.value == 'user' %}
 {% for day_off in day_offs %}
 <div class="modal fade" id="confirmModal{{ day_off.oid }}" tabindex="-1" aria-labelledby="modalLabel{{ day_off.oid }}" aria-hidden="true">
   <div class="modal-dialog">
@@ -85,3 +85,4 @@
   </div>
 </div>
 {% endfor %}
+{% endif %}
