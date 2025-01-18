@@ -1,10 +1,8 @@
-PYTHON_CMD = poetry run python
-MAIN_SCRIPT = src/main.py
-CREATE_SUPERUSER_SCRIPT = scripts.create_superuser
+
 
 # Запуск FastAPI
 start:
-	$(PYTHON_CMD) $(MAIN_SCRIPT)
+	$ uvicorn src.main:create_app
 
 # Создание суперпользователя
 create-superuser:
