@@ -1,0 +1,102 @@
+{% extends "base.html" %}
+
+{% block styles %}
+    <link rel="stylesheet" href="{{ url_for('static', path='css/day_offs/create.css') }}">
+{% endblock %}
+
+{% block content %}
+<div class="container mt-6 ">
+    <div class="d-flex justify-content-center align-items-center">
+        <h1 class="create-ovetime-title">Создание отгула</h1>
+        <!-- Иконка для модального окна -->
+        <div class="info-icon-container ms-2">
+            <i class="bi bi-info-circle-fill" data-bs-toggle="modal" data-bs-target="#infoModal"></i>
+        </div>
+    </div>
+
+    <!-- Показать успешный алерт, если есть сообщение -->
+    {% if msg %}
+    <div class="alert alert-success alert-dismissible fade show" role="alert" id="alertSuccess">
+        {{ msg }}
+    </div>
+    <script>
+        setTimeout(function() {
+            var alertSuccess = document.getElementById('alertSuccess');
+            if (alertSuccess) {
+                alertSuccess.classList.remove('show');
+                alertSuccess.classList.add('fade');
+            }
+        }, 3000);  // Убираем алерт через 3 секунды
+    </script>
+    {% endif %}
+
+    <!-- Показать алерт об ошибке, если есть ошибка -->
+    {% if error %}
+    <div class="alert alert-danger alert-dismissible fade show" role="alert" id="alertError">
+        {{ error }}
+    </div>
+    <script>
+        setTimeout(function() {
+            var alertError = document.getElementById('alertError');
+            if (alertError) {
+                alertError.classList.remove('show');
+                alertError.classList.add('fade');
+            }
+        }, 3000);  // Убираем алерт через 3 секунды
+    </script>
+    {% endif %}
+
+    <!-- Форма создания отгула -->
+    <div class="create-day_off-container w-50 mx-auto">
+        <form method="post" action="/day_off/create" class="form-group">
+            <div class="mb-3">
+                <label for="o_date" class="form-label">Дата отгула:</label>
+                <input type="date" id="o_date" name="o_date" class="form-control" required>
+            </div>
+
+            <div class="mb-3">
+                <label for="reason" class="form-label">Причина:</label>
+                <textarea id="reason" name="reason" maxlength="500" class="form-control" rows="4" required></textarea>
+            </div>
+    
+            <button type="submit" class="btn btn-primary w-100">Создать</button>
+        </form>
+    </div>
+</div>
+
+<!-- Модальное окно с пояснением -->
+<div class="modal fade" id="infoModal" tabindex="-1" aria-labelledby="infoModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="infoModalLabel">Как работает создание отгула</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <p>
+                    Отгул создается в зависимости от режима работы. В зависимости от выбранного режима (сменный или ежедневный) происходит автоматический расчет времени для отгула.
+                    <br>
+                    &nbsp;&nbsp;&nbsp;&nbsp;• В сменном режиме для одного отгула необходимо 24 часа. Система автоматически распределит часы в соответствии с вашим графиком работы.
+                    <br>
+                    &nbsp;&nbsp;&nbsp;&nbsp;• В ежедневном режиме каждый день автоматически назначается 8 часов отгула, чтобы в сумме было 24 часа. Система сама выберет подходящие часы для отгула.
+                    <br>
+                    <br>
+                    При создании отгула вам нужно будет указать только дату и причину отгула. Система автоматически выберет подходящие часы и рассчитает время отгула.
+                </p>
+                
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock %}
+
+{% block scripts %}
+    <!-- Подключаем Bootstrap для тултипов -->
+    <script>
+        var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
+        tooltipTriggerList.forEach(function (tooltipTriggerEl) {
+            new bootstrap.Tooltip(tooltipTriggerEl);
+        });
+    </script>
+{% endblock %}

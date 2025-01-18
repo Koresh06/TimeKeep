@@ -1,0 +1,76 @@
+.create-ovetime-title {
+  font-size: 2.5rem; /* Размер шрифта */
+  font-weight: 600; /* Полужирное начертание */
+  color: #388E3C; /* Темно-зеленый цвет для текста */
+  text-align: center; /* Выравнивание по центру */
+  margin-bottom: 20px; /* Отступ снизу */
+  text-transform: uppercase; /* Преобразование в верхний регистр */
+  letter-spacing: 2px; /* Межбуквенный интервал */
+  transition: color 0.3s ease, transform 0.3s ease; /* Плавный переход */
+  border: 3px solid #A5D6A7; /* Светлый зеленый оттенок для рамки */
+  border-radius: 50px;
+  padding: 1rem 2rem; /* Отступ внутри заголовка */
+  background: linear-gradient(45deg, #FAF3E0, #E8F5E9); /* Кремовый и светлый зеленый */
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Легкая тень для объема */
+}
+
+.create-ovetime-title:hover {
+  color: #1B5E20; /* Более темный зеленый при наведении */
+  transform: scale(1.05); /* Увеличение при наведении */
+}
+
+/* Стиль для алерта */
+.alert {
+    position: fixed;
+    bottom: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    padding: 15px;
+    font-size: 16px;
+    color: #fff;
+    border-radius: 5px;
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.5s ease, visibility 0.5s ease;
+  }
+  
+.alert.show {
+  opacity: 1;
+  visibility: visible;
+}
+
+#alertSuccess {
+  background-color: #28a745;
+}
+
+#alertError {
+  background-color: #dc3545;
+}
+  
+
+/* Позиционирование контейнера для заголовка и иконки */
+.d-flex {
+  position: relative;
+  align-items: center; /* Выравниваем по вертикали */
+  justify-content: center; /* Выравниваем по горизонтали */
+}
+
+/* Позиционирование иконки справа от названия */
+.info-icon-container {
+  position: absolute;
+  right: -40px;  /* Сдвигаем иконку вправо относительно контейнера */
+  font-size: 2rem; /* Уменьшаем размер иконки */
+  color: #388E3C; /* Зеленый цвет для иконки */
+  cursor: pointer;
+  text-align: right;
+  width: 40px;
+  height: 40px;
+  line-height: 40px;
+}
+
+/* Стиль для иконки при наведении */
+.info-icon-container i:hover {
+  color: #1B5E20;  /* Тёмно-зеленый цвет при наведении */
+  transform: scale(1.1); /* Легкое увеличение при наведении */
+  transition: transform 0.2s ease, color 0.2s ease; /* Плавный эффект */
+}

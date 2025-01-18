@@ -1,0 +1,6 @@
+{
+  "python.pythonPath": "D:\\Scripts\\fastapi\\TimeKeep_2\\backend\\.venv\\Scripts\\python.exe",
+  "python.terminal.activateEnvironment": true,
+  "terminal.integrated.defaultProfile.windows": "PowerShell",
+  "remote.WSL.fileWatcher.polling": true
+}

@@ -1,0 +1,45 @@
+<nav>
+    <div class="logo-container">
+        <a href="/overtime/">
+            <img class="logo" src="{{ url_for('static', path='images/logo.png') }}" alt="Logo">
+        </a>
+    </div>
+    
+    <!-- Основные кнопки по центру -->
+    <div class="nav-container">
+        <a href="/overtime/">Переработки</a>
+        <a href="/day_off/">Отгулы</a>
+        <a href="#">Профиль</a>
+    </div>
+    
+    <!-- Контейнер для кнопок уведомлений и кнопки выхода -->
+    <div class="right-buttons">
+        <!-- Кнопки уведомлений -->
+        <div class="notification-buttons">
+            {% if current_user.role.value == 'moderator' or current_user.role.value == 'superuser' %}
+                <a href="/day_off/notifications" class="btn-notification">
+                    <i class="bi bi-bell-fill"></i>
+                    <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
+                        {{ count_day_offs }}+
+                        <span class="visually-hidden">непрочитанные сообщения</span>
+                    </span>
+                </a>
+                {% endif %}
+                
+                {% if current_user.role.value == 'superuser' %}
+                <a href="/user/registration-requests" class="btn-notification">
+                    <i class="bi bi-person-circle"></i>
+                    <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
+                        {{ notifications_count_user }}+
+                        <span class="visually-hidden">непрочитанные сообщения</span>
+                    </span>
+                </a>
+            {% endif %}
+        </div>
+
+        <!-- Кнопка выхода -->
+        <div class="logout">
+            <a href="/auth/logout">Выход</a>
+        </div>
+    </div>
+</nav>
