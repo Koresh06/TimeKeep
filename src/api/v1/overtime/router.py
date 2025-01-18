@@ -6,23 +6,23 @@ from typing import Annotated
 from sqlalchemy.ext.asyncio import AsyncSession
 from urllib.parse import quote, unquote
 
-from api.conf_static import templates
-from api.v1.auth.dependencies import get_current_user, get_is_authenticated
-from models.user import User
-from models import Overtime, Role
-from core.session import get_async_session
-from api.v1.auth.permissions import RoleRequired
-from .service import OvertimeService
-from .schemas import (
+from src.api.conf_static import templates
+from src.api.v1.auth.dependencies import get_current_user, get_is_authenticated
+from src.models.user import User
+from src.models import Overtime, Role
+from src.core.session import get_async_session
+from src.api.v1.auth.permissions import RoleRequired
+from src.api.v1.overtime.service import OvertimeService
+from src.api.v1.overtime.schemas import (
     OvertimeOut,
     OvertimeCreate,
     OvertimeUpdate,
     OvertimeUpdatePartial,
     PaginatedResponse,
 )
-from .dependencies import overtime_by_oid
-from api.v1.day_off.dependencies import count_notifications_day_offs
-from middlewares.notification.dependencies import get_unread_notifications_count_user
+from src.api.v1.overtime.dependencies import overtime_by_oid
+from src.api.v1.day_off.dependencies import count_notifications_day_offs
+from src.middlewares.notification.dependencies import get_unread_notifications_count_user
 
 
 router = APIRouter(

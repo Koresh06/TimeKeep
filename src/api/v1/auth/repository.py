@@ -3,9 +3,9 @@ import uuid
 from typing import Optional
 from sqlalchemy.future import select
 
-from core.repo.base import BaseRepo
+from src.core.repo.base import BaseRepo
 
-from models import User
+from src.models import User
 
 class AuthRepository(BaseRepo):
 

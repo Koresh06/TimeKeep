@@ -7,11 +7,11 @@ from sqlalchemy.orm import joinedload
 from sqlalchemy.exc import IntegrityError, SQLAlchemyError
 
 
-from models.user import User
-from core.repo.base import BaseRepo
-from models import Overtime, Role
+from src.models.user import User
+from src.core.repo.base import BaseRepo
+from src.models import Overtime, Role
 
-from .schemas import OvertimeCreate, OvertimeUpdate, OvertimeUpdatePartial
+from src.api.v1.overtime.schemas import OvertimeCreate, OvertimeUpdate, OvertimeUpdatePartial
 
 
 class OvertimeRepository(BaseRepo):

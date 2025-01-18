@@ -4,7 +4,7 @@ from fastapi import Form
 from pydantic import BaseModel, ConfigDict, Field
 from datetime import date, datetime
 
-from api.v1.user.schemas import UserOut
+from src.api.v1.user.schemas import UserOut
 
 
 M = TypeVar('M')

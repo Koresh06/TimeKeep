@@ -4,10 +4,10 @@ from typing import Annotated
 from fastapi import Path, Depends, HTTPException, status
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from core.session import get_async_session
-from models.department import Department
+from src.core.session import get_async_session
+from src.models.department import Department
 
-from .service import DepartmentService
+from src.api.v1.department.service import DepartmentService
 
 
 

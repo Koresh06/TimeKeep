@@ -1,6 +1,6 @@
 from uuid import uuid4
 from httpx import AsyncClient
-from models import Department, User
+from src.models import Department, User
 
 
 async def test_create_department(async_client: AsyncClient, created_department: Department):

@@ -1,9 +1,9 @@
 from fastapi import FastAPI
-from .user.router import router as users_router
-from .auth.router import router as auth_router
-from .department.router import router as department_router
-from .overtime.router import router as overtime_router
-from .day_off.router import router as day_off_router
+from src.api.v1.user.router import router as users_router
+from src.api.v1.auth.router import router as auth_router
+from src.api.v1.department.router import router as department_router
+from src.api.v1.overtime.router import router as overtime_router
+from src.api.v1.day_off.router import router as day_off_router
 
 
 def register_routers(app: FastAPI) -> None:

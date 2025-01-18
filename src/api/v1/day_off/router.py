@@ -5,11 +5,11 @@ from fastapi import APIRouter, Depends, Path, Query, Request, status
 from fastapi.responses import HTMLResponse, RedirectResponse
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from core.session import get_async_session
-from models import User, Role, DayOff
-from api.conf_static import templates
+from src.core.session import get_async_session
+from src.models import User, Role, DayOff
+from src.api.conf_static import templates
 
-from .schemas import (
+from src.api.v1.day_off.schemas import (
     DayOffOut,
     DayOffCreate,
     DayOffExtendedOut,
@@ -17,13 +17,13 @@ from .schemas import (
     DayOffUpdate,
     DayOffUpdatePartil,
 )
-from .service import DayOffService
-from api.v1.auth.dependencies import get_current_user
-from api.v1.auth.permissions import RoleRequired
-from .dependencies import day_off_by_oid
-from .errors import InsufficientOvertimeHours
-from .dependencies import count_notifications_day_offs
-from middlewares.notification.dependencies import get_unread_notifications_count_user
+from src.api.v1.day_off.service import DayOffService
+from src.api.v1.auth.dependencies import get_current_user
+from src.api.v1.auth.permissions import RoleRequired
+from src.api.v1.day_off.dependencies import day_off_by_oid
+from src.api.v1.day_off.errors import InsufficientOvertimeHours
+from src.api.v1.day_off.dependencies import count_notifications_day_offs
+from src.middlewares.notification.dependencies import get_unread_notifications_count_user
 
 
 router = APIRouter(

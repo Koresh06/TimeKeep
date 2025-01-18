@@ -4,8 +4,8 @@ from starlette.middleware.base import BaseHTTPMiddleware
 from fastapi import Request, Depends
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from core.session import async_session_maker
-from .service import NotificationService
+from src.core.session import async_session_maker
+from src.middlewares.notification.service import NotificationService
 
 
 class NotificationMiddleware(BaseHTTPMiddleware):

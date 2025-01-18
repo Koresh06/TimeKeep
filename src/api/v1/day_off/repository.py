@@ -6,11 +6,11 @@ from sqlalchemy import Result, func, select, Select
 from sqlalchemy.orm import joinedload, selectinload
 from sqlalchemy.exc import IntegrityError, SQLAlchemyError
 
-from core.repo.base import BaseRepo
-from models import DayOff, Overtime, OvertimeDayOffLink, User, Role
+from src.core.repo.base import BaseRepo
+from src.models import DayOff, Overtime, OvertimeDayOffLink, User, Role
 
-from .schemas import DayOffCreate, DayOffUpdatePartil, DayOffUpdate
-from .errors import DayOffNotFoundError, DepartmentPermissionError
+from src.api.v1.day_off.schemas import DayOffCreate, DayOffUpdatePartil, DayOffUpdate
+from src.api.v1.day_off.errors import DayOffNotFoundError, DepartmentPermissionError
 
 
 class DayOffRepository(BaseRepo):

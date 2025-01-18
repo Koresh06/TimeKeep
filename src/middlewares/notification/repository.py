@@ -1,8 +1,8 @@
 from sqlalchemy.future import select
 from sqlalchemy import func, Result
 
-from core.repo.base import BaseRepo
-from models.user import User
+from src.core.repo.base import BaseRepo
+from src.models.user import User
 
 class NotificationRepository(BaseRepo):
 

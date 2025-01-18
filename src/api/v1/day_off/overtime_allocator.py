@@ -1,7 +1,7 @@
 from typing import List
-from models import Overtime
+from src.models import Overtime
 
-from .errors import InsufficientOvertimeHours
+from src.api.v1.day_off.errors import InsufficientOvertimeHours
 
 class OvertimeAllocator:
 

@@ -1,9 +1,9 @@
 from httpx import AsyncClient
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from models import User, Department, Role, WorkSchedule
-from api.v1.user.service import UserService
-from api.v1.user.schemas import UserCreate
+from src.models import User, Department, Role, WorkSchedule
+from src.api.v1.user.service import UserService
+from src.api.v1.user.schemas import UserCreate
 
 
 async def create_test_user(

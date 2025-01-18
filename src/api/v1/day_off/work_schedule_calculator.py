@@ -1,5 +1,7 @@
-from models import User, WorkSchedule
 from fastapi import HTTPException
+
+from src.models import User, WorkSchedule
+
 
 class WorkScheduleCalculator:
     

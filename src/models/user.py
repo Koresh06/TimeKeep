@@ -8,11 +8,11 @@ from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy import Enum as SQLAlchemyEnum
 from datetime import datetime
 
-from .base import Base
+from src.models.base import Base
 
 
 if TYPE_CHECKING:
-    from models import DayOff, Department, Overtime
+    from src.models import DayOff, Department, Overtime
 
 
 class Role(Enum):

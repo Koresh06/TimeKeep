@@ -1,8 +1,8 @@
 from typing import List, Union
 from fastapi import Depends, HTTPException, status
 from fastapi.responses import RedirectResponse
-from api.v1.auth.dependencies import get_current_user
-from models.user import User, Role
+from src.api.v1.auth.dependencies import get_current_user
+from src.models.user import User, Role
 
 class RoleRequired:
     def __init__(self, required_roles: Union[Role, List[Role]]):

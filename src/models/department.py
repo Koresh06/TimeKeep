@@ -5,10 +5,10 @@ from sqlalchemy.orm import Mapped, mapped_column, relationship
 from sqlalchemy.dialects.postgresql import UUID
 from datetime import datetime
 
-from .base import Base
+from src.models.base import Base
 
 if TYPE_CHECKING:
-    from models import User
+    from src.models import User, Base
 
 
 class Department(Base):

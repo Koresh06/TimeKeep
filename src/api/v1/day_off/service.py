@@ -2,9 +2,9 @@ from typing import List
 import uuid
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from models import Overtime, User, OvertimeDayOffLink, Role
-from .repository import DayOffRepository
-from .schemas import (
+from src.models import Overtime, User, OvertimeDayOffLink, Role
+from src.api.v1.day_off.repository import DayOffRepository
+from src.api.v1.day_off.schemas import (
     DayOffCreate,
     DayOffOut,
     DayOffExtendedOut,
@@ -12,10 +12,10 @@ from .schemas import (
     DayOffUpdatePartil,
     DayOffUpdate,
 )
-from .overtime_allocator import OvertimeAllocator
-from .work_schedule_calculator import WorkScheduleCalculator
-from api.v1.user.schemas import UserOut
-from models import DayOff
+from src.api.v1.day_off.overtime_allocator import OvertimeAllocator
+from src.api.v1.day_off.work_schedule_calculator import WorkScheduleCalculator
+from src.api.v1.user.schemas import UserOut
+from src.models import DayOff
 
 
 class DayOffService:

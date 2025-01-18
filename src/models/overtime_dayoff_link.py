@@ -5,12 +5,10 @@ from sqlalchemy import DateTime, ForeignKey, Integer, func
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 from sqlalchemy.dialects.postgresql import UUID
 
-
-from .base import Base
-
+from src.models.base import Base
 
 if TYPE_CHECKING:
-    from models import DayOff,  Overtime
+    from src.models import DayOff,  Overtime
 
 
 

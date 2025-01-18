@@ -5,9 +5,9 @@ from fastapi import HTTPException
 from sqlalchemy import select, Result
 from sqlalchemy.exc import SQLAlchemyError
 
-from core.repo.base import BaseRepo
-from models import Department
-from .schemas import DepartmentCreate, DepartmentUpdate, DepartmentOut, DepartmentUpdatePartil
+from src.core.repo.base import BaseRepo
+from src.models import Department
+from src.api.v1.department.schemas import DepartmentCreate, DepartmentUpdate, DepartmentOut, DepartmentUpdatePartil
 
 
 class DepartmentRepository(BaseRepo):

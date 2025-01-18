@@ -1,9 +1,9 @@
 import uuid
 from httpx import AsyncClient
 
-from models import User, Department, Role, WorkSchedule
-from api.v1.user.service import UserService
-from api.v1.user.schemas import UserCreate
+from src.models import User, Department, Role, WorkSchedule
+from src.api.v1.user.service import UserService
+from src.api.v1.user.schemas import UserCreate
 
 
 async def test_unauthorized_user(async_client: AsyncClient):

@@ -4,9 +4,9 @@ import uuid
 from fastapi import Form
 from pydantic import BaseModel, ConfigDict, Field, field_validator
 
-from models import Role, WorkSchedule
+from src.models import Role, WorkSchedule
 
-from api.v1.department.schemas import DepartmentOut
+from src.api.v1.department.schemas import DepartmentOut
 
 
 M = TypeVar("M")

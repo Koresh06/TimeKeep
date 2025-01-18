@@ -1,20 +1,22 @@
 import sys
+import os
+
 sys.dont_write_bytecode = True
+sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), 'src')))
+
 
 import uvicorn
 
 from fastapi import FastAPI, Request, status
 from fastapi.exceptions import HTTPException
 from fastapi.responses import RedirectResponse
-# from fastapi_admin.app import app as admin_app
 
-from api.conf_static import configure_static
-from api.v1.router_registration import register_routers
-from api.error_handlers import http_exception_handler
-from core.config import settings
-from core.logging import setup_logging
-from middlewares.notification.middleware import NotificationMiddleware
-# from api.v1.admin.admin_app import lifespan
+from src.api.conf_static import configure_static
+from src.api.v1.router_registration import register_routers
+from src.api.error_handlers import http_exception_handler
+from src.core.config import settings
+from src.core.logging import setup_logging
+from src.middlewares.notification.middleware import NotificationMiddleware
 
 
 def create_app():
@@ -22,7 +24,6 @@ def create_app():
         title="TimeKeep",
         description="TimeKeep API",
         version="1.0",
-        # lifespan=lifespan,
     )
     
     configure_static(app)
@@ -40,7 +41,6 @@ def create_app():
             status_code=status.HTTP_302_FOUND,
         )
     
-    # app.mount("/admin", admin_app)
 
     return app
 

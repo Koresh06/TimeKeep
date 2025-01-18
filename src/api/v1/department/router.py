@@ -2,12 +2,12 @@ from typing import Annotated, List
 from fastapi import APIRouter, Depends, status
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from core.session import get_async_session
-from models import Department, Role
-from api.v1.auth.permissions import RoleRequired
-from .schemas import DepartmentOut, DepartmentCreate, DepartmentUpdatePartil
-from .service import DepartmentService
-from .dependencies import department_by_oid
+from src.core.session import get_async_session
+from src.models import Department, Role
+from src.api.v1.auth.permissions import RoleRequired
+from src.api.v1.department.schemas import DepartmentOut, DepartmentCreate, DepartmentUpdatePartil
+from src.api.v1.department.service import DepartmentService
+from src.api.v1.department.dependencies import department_by_oid
 
 
 router = APIRouter(

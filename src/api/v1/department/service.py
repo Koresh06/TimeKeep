@@ -3,9 +3,9 @@ import uuid
 from fastapi import HTTPException
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from models import Department
-from .repository import DepartmentRepository
-from .schemas import (
+from src.models import Department
+from src.api.v1.department.repository import DepartmentRepository
+from src.api.v1.department.schemas import (
     DepartmentCreate,
     DepartmentUpdate,
     DepartmentOut,

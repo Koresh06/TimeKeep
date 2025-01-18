@@ -6,10 +6,10 @@ from sqlalchemy import and_, func, select, Result
 from sqlalchemy.orm import selectinload
 from sqlalchemy.exc import IntegrityError, SQLAlchemyError
 
-from core.repo.base import BaseRepo
-from models.user import User, Role
-from .schemas import UserCreate, UserFilterParams, UserUpdatePartial, UserUpdate
-from ..auth.security import get_password_hash
+from src.core.repo.base import BaseRepo
+from src.models.user import User, Role
+from src.api.v1.user.schemas import UserCreate, UserFilterParams, UserUpdatePartial, UserUpdate
+from src.api.v1.auth.security import get_password_hash
 
 
 class UserRepository(BaseRepo):

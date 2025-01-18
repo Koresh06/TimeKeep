@@ -1,10 +1,10 @@
 import uuid
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from models.user import User
-from models import Overtime, Role
-from .repository import OvertimeRepository
-from .schemas import (
+from src.models.user import User
+from src.models import Overtime, Role
+from src.api.v1.overtime.repository import OvertimeRepository
+from src.api.v1.overtime.schemas import (
     OvertimeOut,
     OvertimeCreate,
     OvertimeUpdate,
@@ -12,7 +12,7 @@ from .schemas import (
     PaginatedResponse,
     OvertimeExtendedOut,
 )
-from api.v1.user.schemas import UserOut
+from src.api.v1.user.schemas import UserOut
 
 
 class OvertimeService:

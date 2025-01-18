@@ -5,14 +5,14 @@ from fastapi.security import APIKeyCookie
 from fastapi.responses import RedirectResponse
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from core.config import settings
-from core.session import get_async_session
+from src.core.config import settings
+from src.core.session import get_async_session
 
-from models import User
-from .service import AuthService
+from src.models import User
+from src.api.v1.auth.service import AuthService
 
-from .jwt import ALGORITHM
-from .schemas import TokenPayload
+from src.api.v1.auth.jwt import ALGORITHM
+from src.api.v1.auth.schemas import TokenPayload
 
 
 cookie_scheme = APIKeyCookie(name="access_token", auto_error=False)

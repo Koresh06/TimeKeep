@@ -6,13 +6,14 @@ from sqlalchemy.pool import NullPool
 import pytest_asyncio
 from httpx import ASGITransport, AsyncClient
 from asgi_lifespan import LifespanManager
-from main import app
-from core.session import get_async_session
-from core.config import settings
-from models import Base, Role, WorkSchedule, Department
-from api.v1.user.service import UserService
-from api.v1.user.schemas import UserCreate
-from api.v1.auth.jwt import create_access_token
+
+from main import create_app
+from src.core.session import get_async_session
+from src.core.config import settings
+from src.models import Base, Role, WorkSchedule, Department
+from src.api.v1.user.service import UserService
+from src.api.v1.user.schemas import UserCreate
+from src.api.v1.auth.jwt import create_access_token
 
 
 @pytest_asyncio.fixture(scope="function")
@@ -69,6 +70,7 @@ async def async_client(async_db_session) -> AsyncGenerator[AsyncClient, None]:
     def override_get_db() -> Iterator[AsyncSession]:
         yield async_db_session
 
+    app = create_app()
     app.dependency_overrides[get_async_session] = override_get_db
 
     async with LifespanManager(app):

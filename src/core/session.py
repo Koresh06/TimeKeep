@@ -6,7 +6,7 @@ from sqlalchemy.ext.asyncio import (
 )
 
 
-from core.config import settings
+from src.core.config import settings
 
 
 

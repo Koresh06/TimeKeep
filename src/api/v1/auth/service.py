@@ -5,7 +5,7 @@ from fastapi.security import OAuth2PasswordRequestForm
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from .repository import AuthRepository
-from models import User
+from src.models import User
 
 from .schemas import Token
 from .security import verify_password

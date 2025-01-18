@@ -3,9 +3,9 @@ import uuid
 from fastapi import HTTPException, status
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from models.user import User, Role
-from .repository import UserRepository
-from .schemas import (
+from src.models.user import User, Role
+from src.api.v1.user.repository import UserRepository
+from src.api.v1.user.schemas import (
     UserOut,
     UserCreate,
     UserFilterParams,

@@ -2,8 +2,8 @@ import uuid
 from jose import jwt
 from datetime import datetime, timedelta, timezone
 
-from core.config import settings
-from .schemas import Token
+from src.core.config import settings
+from src.api.v1.auth.schemas import Token
 
 ALGORITHM = "HS256"
 access_token_jwt_subject = "access"

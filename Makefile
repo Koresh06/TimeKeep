@@ -1,4 +1,3 @@
-# Переменные
 PYTHON_CMD = poetry run python
 MAIN_SCRIPT = src/main.py
 CREATE_SUPERUSER_SCRIPT = scripts.create_superuser

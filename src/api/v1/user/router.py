@@ -3,23 +3,23 @@ from fastapi import APIRouter, Depends, Query, status, Request, HTTPException
 from fastapi.responses import HTMLResponse, RedirectResponse
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from models.user import Role, User
-from core.session import get_async_session
-from api.conf_static import templates
-from api.v1.auth.permissions import RoleRequired
-from api.v1.auth.dependencies import get_current_user
-from api.v1.department.service import DepartmentService
-from .service import UserService
-from .schemas import (
+from src.models.user import Role, User
+from src.core.session import get_async_session
+from src.api.conf_static import templates
+from src.api.v1.auth.permissions import RoleRequired
+from src.api.v1.auth.dependencies import get_current_user
+from src.api.v1.department.service import DepartmentService
+from src.api.v1.user.service import UserService
+from src.api.v1.user.schemas import (
     UserOut,
     UserCreate,
     UserFilterParams,
     UserUpdatePartial,
     UserUpdate,
 )
-from .dependencies import user_by_oid
-from api.v1.day_off.dependencies import count_notifications_day_offs
-from middlewares.notification.dependencies import get_unread_notifications_count_user
+from src.api.v1.user.dependencies import user_by_oid
+from src.api.v1.day_off.dependencies import count_notifications_day_offs
+from src.middlewares.notification.dependencies import get_unread_notifications_count_user
 
 
 router = APIRouter(
