@@ -1,5 +1,9 @@
 {% extends 'base.html' %}
 
+{% block styles %}
+    <link rel="stylesheet" href="{{ url_for('static', path='css/auth.css') }}">
+{% endblock %}
+
 {% block content %}
 <div class="auth-container mt-5">
     <div class="row justify-content-center">
