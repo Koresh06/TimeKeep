@@ -17,6 +17,7 @@ services:
 
   web:
     container_name: fastapi_container
+    restart: always
     build:
       context: .
       dockerfile: src/Dockerfile
