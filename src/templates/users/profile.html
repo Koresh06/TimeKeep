@@ -1,0 +1,119 @@
+{% extends 'base.html' %}
+
+{% block styles %}
+    <link rel="stylesheet" href="{{ url_for('static', path='css/users/profile.css') }}">
+{% endblock %}
+
+{% block content %}
+<div class="profile-page">
+    <div class="profile-container">
+        <!-- Левая секция с профилем -->
+        <div class="profile-section">
+            <h2>Профиль пользователя</h2>
+            <div class="profile-info">
+                <div>
+                    <label>Имя пользователя:</label>
+                    {{ current_user.username }}
+                </div>
+                <div>
+                    <label>Роль:</label>
+                    {{ current_user.role }}
+                </div>
+                <div>
+                    <label>Должность:</label>
+                    {{ current_user.position }}
+                </div>
+                <div>
+                    <label>График работы:</label>
+                    {{ "Ежедневник" if current_user.work_schedule == 'daily' else "Сменна" }}
+                </div>
+                <div>
+                    <label>Дата создания:</label>
+                    {{ current_user.create_at.strftime('%d.%m.%Y') }}
+                </div>
+            </div>
+            <div class="department-info">
+                <strong>Подразделение:</strong>
+                {{ current_user.department_rel.name if current_user.department_rel else 'Не назначен' }}
+            </div>
+        </div>
+
+        <!-- Правая секция со статистикой -->
+        <div class="statistics-section">
+            <h3>Статистика</h3>
+            <div class="stat-block">
+                <label>Общее количество переработок:</label>
+                <span>12</span>
+            </div>
+            <div class="stat-block">
+                <label>Текущие/Использованные отгулы:</label>
+                <span>3 / 8</span>
+            </div>
+            <div class="stat-block">
+                <label>Оставшиеся часы:</label>
+                <span>24 ч.</span>
+            </div>
+            <div class="statistics-filters">
+                <label for="year-select">Выберите год:</label>
+                <select id="year-select">
+                    <option value="2024" selected>2024</option>
+                    <option value="2023">2023</option>
+                    <option value="2022">2022</option>
+                </select>
+            </div>
+            <div class="chart-container">
+                <canvas id="overtimeChart"></canvas>
+            </div>
+            
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+    const ctx = document.getElementById('overtimeChart').getContext('2d');
+let currentYear = '2024';
+
+const dataByYear = {
+    '2024': [8, 12, 5, 6, 15, 10, 20, 25, 18, 12, 10, 5],
+    '2023': [5, 10, 15, 7, 6, 9, 12, 20, 22, 25, 18, 14],
+    '2022': [3, 5, 10, 8, 12, 15, 18, 20, 16, 8, 5, 4],
+};
+
+const chart = new Chart(ctx, {
+    type: 'bar',
+    data: {
+        labels: ['Янв', 'Фев', 'Март', 'Апр', 'Май', 'Июнь', 'Июль', 'Авг', 'Сен', 'Окт', 'Ноя', 'Дек'],
+        datasets: [{
+            label: 'Часы переработки',
+            data: dataByYear[currentYear],
+            backgroundColor: 'rgba(75, 192, 192, 0.2)',
+            borderColor: 'rgba(75, 192, 192, 1)',
+            borderWidth: 1,
+        }]
+    },
+    options: {
+        responsive: true,
+        plugins: {
+            legend: {
+                display: true,
+            }
+        },
+        scales: {
+            y: {
+                beginAtZero: true,
+            }
+        }
+    }
+});
+
+// Событие изменения года
+document.getElementById('year-select').addEventListener('change', (e) => {
+    currentYear = e.target.value;
+    chart.data.datasets[0].data = dataByYear[currentYear];
+    chart.update();
+});
+</script>
+{% endblock %}

@@ -177,19 +177,27 @@ async def delete(
 
 @router.get(
     "/me",
-    response_model=UserOut,
+    response_class=HTMLResponse,
     dependencies=[Depends(RoleRequired([Role.SUPERUSER, Role.MODERATOR, Role.USER]))],
     status_code=status.HTTP_200_OK,
     name="users:me",
     description="Get current user",
 )
 async def get_me(
-    user: Annotated[
-        User,
-        Depends(get_current_user),
-    ]
+    request: Request,
+    current_user: User = Depends(get_current_user),
+    count_day_offs: int = Depends(count_notifications_day_offs),
+    notifications_count_user: int = Depends(get_unread_notifications_count_user),
 ):
-    return UserOut.model_validate(user)
+    return templates.TemplateResponse(
+        request=request,
+        name="users/profile.html",
+        context={
+            "current_user": current_user,
+            "count_day_offs": count_day_offs,
+            "notifications_count_user": notifications_count_user
+        },
+    )
 
 
 @router.get(
