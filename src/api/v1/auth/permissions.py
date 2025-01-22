@@ -4,6 +4,7 @@ from fastapi.responses import RedirectResponse
 from src.api.v1.auth.dependencies import get_current_user
 from src.models.user import User, Role
 
+
 class RoleRequired:
     def __init__(self, required_roles: Union[Role, List[Role]]):
         if isinstance(required_roles, Role):
@@ -17,5 +18,4 @@ class RoleRequired:
                 raise HTTPException(status_code=403, detail="Not enough permissions")
             return user
         except HTTPException as e:
-            print(e.detail)
             return RedirectResponse(url='/auth/', status_code=status.HTTP_302_FOUND)

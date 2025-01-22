@@ -77,7 +77,7 @@ async def login(
             oauth_form_data
         )
 
-        response = RedirectResponse(url="/overtime/", status_code=status.HTTP_302_FOUND)
+        response = RedirectResponse(url="/home", status_code=status.HTTP_302_FOUND)
 
         # Устанавливаем токен в cookie
         response.set_cookie(

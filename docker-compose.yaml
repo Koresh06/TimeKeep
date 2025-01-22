@@ -17,11 +17,11 @@ services:
 
   web:
     container_name: fastapi_container
+    restart: always
     build:
       context: .
       dockerfile: src/Dockerfile
-    command: uvicorn src.main:create_app --host 0.0.0.0 --port 8000
-    restart: none
+    command: uvicorn --factory src.main:create_app --host 0.0.0.0 --port 8000
     ports:
       - "8000:8000"
     volumes:
@@ -31,7 +31,7 @@ services:
     env_file:
       - .env
     environment:
-      DATABASE_URL: postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres:5432/${POSTGRES_DB}
+      DATABASE_URL: postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@${DB_HOST}:${DB_PORT}/${POSTGRES_DB}
 
   nginx:
     image: nginx:latest

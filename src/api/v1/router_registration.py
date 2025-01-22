@@ -1,4 +1,6 @@
 from fastapi import FastAPI
+
+from src.api.v1.user.main_router import router as main_router
 from src.api.v1.user.router import router as users_router
 from src.api.v1.auth.router import router as auth_router
 from src.api.v1.department.router import router as department_router
@@ -14,6 +16,7 @@ def register_routers(app: FastAPI) -> None:
         app (FastAPI): The FastAPI application instance.
     """
 
+    app.include_router(main_router)
     app.include_router(auth_router)
     app.include_router(users_router)
     app.include_router(department_router)
