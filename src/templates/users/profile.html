@@ -17,8 +17,17 @@
                 </div>
                 <div>
                     <label>Роль:</label>
-                    {{ current_user.role }}
+                    {% if current_user.role.value == 'user' %}
+                        Пользователь
+                    {% elif current_user.role.value == 'moderator' %}
+                        Модератор
+                    {% elif current_user.role.value == 'superuser' %}
+                        Суперюзер
+                    {% else %}
+                        Неизвестная роль
+                    {% endif %}
                 </div>
+                
                 <div>
                     <label>Должность:</label>
                     {{ current_user.position }}
@@ -28,7 +37,7 @@
                     {{ "Ежедневник" if current_user.work_schedule == 'daily' else "Сменна" }}
                 </div>
                 <div>
-                    <label>Дата создания:</label>
+                    <label>Дата регистрации:</label>
                     {{ current_user.create_at.strftime('%d.%m.%Y') }}
                 </div>
             </div>
