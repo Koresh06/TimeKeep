@@ -274,3 +274,44 @@ class DayOffRepository(BaseRepo):
             return day_off
         except SQLAlchemyError as e:
             raise HTTPException(status_code=500, detail=f"Database error: {str(e)}")
+        
+
+    async def get_overtimes_for_day_off(self, day_off: DayOff, current_user: User):
+        """Получить переработки для отгула."""
+        def format_full_name(full_name: str) -> str:
+            name_parts = full_name.split()  
+            initials = '.'.join([part[0] for part in name_parts[1:]]) + '.'
+            return f"{initials} {name_parts[0]}"  
+
+        result = await self.session.execute(
+            select(
+                Overtime.o_date,
+                Overtime.description,
+                OvertimeDayOffLink.hours_used,
+            )
+            .join(OvertimeDayOffLink, Overtime.oid == OvertimeDayOffLink.overtime_oid)
+            .join(DayOff, DayOff.oid == OvertimeDayOffLink.day_off_oid)
+            .where(DayOff.oid == day_off.oid)
+        )
+
+        rows = result.all()
+
+        # Формируем список переработок
+        info_overtimes = [
+            {"hours": row.hours_used, "description": row.description} 
+            for row in rows
+        ]
+
+        # Формируем итоговый словарь
+        data = {
+            "date_report": day_off.create_at.strftime('%d.%m.%Y'), 
+            "date_day_off": day_off.o_date.strftime('%d.%m.%Y'),
+            "info_overtimes": info_overtimes,
+            "full_name_user": format_full_name(current_user.full_name), 
+            "position_user": current_user.position,
+            "department_user": current_user.department_rel.name
+        }
+
+        return data
+
+

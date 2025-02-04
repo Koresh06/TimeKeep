@@ -2,7 +2,12 @@ from typing import Annotated
 from urllib.parse import quote, unquote
 import uuid
 from fastapi import APIRouter, Depends, Path, Query, Request, status
-from fastapi.responses import HTMLResponse, RedirectResponse
+from fastapi.responses import (
+    FileResponse,
+    HTMLResponse,
+    RedirectResponse,
+    StreamingResponse,
+)
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from src.core.session import get_async_session
@@ -23,7 +28,10 @@ from src.api.v1.auth.permissions import RoleRequired
 from src.api.v1.day_off.dependencies import day_off_by_oid
 from src.api.v1.day_off.errors import InsufficientOvertimeHours
 from src.api.v1.day_off.dependencies import count_notifications_day_offs
-from src.middlewares.notification.dependencies import get_unread_notifications_count_user
+from src.middlewares.notification.dependencies import (
+    get_unread_notifications_count_user,
+)
+from src.api.v1.day_off.generate_report import ReportGenerator
 
 
 router = APIRouter(
@@ -49,7 +57,7 @@ async def create_day_off_page(
     success_message = request.cookies.get("success_message")
     # Декодируем сообщение из куки
     if success_message:
-        success_message = unquote(success_message)  
+        success_message = unquote(success_message)
     response = templates.TemplateResponse(
         request=request,
         name="day_offs/create.html",
@@ -57,7 +65,7 @@ async def create_day_off_page(
             "msg": success_message,
             "current_user": current_user,
             "count_day_offs": count_day_offs,
-            "notifications_count_user": notifications_count_user
+            "notifications_count_user": notifications_count_user,
         },
     )
 
@@ -96,17 +104,14 @@ async def create_day_off(
         success_message = quote("✔️ Отгул успешно создан!")
         response.set_cookie(key="success_message", value=success_message)
         return response
-    
+
     except InsufficientOvertimeHours as e:
         return templates.TemplateResponse(
             request=request,
             name="day_offs/create.html",
-            context={
-                "error": str(e),
-                "current_user": current_user
-            },
+            context={"error": str(e), "current_user": current_user},
         )
-    
+
 
 @router.get(
     "/",
@@ -162,7 +167,7 @@ async def get_all_day_offs(
 
 
 @router.get(
-    '/notifications',
+    "/notifications",
     response_class=HTMLResponse,
     status_code=status.HTTP_200_OK,
     dependencies=[Depends(RoleRequired([Role.SUPERUSER, Role.MODERATOR]))],
@@ -203,9 +208,10 @@ async def notifications_page(
             "limit": limit,
             "offset": offset,
             "count_day_offs": count_day_offs,
-            "notifications_count_user": notifications_count_user
-        }
+            "notifications_count_user": notifications_count_user,
+        },
     )
+
 
 @router.post(
     "/{oid}/approve",
@@ -226,7 +232,9 @@ async def approve_day_off(
         is_approved=True,
     )
 
-    return RedirectResponse(url="/day_off/notifications", status_code=status.HTTP_302_FOUND)
+    return RedirectResponse(
+        url="/day_off/notifications", status_code=status.HTTP_302_FOUND
+    )
 
 
 @router.get(
@@ -280,4 +288,35 @@ async def delete_day_off(
     day_off: DayOff = Depends(day_off_by_oid),
     current_user: User = Depends(get_current_user),
 ):
-    return await DayOffService(session).delete(current_user=current_user, day_off=day_off)
+    return await DayOffService(session).delete(
+        current_user=current_user, day_off=day_off
+    )
+
+
+@router.get(
+    "/download_report/{oid}",
+    response_class=FileResponse,
+    # dependencies=[Depends(RoleRequired([Role.SUPERUSER, Role.MODERATOR, Role.USER]))],
+    status_code=status.HTTP_200_OK,
+    name="day_off:download_report",
+)
+async def download_report(
+    session: Annotated[
+        AsyncSession,
+        Depends(get_async_session),
+    ],
+    day_off: DayOff = Depends(day_off_by_oid),
+    current_user: User = Depends(get_current_user),
+):
+
+    data = await DayOffService(session).generate_report_data(day_off=day_off, current_user=current_user)
+
+
+    generator = ReportGenerator(data=data)
+    file_stream = generator.get_report_bytes()
+
+    return StreamingResponse(
+        file_stream,
+        media_type="application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+        headers={"Content-Disposition": "attachment; filename=raport.docx"},
+    )

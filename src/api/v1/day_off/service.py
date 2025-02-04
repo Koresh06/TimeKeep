@@ -160,3 +160,7 @@ class DayOffService:
 
     async def count_notifications(self, current_user: User) -> int:
         return await self.repository.count_notifications_stmt_is_unapproved(current_user=current_user)
+    
+
+    async def generate_report_data(self, day_off: DayOff, current_user: User):
+        return await self.repository.get_overtimes_for_day_off(day_off=day_off, current_user=current_user)

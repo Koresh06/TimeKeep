@@ -48,4 +48,4 @@ class User(Base):
 
 
     def __repr__(self):
-        return f"User({self.oid}, {self.username}, {self.department_oid}, {self.create_at}, {self.update_at})"
+        return f"User({self.oid}, {self.department_oid}, {self.username}, {self.full_name}, {self.role}, {self.work_schedule}, {self.hashed_password}, {self.position}, {self.is_active}, {self.create_at}, {self.update_at})"

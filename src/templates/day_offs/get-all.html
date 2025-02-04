@@ -66,12 +66,12 @@
                     <td>{{ day_off.create_at.strftime('%d.%m.%Y') }}</td>
                     <td>
                         {% if day_off.is_approved %}
-                            <!-- Кнопка для скачивания отчета в Word с иконкой загрузки -->
+                            <!-- Кнопка скачивания отчета -->
                             <a href="/day_off/download_report/{{ day_off.oid }}" class="btn btn-success">
                                 <i class="bi bi-download"></i>
                             </a>
                         {% else %}
-                            <!-- Кнопка для скачивания отчета в Word, но она неактивна -->
+                            <!-- Неактивная кнопка -->
                             <button class="btn btn-secondary" disabled>
                                 <i class="bi bi-download"></i>
                             </button>
