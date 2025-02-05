@@ -318,5 +318,5 @@ async def download_report(
     return StreamingResponse(
         file_stream,
         media_type="application/vnd.openxmlformats-officedocument.wordprocessingml.document",
-        headers={"Content-Disposition": "attachment; filename=raport.docx"},
+        headers={"Content-Disposition": f"attachment; filename=raport-{day_off.o_date.strftime('%d.%m.%Y')}.docx"},
     )

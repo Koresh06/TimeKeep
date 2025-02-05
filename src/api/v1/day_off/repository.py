@@ -1,4 +1,5 @@
 import uuid
+import pymorphy3
 
 from typing import List, Tuple
 from fastapi import HTTPException, status
@@ -282,6 +283,48 @@ class DayOffRepository(BaseRepo):
             name_parts = full_name.split()  
             initials = '.'.join([part[0] for part in name_parts[1:]]) + '.'
             return f"{initials} {name_parts[0]}"  
+        
+        def format_name_boss(full_name: str) -> str:
+            name_parts = full_name.split()  
+            initials = '.'.join([part[0] for part in name_parts[1:]]) + '.'
+            return f"{name_parts[0]} {initials}"
+
+        import pymorphy3
+
+        def to_genitive(name: str, case: str) -> str:
+            morph = pymorphy3.MorphAnalyzer()
+
+            # Словарь падежей с кодами для pymorphy3
+            cases = {
+                'nomn': 'именительный',
+                'gent': 'родительный',
+                'datv': 'дательный',
+                'accs': 'винительный',
+                'ablt': 'творительный',
+                'loct': 'предложный',
+            }
+
+            # Проверка валидности падежа
+            if case not in cases:
+                raise ValueError(f"Неизвестный падеж: {case}. Доступные падежи: {', '.join(cases.keys())}")
+
+            # Разделяем строку на слова
+            words = name.split()
+
+            # Если строка состоит из одного слова
+            if len(words) == 1:
+                parsed_word = morph.parse(words[0])[0]
+                inflected_word = parsed_word.inflect({case})
+                # Возвращаем слово в нужном падеже или исходное слово, если не склоняется
+                return inflected_word.word if inflected_word else words[0]
+
+            # Склоняем первое слово в нужный падеж
+            first_word_case = morph.parse(words[0])[0].inflect({case})
+            first_word_case = first_word_case.word.capitalize() if first_word_case else words[0]
+
+            # Остальные слова оставляем как есть
+            return ' '.join([first_word_case] + words[1:])
+        
 
         result = await self.session.execute(
             select(
@@ -308,7 +351,12 @@ class DayOffRepository(BaseRepo):
             "date_day_off": day_off.o_date.strftime('%d.%m.%Y'),
             "info_overtimes": info_overtimes,
             "full_name_user": format_full_name(current_user.full_name), 
-            "position_user": current_user.position,
+            "position_user": current_user.position.capitalize(),
+            "rank_user": current_user.rank.lower(),
+            "name_organization": to_genitive(name=current_user.organization_rel.name, case='gent'),
+            "organization_name_boss": to_genitive(name=format_name_boss(current_user.organization_rel.name_boss), case='datv'),
+            "organization_position_boss": to_genitive(name=current_user.organization_rel.position, case='datv').capitalize(),
+            "organization_rank_boss": to_genitive(name=current_user.organization_rel.rank, case='datv'),
             "department_user": current_user.department_rel.name
         }
 

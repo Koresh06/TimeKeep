@@ -19,7 +19,10 @@ class AuthRepository(BaseRepo):
     
 
     async def get_user_by_id(self, user_oid: uuid.UUID) -> Optional[User]:
-        stmt = select(User).where(User.oid == user_oid).options(selectinload(User.department_rel))
+        stmt = select(User).where(User.oid == user_oid).options(
+            selectinload(User.department_rel),
+            selectinload(User.organization_rel)
+        )
         result: Result = await self.session.scalar(stmt)
         return result
 
