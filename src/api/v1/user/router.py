@@ -9,6 +9,7 @@ from src.api.conf_static import templates
 from src.api.v1.auth.permissions import RoleRequired
 from src.api.v1.auth.dependencies import get_current_user
 from src.api.v1.department.service import DepartmentService
+from src.api.v1.organization.service import OrganizationService
 from src.api.v1.user.service import UserService
 from src.api.v1.user.schemas import (
     UserOut,
@@ -42,12 +43,14 @@ async def register_page(
         Depends(get_async_session),
     ],
 ):
+    organizations = await OrganizationService(session).get_all()
     departments = await DepartmentService(session).get_all()
-
+    
     return templates.TemplateResponse(
         request=request,
         name="register.html",
         context={
+            "organizations": organizations,
             "departments": departments,
         },
     )

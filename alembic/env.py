@@ -7,7 +7,7 @@ from sqlalchemy.ext.asyncio import async_engine_from_config
 
 from alembic import context
 
-from src.models import Base, User, Department, DayOff, OvertimeDayOffLink  # noqa
+from src.models import Base, User, Department, DayOff, OvertimeDayOffLink, Organization  # noqa
 from src.core.config import settings
 
 # this is the Alembic Config object, which provides

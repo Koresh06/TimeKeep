@@ -22,10 +22,12 @@ class PaginatedResponse(BaseModel, Generic[M]):
 
 
 class UserBase(BaseModel):
+    organization_oid: uuid.UUID | None = None
     department_oid: uuid.UUID | None = None
     username: str
     full_name: str
     position: str
+    rank: str
     work_schedule: WorkSchedule = Field(
         ..., description="Work schedule type: 'daily' or 'shift'"
     )
@@ -43,28 +45,34 @@ class UserCreate(UserBase):
     @classmethod
     def as_form(
         cls,
+        organization_oid: uuid.UUID = Form(...),
         department_oid: uuid.UUID = Form(...),
         username: str = Form(...),
         full_name: str = Form(...),
         position: str = Form(...),
+        rank: str = Form(...),
         password: str = Form(...),
         work_schedule: WorkSchedule = Form(...),
     ):
         return cls(
+            organization_oid=organization_oid,
             department_oid=department_oid,
             username=username,
             full_name=full_name,
             position=position,
+            rank=rank,
             password=password,
             work_schedule=work_schedule,
         )
 
 
 class UserUpdate(UserBase):
+    organization_oid: uuid.UUID | None = None
     department_oid: uuid.UUID | None = None
     username: str | None = None
     full_name: str | None = None
     position: str | None = None
+    rank: str | None = None
     role: Role | None = None
     work_schedule: WorkSchedule | None = None
 
