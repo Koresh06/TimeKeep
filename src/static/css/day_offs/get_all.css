@@ -1,11 +1,3 @@
-/* Общие стили */
-* {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
-    font-family: "Poppins", sans-serif;
-}
-
 .day_off-title {
     font-size: 2.5rem; /* Размер шрифта */
     font-weight: 600; /* Полужирное начертание */

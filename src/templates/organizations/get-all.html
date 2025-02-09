@@ -1,0 +1,82 @@
+{% extends 'base.html' %}
+
+{% block styles %}
+    <link rel="stylesheet" href="{{ url_for('static', path='css/organizations/get_all.css') }}">
+{% endblock %}
+
+{% block content %}
+    <div class="text-center">
+        <h1 class="organization-title">Организации</h1>
+    </div>
+
+    <div class="create-btn-container">
+        <a href="/organization/create" class="create-btn-overtime">Создать</a>
+    </div>
+
+    <div id="organization-table-container" data-limit="{{ limit }}" data-offset="{{ offset }}">
+        {% if organizations %}
+        <table class="table table-striped table-bordered">
+            <thead>
+                <tr class="text-center">
+                    <th>#</th>
+                    <th>Организация</th>
+                    <th>ФИО руководителя</th>
+                    <th>Должность</th>
+                    <th>Звание</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for organization in organizations %}
+                <tr class="text-center">
+                    <td>{{ loop.index + (current_page - 1) * limit }}</td>
+                    <td>{{ organization.name }}</td>
+                    <td>{{ organization.name_boss }}</td>
+                    <td>{{ organization.position }}</td>
+                    <td>{{ organization.rank }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+
+        <div class="pagination-container">
+            <div class="pagination">
+                {% if current_page > 1 %}
+                <a class="pagination-btn"
+                    href="/overtime/?limit={{ limit }}&offset={{ (current_page  - 2) * limit }}&filter={{ filter }}">Предыдущая</a>
+                {% endif %}
+
+                {% if current_page > 3 %}
+                <a class="pagination-btn" href="/overtime/?limit={{ limit }}&offset=0&filter={{ filter }}">1</a>
+                <span class="ellipsis">...</span>
+                {% endif %}
+
+                {% set start_page = 1 if current_page - 2 < 1 else current_page - 2 %}
+                {% set end_page = total_pages if current_page + 2 > total_pages else current_page + 2 %}
+
+                {% for page in range(start_page, end_page + 1) %}
+                {% if page == current_page %}
+                <span class="current-page">{{ page }}</span>
+                {% else %}
+                <a class="pagination-btn" href="/overtime/?limit={{ limit }}&offset={{ (page - 1) * limit }}&filter={{ filter }}">{{ page }}</a>
+                {% endif %}
+                {% endfor %}
+
+                {% if current_page < total_pages - 2 %}
+                <span class="ellipsis">...</span>
+                <a class="pagination-btn" href="/overtime/?limit={{ limit }}&offset={{ (total_pages - 1) * limit }}&filter={{ filter }}">{{ total_pages }}</a>
+                {% endif %}
+
+                {% if current_page < total_pages %}
+                <a class="pagination-btn"
+                    href="/overtime/?limit={{ limit }}&offset={{ current_page * limit }}&filter={{ filter }}">Следующая</a>
+                {% endif %}
+            </div>
+        </div>
+        {% else %}
+        <!-- Сообщение об отсутствии данных -->
+        <div class="alert alert-warning text-center" role="alert">
+            Нет данных для отображения.
+        </div>
+        {% endif %}
+    </div>
+{% endblock %}

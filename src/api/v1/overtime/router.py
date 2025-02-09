@@ -48,6 +48,7 @@ async def create_overtime_page(
     # Декодируем сообщение из куки
     if success_message:
         success_message = unquote(success_message)
+        
     response = templates.TemplateResponse(
         request=request,
         name="overtimes/create.html",

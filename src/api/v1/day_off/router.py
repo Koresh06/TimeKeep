@@ -55,7 +55,7 @@ async def create_day_off_page(
     notifications_count_user: int = Depends(get_unread_notifications_count_user),
 ):
     success_message = request.cookies.get("success_message")
-    # Декодируем сообщение из куки
+
     if success_message:
         success_message = unquote(success_message)
     response = templates.TemplateResponse(
@@ -69,7 +69,6 @@ async def create_day_off_page(
         },
     )
 
-    # Удаляем cookie, чтобы сообщение не отображалось снова
     if success_message:
         response.delete_cookie("success_message")
     return response
@@ -308,9 +307,7 @@ async def download_report(
     day_off: DayOff = Depends(day_off_by_oid),
     current_user: User = Depends(get_current_user),
 ):
-
     data = await DayOffService(session).generate_report_data(day_off=day_off, current_user=current_user)
-
 
     generator = ReportGenerator(data=data)
     file_stream = generator.get_report_bytes()

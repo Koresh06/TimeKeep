@@ -1,4 +1,4 @@
-.overtime-title {
+.organization-title {
     font-size: 2.5rem; /* Размер шрифта */
     font-weight: 600; /* Полужирное начертание */
     color: #388E3C; /* Темно-зеленый цвет для текста */
@@ -14,16 +14,14 @@
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Легкая тень для объема */
 }
 
-.overtime-title:hover {
+.organization-title:hover {
     color: #1B5E20; /* Более темный зеленый при наведении */
     transform: scale(1.05); /* Увеличение при наведении */
 }
 
-
-.filters-and-create-container {
+.create-btn-container {
     display: flex;
-    justify-content: space-around; /* Равномерное распределение по горизонтали */
-    align-items: center; /* Выравнивание по вертикали */
+    justify-content: center;
     margin-bottom: 20px; /* Отступ снизу */
 }
 
@@ -46,49 +44,6 @@
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); /* Добавление тени для эффекта приподнимания */
     color: #fff
 }
-
-
-
-
-/* Контейнер для фильтра */
-.filters-container {
-    display: flex;
-    justify-content: flex-end; /* Фильтр выровнен по правому краю */
-    align-items: center;
-    margin: 20px 0;
-}
-
-/* Стили для выпадающего списка */
-.filter-select {
-    padding: 8px 12px;
-    font-size: 1rem;
-    border: 2px solid #007bff;
-    border-radius: 5px;
-    background-color: #fff;
-    color: #333;
-    transition: border-color 0.3s ease, box-shadow 0.3s ease;
-    cursor: pointer;
-}
-
-/* Эффект при наведении */
-.filter-select:hover {
-    border-color: #0056b3;
-}
-
-/* Стили для фокуса на элементе */
-.filter-select:focus {
-    border-color: #0056b3;
-    outline: none;
-    box-shadow: 0 0 5px rgba(0, 123, 255, 0.5);
-}
-
-/* Стили для текста */
-.filter-select option {
-    padding: 10px;
-    font-size: 1rem;
-}
-
-
 
 /* Стили для таблицы */
 table {
@@ -154,14 +109,3 @@ th {
     background-color: #e0f7e0;
     border-radius: 5px;
 }
-
-/* Сообщение об отсутствии данных */
-.alert {
-    padding: 15px;
-    margin-top: 20px;
-    background-color: #f8d7da;
-    color: #721c24;
-    border: 1px solid #f5c6cb;
-    border-radius: 5px;
-}
-

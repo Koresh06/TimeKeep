@@ -26,7 +26,8 @@ class OvertimeService:
         overtime_create: OvertimeCreate,
     ) -> OvertimeOut:
         overtime = await self.repository.create(
-            current_user=current_user, overtime_create=overtime_create
+            current_user=current_user,
+            overtime_create=overtime_create,
         )
         return OvertimeOut.model_validate(overtime)
 

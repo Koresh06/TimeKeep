@@ -11,10 +11,10 @@
         <a href="/day_off/">Отгулы</a>
         <a href="/user/me">Профиль</a>
     </div>
-    
+
+
     <!-- Контейнер для кнопок уведомлений и кнопки выхода -->
     <div class="right-buttons">
-        <!-- Кнопки уведомлений -->
         <div class="notification-buttons">
             {% if current_user.role.value == 'moderator' or current_user.role.value == 'superuser' %}
                 <a href="/day_off/notifications" class="btn-notification">
@@ -34,6 +34,16 @@
                         <span class="visually-hidden">непрочитанные сообщения</span>
                     </span>
                 </a>
+
+                <a class="btn-notification dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                    <i class="bi bi-gear"></i>
+                </a>
+                <ul class="dropdown-menu">
+                    <li><a class="dropdown-item" href="#">Статистика</a></li>
+                    <li><a class="dropdown-item" href="#">Пользователи</a></li>
+                    <li><a class="dropdown-item" href="/organization/">Организации</a></li>
+                    <li><a class="dropdown-item" href="#">Подразделения</a></li>
+                </ul>
             {% endif %}
         </div>
 

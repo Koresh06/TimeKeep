@@ -1,4 +1,4 @@
-.create-ovetime-title {
+.create-day-off-title {
   font-size: 2.5rem; /* Размер шрифта */
   font-weight: 600; /* Полужирное начертание */
   color: #388E3C; /* Темно-зеленый цвет для текста */
@@ -14,7 +14,7 @@
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Легкая тень для объема */
 }
 
-.create-ovetime-title:hover {
+.create-day-off-title:hover {
   color: #1B5E20; /* Более темный зеленый при наведении */
   transform: scale(1.05); /* Увеличение при наведении */
 }
