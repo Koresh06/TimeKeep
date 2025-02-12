@@ -40,10 +40,18 @@
                     <label>Дата регистрации:</label>
                     {{ current_user.create_at.strftime('%d.%m.%Y') }}
                 </div>
-            </div>
-            <div class="department-info">
-                <strong>Подразделение:</strong>
-                {{ current_user.department_rel.name if current_user.department_rel else 'Не назначен' }}
+                <div>
+                    <label>Звание:</label>
+                    {{ current_user.rank }}
+                </div>
+                <div>
+                    <label>Подразделение</label>
+                    {{ current_user.department_rel.name }}
+                </div>
+                <div>
+                    <label>Организация</label>
+                    {{ current_user.organization_rel.name }}
+                </div>
             </div>
         </div>
 
@@ -51,26 +59,32 @@
         <div class="statistics-section">
             <h3>Статистика</h3>
             <div class="stat-block">
-                <label>Общее количество переработок:</label>
-                <span>12</span>
+                <label>Переработки (Общее/Использовано/Осталось):</label>
+                <span id="overtime-total">{{ statistics["overtime"]["total"] }}</span> / 
+                <span id="overtime-used">{{ statistics["overtime"]["used"] }}</span> / 
+                <span id="overtime-remaining">{{ statistics["overtime"]["remaining"] }}</span>
             </div>
             <div class="stat-block">
-                <label>Текущие/Использованные отгулы:</label>
-                <span>3 / 8</span>
+                <label>Оставшиеся часы переработки:</label>
+                <span id="total-remaining-hours">{{ statistics["overtime"]["total_remaining_hours"] }} ч.</span>
             </div>
             <div class="stat-block">
-                <label>Оставшиеся часы:</label>
-                <span>24 ч.</span>
+                <label>Отгулы (Всего/Использовано/Осталось):</label>
+                <span id="day-off-total">{{ statistics["day_off"]["total"] }}</span> / 
+                <span id="day-off-used">{{ statistics["day_off"]["used"] }}</span> / 
+                <span id="day-off-remaining">{{ statistics["day_off"]["remaining"] }}</span>
             </div>
+            
             <div class="statistics-filters">
                 <label for="year-select">Выберите год:</label>
                 <select id="year-select">
-                    <option value="2024" selected>2024</option>
-                    <option value="2023">2023</option>
-                    <option value="2022">2022</option>
+                    {% for year in statistics["years"] %}
+                        <option value="{{ year }}" {% if year == statistics["selected_year"] %}selected{% endif %}>{{ year }}</option>
+                    {% endfor %}
                 </select>
             </div>
-            <div class="chart-container">
+            
+            <div class="chart-container" id="chart-container">
                 <canvas id="overtimeChart"></canvas>
             </div>
             
@@ -82,47 +96,64 @@
 {% block scripts %}
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script>
+    // Получаем элемент canvas для отображения графика
     const ctx = document.getElementById('overtimeChart').getContext('2d');
-let currentYear = '2024';
 
-const dataByYear = {
-    '2024': [8, 12, 5, 6, 15, 10, 20, 25, 18, 12, 10, 5],
-    '2023': [5, 10, 15, 7, 6, 9, 12, 20, 22, 25, 18, 14],
-    '2022': [3, 5, 10, 8, 12, 15, 18, 20, 16, 8, 5, 4],
-};
+    // Изначально устанавливаем текущий год и получаем данные из шаблона
+    let currentYear = "{{ statistics['selected_year'] }}"; // Значение передано через шаблон
+    console.log(currentYear)
 
-const chart = new Chart(ctx, {
-    type: 'bar',
-    data: {
-        labels: ['Янв', 'Фев', 'Март', 'Апр', 'Май', 'Июнь', 'Июль', 'Авг', 'Сен', 'Окт', 'Ноя', 'Дек'],
-        datasets: [{
-            label: 'Часы переработки',
-            data: dataByYear[currentYear],
-            backgroundColor: 'rgba(75, 192, 192, 0.2)',
-            borderColor: 'rgba(75, 192, 192, 1)',
-            borderWidth: 1,
-        }]
-    },
-    options: {
-        responsive: true,
-        plugins: {
-            legend: {
-                display: true,
-            }
+    // Переводим данные о переработках в формат JSON (из Python в JavaScript)
+    let overtimeData = {{ statistics["overtime"]["monthly"] | tojson }};
+
+    // Создаем график
+    const chart = new Chart(ctx, {
+        type: 'bar',
+        data: {
+            labels: ['Янв', 'Фев', 'Март', 'Апр', 'Май', 'Июнь', 'Июль', 'Авг', 'Сен', 'Окт', 'Ноя', 'Дек'],
+            datasets: [{
+                label: 'Часы переработки',
+                data: Array.from({ length: 12 }, (_, i) => overtimeData[currentYear]?.[i + 1] || 0),
+                backgroundColor: 'rgba(75, 192, 192, 0.2)',
+                borderColor: 'rgba(75, 192, 192, 1)',
+                borderWidth: 1,
+            }]
         },
-        scales: {
-            y: {
-                beginAtZero: true,
-            }
+        options: {
+            responsive: true,
+            scales: { y: { beginAtZero: true } }
         }
-    }
-});
+    });
 
-// Событие изменения года
-document.getElementById('year-select').addEventListener('change', (e) => {
-    currentYear = e.target.value;
-    chart.data.datasets[0].data = dataByYear[currentYear];
-    chart.update();
-});
+    // Функция для обновления данных и графика
+    async function updateStatistics(year) {
+        const response = await fetch(`/user/statistics/${year}`);
+        const data = await response.json();
+
+        document.getElementById('overtime-total').textContent = data.statistics.overtime.total;
+        document.getElementById('overtime-used').textContent = data.statistics.overtime.used;
+        document.getElementById('overtime-remaining').textContent = data.statistics.overtime.remaining;
+        document.getElementById('total-remaining-hours').textContent = data.statistics.overtime.total_remaining_hours + ' ч.';
+        document.getElementById('day-off-total').textContent = data.statistics.day_off.total;
+        document.getElementById('day-off-used').textContent = data.statistics.day_off.used;
+        document.getElementById('day-off-remaining').textContent = data.statistics.day_off.remaining;
+
+        // Обновляем данные на графике для нового года
+        chart.data.datasets[0].data = Array.from({ length: 12 }, (_, i) => data.statistics.overtime.monthly[i + 1] || 0);
+        chart.update();
+    }
+
+    // Инициализируем данные для текущего года при загрузке страницы
+    updateStatistics(currentYear);
+
+    // Обработчик события для изменения года
+    document.getElementById('year-select').addEventListener('change', async (e) => {
+        currentYear = e.target.value;
+        await updateStatistics(currentYear); // Обновляем данные и график при смене года
+    });
 </script>
+
+
 {% endblock %}
+
+

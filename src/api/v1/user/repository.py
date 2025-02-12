@@ -1,3 +1,4 @@
+from datetime import date
 import uuid
 
 from typing import List, Optional, Tuple
@@ -7,8 +8,8 @@ from sqlalchemy.orm import selectinload
 from sqlalchemy.exc import IntegrityError, SQLAlchemyError
 
 from src.core.repo.base import BaseRepo
-from src.models.user import User, Role
-from src.api.v1.user.schemas import UserCreate, UserFilterParams, UserUpdatePartial, UserUpdate
+from src.models import User, Role, Overtime, DayOff
+from src.api.v1.user.schemas import UserCreate, UserUpdatePartial, UserUpdate
 from src.api.v1.auth.security import get_password_hash
 
 
@@ -131,3 +132,70 @@ class UserRepository(BaseRepo):
         except SQLAlchemyError as e:
             await self.session.rollback()
             raise HTTPException(status_code=500, detail=f"Database error: {str(e)}")
+
+
+    async def get_statistics_current_user(self, current_user: User, selected_year: int = None):
+        # Получаем список всех доступных лет с переработками
+        result = await self.session.execute(
+            select(func.extract("year", Overtime.o_date).distinct())
+            .where(Overtime.user_oid == current_user.oid)
+        )
+        available_years = [int(row[0]) for row in result.fetchall() if row[0] is not None]
+
+        # Если год не выбран, берем последний доступный
+        selected_year = selected_year or (max(available_years) if available_years else date.today().year)
+
+        # Получаем часы переработок по месяцам для выбранного года
+        result = await self.session.execute(
+            select(
+                func.extract("month", Overtime.o_date),
+                func.sum(Overtime.hours)
+            )
+            .where(
+                Overtime.user_oid == current_user.oid,
+                func.extract("year", Overtime.o_date) == selected_year
+            )
+            .group_by(func.extract("month", Overtime.o_date))
+        )
+
+        monthly_overtime = {int(month): hours for month, hours in result.fetchall()}
+
+        # Получаем общую статистику (оставляем как было)
+        result = await self.session.execute(
+            select(
+                func.count(Overtime.oid),
+                func.count().filter(Overtime.is_used == True),
+                func.count().filter(Overtime.is_used == False),
+                func.sum(Overtime.remaining_hours),
+            ).where(Overtime.user_oid == current_user.oid)
+        )
+        total_overtimes, used_overtimes, remaining_overtimes, total_remaining_hours = result.first()
+
+        # Получаем данные об отгулах
+        today = date.today()
+        result = await self.session.execute(
+            select(
+                func.count(DayOff.oid),
+                func.count().filter(DayOff.o_date < today),
+                func.count().filter(DayOff.o_date >= today),
+            ).where(DayOff.user_oid == current_user.oid)
+        )
+        total_day_offs, used_day_offs, remaining_day_offs = result.first()
+
+        return {
+            "years": available_years,
+            "selected_year": selected_year,
+            "overtime": {
+                "total": total_overtimes,
+                "used": used_overtimes,
+                "remaining": remaining_overtimes,
+                "total_remaining_hours": total_remaining_hours,
+                "monthly": monthly_overtime,
+            },
+            "day_off": {
+                "total": total_day_offs,
+                "used": used_day_offs,
+                "remaining": remaining_day_offs,
+            },
+        }
+

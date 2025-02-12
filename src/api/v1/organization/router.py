@@ -93,7 +93,6 @@ async def create_organization(
         )
 
 
-
 @router.get(
     "/",
     response_class=HTMLResponse,

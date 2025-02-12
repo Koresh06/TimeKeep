@@ -29,7 +29,6 @@ class Overtime(Base):
 
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
-        # Установим remaining_hours равным hours при создании
         self.remaining_hours = self.hours
 
 

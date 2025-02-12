@@ -1,3 +1,4 @@
+from datetime import datetime
 from typing import Annotated, List
 from fastapi import APIRouter, Depends, Query, status, Request, HTTPException
 from fastapi.responses import HTMLResponse, RedirectResponse
@@ -188,19 +189,38 @@ async def delete(
 )
 async def get_me(
     request: Request,
+    session: Annotated[AsyncSession, Depends(get_async_session)],
     current_user: User = Depends(get_current_user),
     count_day_offs: int = Depends(count_notifications_day_offs),
     notifications_count_user: int = Depends(get_unread_notifications_count_user),
 ):
+    current_year = datetime.now().year
+
+    statistics = await UserService(session).get_statistics_current_user(current_user=current_user, selected_year=current_year)
     return templates.TemplateResponse(
         request=request,
         name="users/profile.html",
         context={
             "current_user": current_user,
             "count_day_offs": count_day_offs,
-            "notifications_count_user": notifications_count_user
+            "notifications_count_user": notifications_count_user,
+            "statistics": statistics,
+            "current_year": current_year,
         },
     )
+
+@router.get(
+    "/statistics/{year}",
+    dependencies=[Depends(RoleRequired([Role.SUPERUSER, Role.MODERATOR, Role.USER]))],
+    status_code=status.HTTP_200_OK,
+)
+async def get_statistics_current_year(
+    session: Annotated[AsyncSession, Depends(get_async_session)],
+    current_user: User = Depends(get_current_user),
+    year: int = None,
+):
+    statistics = await UserService(session).get_statistics_current_user(current_user, selected_year=year)  # Получаем статистику с указанным годом
+    return {"statistics": statistics}
 
 
 @router.get(
@@ -261,7 +281,6 @@ async def replace(
         user_update=user_update,
         partil=False,
     )
-
 
 
 

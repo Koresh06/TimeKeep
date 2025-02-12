@@ -119,3 +119,6 @@ class UserService:
     async def toggle_role(self, user: UserOut, role: Role):
         user = await self.repository.toggle_role(user=user, role=role)
         return UserOut.model_validate(user)
+    
+    async def get_statistics_current_user(self, current_user: User, selected_year: int = None):
+        return await self.repository.get_statistics_current_user(current_user=current_user, selected_year=selected_year)
