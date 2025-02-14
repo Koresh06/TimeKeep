@@ -77,7 +77,7 @@
           </div>
           <div class="modal-footer">
               <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Отмена</button>
-              <form method="POST" action="{{ url_for('day_off:approve', oid=day_off.oid) }}">
+              <form method="POST" action="/day_off/approve/{{ day_off.oid }}">
                   <button type="submit" class="btn btn-success">Подтвердить</button>
               </form>
           </div>

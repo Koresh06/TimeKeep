@@ -12,7 +12,7 @@
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Отмена</button>
-                    <form method="POST" action="{{ url_for('user:approve', oid=user.oid) }}">
+                    <form method="POST" action="/user/approve/{{ user.oid }}">
                         <button type="submit" class="btn btn-success">Подтвердить</button>
                     </form>
                 </div>
@@ -33,7 +33,7 @@
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Отмена</button>
-                <form method="POST" action="{{ url_for('user:delete', oid=user.oid) }}">
+                <form method="POST" action="/user/delete/{{ user.oid }}">
                     <button type="submit" class="btn btn-danger">Удалить</button>
                 </form>
             </div>
