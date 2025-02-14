@@ -1,7 +1,7 @@
 {% extends 'base.html' %}
 
 {% block styles %}
-    <link rel="stylesheet" href="{{ url_for('static', path='css/users/profile.css') }}">
+<link rel="stylesheet" href="{{ url_for('static', path='css/users/profile.css') }}">
 {% endblock %}
 
 {% block content %}
@@ -18,16 +18,16 @@
                 <div>
                     <label>Роль:</label>
                     {% if current_user.role.value == 'user' %}
-                        Пользователь
+                    Пользователь
                     {% elif current_user.role.value == 'moderator' %}
-                        Модератор
+                    Модератор
                     {% elif current_user.role.value == 'superuser' %}
-                        Суперюзер
+                    Суперюзер
                     {% else %}
-                        Неизвестная роль
+                    Неизвестная роль
                     {% endif %}
                 </div>
-                
+
                 <div>
                     <label>Должность:</label>
                     {{ current_user.position }}
@@ -60,34 +60,35 @@
             <h3>Статистика</h3>
             <div class="stat-block">
                 <label>Переработки (Общее/Использовано/Осталось):</label>
-                <span id="overtime-total">{{ statistics["overtime"]["total"] }}</span> / 
-                <span id="overtime-used">{{ statistics["overtime"]["used"] }}</span> / 
-                <span id="overtime-remaining">{{ statistics["overtime"]["remaining"] }}</span>
+                <b id="overtime-total">{{ statistics["overtime"]["total"] }}</b> /
+                <b id="overtime-used">{{ statistics["overtime"]["used"] }}</b> /
+                <b id="overtime-remaining">{{ statistics["overtime"]["remaining"] }}</b>
             </div>
             <div class="stat-block">
                 <label>Оставшиеся часы переработки:</label>
-                <span id="total-remaining-hours">{{ statistics["overtime"]["total_remaining_hours"] }} ч.</span>
+                <b id="total-remaining-hours">{{ statistics["overtime"]["total_remaining_hours"] }} ч.</b>
             </div>
             <div class="stat-block">
                 <label>Отгулы (Всего/Использовано/Осталось):</label>
-                <span id="day-off-total">{{ statistics["day_off"]["total"] }}</span> / 
-                <span id="day-off-used">{{ statistics["day_off"]["used"] }}</span> / 
-                <span id="day-off-remaining">{{ statistics["day_off"]["remaining"] }}</span>
+                <b id="day-off-total">{{ statistics["day_off"]["total"] }}</b> /
+                <b id="day-off-used">{{ statistics["day_off"]["used"] }}</b> /
+                <b id="day-off-remaining">{{ statistics["day_off"]["remaining"] }}</b>
             </div>
-            
+
             <div class="statistics-filters">
                 <label for="year-select">Выберите год:</label>
                 <select id="year-select">
                     {% for year in statistics["years"] %}
-                        <option value="{{ year }}" {% if year == statistics["selected_year"] %}selected{% endif %}>{{ year }}</option>
+                    <option value="{{ year }}" {% if year==statistics["selected_year"] %}selected{% endif %}>{{ year }}
+                    </option>
                     {% endfor %}
                 </select>
             </div>
-            
+
             <div class="chart-container" id="chart-container">
                 <canvas id="overtimeChart"></canvas>
             </div>
-            
+
         </div>
     </div>
 </div>
@@ -155,5 +156,3 @@
 
 
 {% endblock %}
-
-
