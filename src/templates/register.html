@@ -20,7 +20,6 @@
                 <div class="card-body">
                     <form action="/user/register" method="post">
                         <div class="row">
-                            <!-- Первый столбец -->
                             <div class="col-md-6 mb-3">
                                 <label for="username" class="form-label">Имя пользователя</label>
                                 <div class="input-group">
@@ -28,6 +27,7 @@
                                     <input type="text" id="username" name="username" class="form-control form-control-lg" required placeholder="Введите имя пользователя">
                                 </div>
                             </div>
+
                             <div class="col-md-6 mb-3">
                                 <label for="password" class="form-label">Пароль</label>
                                 <div class="input-group">
@@ -37,7 +37,6 @@
                                 <small id="passwordHelp" class="form-text text-muted">Пароль должен содержать не менее 8 символов.</small>
                             </div>
 
-                            <!-- Второй столбец -->
                             <div class="col-md-6 mb-3">
                                 <label for="full_name" class="form-label">Полное имя</label>
                                 <div class="input-group">
@@ -45,6 +44,7 @@
                                     <input type="text" id="full_name" name="full_name" class="form-control form-control-lg" required placeholder="Введите ФИО">
                                 </div>
                             </div>
+
                             <div class="col-md-6 mb-3">
                                 <label for="position" class="form-label">Должность</label>
                                 <div class="input-group">
@@ -53,7 +53,6 @@
                                 </div>
                             </div>
 
-                            <!-- Третий столбец -->
                             <div class="col-md-6 mb-3">
                                 <label for="rank" class="form-label">Звание</label>
                                 <div class="input-group">
@@ -61,6 +60,7 @@
                                     <input type="text" id="rank" name="rank" class="form-control form-control-lg" required placeholder="Введите звание">
                                 </div>
                             </div>
+
                             <div class="col-md-6 mb-3">
                                 <label for="organization_oid" class="form-label">Выберите организацию</label>
                                 <select id="organization_oid" name="organization_oid" class="form-control form-control-lg" required>
@@ -71,7 +71,6 @@
                                 </select>
                             </div>
 
-                            <!-- Четвертый столбец -->
                             <div class="col-md-6 mb-3">
                                 <label for="department_oid" class="form-label">Выберите департамент</label>
                                 <select id="department_oid" name="department_oid" class="form-control form-control-lg" required>

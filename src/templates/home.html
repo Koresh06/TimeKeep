@@ -1,45 +1,28 @@
 {% extends "base.html" %}
 
 {% block content %}
-    <header class="header text-center py-5 mb-5 bg-light">
-        <div class="container">
-            <h1>Добро пожаловать в TimeKeep</h1>
-            <p class="lead">Эффективный сервис для учета отгулов сотрудников</p>
+    <header class="header text-center py-5 mb-5 rounded-3 position-relative">
+        <div class="background-image" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; background-image: url('../static/images/home.png'); background-size: cover; background-position: center; opacity: 0.6;"></div>
+        
+        <div class="container position-relative z-index-1">
+            <div class="text-overlay p-5" style="background-color: rgba(0, 0, 0, 0.6); border-radius: 10px;">
+                <h1 class="display-3 fw-bold text-white">TimeKeep</h1>
+                <p class="lead fs-4 text-white">Умный сервис для учета рабочего времени и отдыха сотрудников</p>
+            </div>
         </div>
     </header>
 
     <main class="container my-5">
-        <section class="section">
-            <h2>Описание</h2>
-            <p>TimeKeep — это удобный сервис, который помогает сотрудникам подавать заявки на отгулы, а администраторам и супервизорам — эффективно управлять этими заявками. Мы упрощаем процесс взаимодействия между сотрудниками и руководством, обеспечивая прозрачность и удобство.</p>
-        </section>
-
-        <section class="section">
-            <h2>Ключевые возможности</h2>
-            <ul>
-                <li><strong>Регистрация и авторизация:</strong> Легкий процесс регистрации для сотрудников и доступ через защищенный вход.</li>
-                <li><strong>Управление отгулами:</strong> Подавать, одобрять и отслеживать заявки на отгулы стало проще.</li>
-                <li><strong>Статистика:</strong> Получайте детализированную информацию по отгулам за выбранные периоды.</li>
-            </ul>
-        </section>
-
-        <section class="section">
-            <h2>Как это работает?</h2>
-            <p>
-                Сотрудники могут:
-                <ul>
-                    <li>Подавать заявки на отгулы прямо через систему.</li>
-                    <li>Отслеживать статус своих заявок.</li>
-                </ul>
+        <section id="about" class="section text-center">
+            <h2 class="mb-4 fw-semibold" style="font-size: 2rem;">Что такое TimeKeep?</h2>
+            <p class="lead fs-4" style="max-width: 800px; margin: 0 auto;">
+                TimeKeep — это сервис, который помогает эффективно отслеживать рабочее время и отдых сотрудников. Мы облегчаем процесс учета и контроля рабочего времени, предоставляя простой и удобный инструмент для работников и их руководителей.
             </p>
-            <p>
-                Администраторы и супервизоры могут:
-                <ul>
-                    <li>Просматривать и управлять заявками сотрудников.</li>
-                    <li>Получать доступ к статистике для анализа и планирования.</li>
-                </ul>
-            </p>
+            <div class="mt-4">
+                <a href="/overtime/" class="btn btn-secondary btn-lg rounded-pill shadow-lg">
+                    Начать использовать
+                </a>
+            </div>
         </section>
     </main>
 {% endblock %}
-

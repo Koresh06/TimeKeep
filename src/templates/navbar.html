@@ -11,7 +11,6 @@
         <a href="/user/me">Профиль</a>
     </div>
 
-
     <div class="right-buttons">
         <div class="notification-buttons">
             {% if current_user.role.value == 'moderator' or current_user.role.value == 'superuser' %}
@@ -32,7 +31,6 @@
                         <span class="visually-hidden">непрочитанные сообщения</span>
                     </span>
                 </a>
-
                 <a class="btn-notification dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
                     <i class="bi bi-gear"></i>
                 </a>
