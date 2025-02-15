@@ -6,7 +6,7 @@
 
 {% block content %}
 
-    <h1 class="moderation-title">Подтверждение новых пользователей</h1>
+    <h1 class="page-title">Заявки на регистрацию</h1>
     
     {% if users %}
     <div class="container my-5">
@@ -46,48 +46,14 @@
         </table>
     </div>
 
-    <div class="pagination-container">
-        <div class="pagination">
-            {% if current_page > 1 %}
-            <a class="pagination-btn"
-               href="/users/approval/?limit={{ limit }}&offset={{ (current_page - 2) * limit }}">Предыдущая</a>
-            {% endif %}
-
-            {% if current_page > 3 %}
-            <a class="pagination-btn" href="/users/approval/?limit={{ limit }}&offset=0">1</a>
-            <span class="ellipsis">...</span>
-            {% endif %}
-
-            {% set start_page = 1 if current_page - 2 < 1 else current_page - 2 %}
-            {% set end_page = total_pages if current_page + 2 > total_pages else current_page + 2 %}
-
-            {% for page in range(start_page, end_page + 1) %}
-            {% if page == current_page %}
-            <span class="current-page">{{ page }}</span>
-            {% else %}
-            <a class="pagination-btn" href="/users/approval/?limit={{ limit }}&offset={{ (page - 1) * limit }}">{{ page }}</a>
-            {% endif %}
-            {% endfor %}
-
-            {% if current_page < total_pages - 2 %}
-            <span class="ellipsis">...</span>
-            <a class="pagination-btn" href="/users/approval/?limit={{ limit }}&offset={{ (total_pages - 1) * limit }}">{{ total_pages }}</a>
-            {% endif %}
-
-            {% if current_page < total_pages %}
-            <a class="pagination-btn"
-               href="/users/approval/?limit={{ limit }}&offset={{ current_page * limit }}">Следующая</a>
-            {% endif %}
-        </div>
-    </div>
+    {% set pagination_url = '/users/approval/' %}
+    {% include 'pagination.html' %}
 
     {% else %}
-        <!-- Сообщение об отсутствии данных -->
         <div class="alert alert-warning text-center" role="alert">
             Нет данных для отображения.
         </div>
     {% endif %}
-
 
     {% include 'users/modals.html' %}
 

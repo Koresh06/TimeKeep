@@ -1,16 +1,15 @@
 {% extends "base.html" %}
 
 {% block styles %}
-    <link rel="stylesheet" href="../static/css/organizations/create.css">
+    <link rel="stylesheet" href="../static/css/components-create.css">
 {% endblock %}
 
 {% block content %}
 <div class="container mt-6 ">
     <div class="d-flex justify-content-center align-items-center">
-        <h1 class="create-organization-title">Создание организации</h1>
+        <h1 class="page-title">Создание организации</h1>
     </div>
 
-    <!-- Показать успешный алерт, если есть сообщение -->
     {% if msg %}
     <div class="alert alert-success alert-dismissible fade show" role="alert" id="alertSuccess">
         {{ msg }}
@@ -22,11 +21,10 @@
                 alertSuccess.classList.remove('show');
                 alertSuccess.classList.add('fade');
             }
-        }, 3000);  // Убираем алерт через 3 секунды
+        }, 3000);  
     </script>
     {% endif %}
 
-    <!-- Показать алерт об ошибке, если есть ошибка -->
     {% if error %}
     <div class="alert alert-danger alert-dismissible fade show" role="alert" id="alertError">
         {{ error }}
@@ -38,11 +36,10 @@
                 alertError.classList.remove('show');
                 alertError.classList.add('fade');
             }
-        }, 3000);  // Убираем алерт через 3 секунды
+        }, 3000); 
     </script>
     {% endif %}
 
-    <!-- Форма создания отгула -->
     <div class="create-organization-container w-50 mx-auto">
         <form method="post" action="/organization/create" class="form-group">
             <div class="mb-3">

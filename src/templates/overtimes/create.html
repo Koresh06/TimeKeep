@@ -1,20 +1,18 @@
 {% extends "base.html" %}
 
 {% block styles %}
-    <link rel="stylesheet" href="../static/css/overtimes/create.css">
+    <link rel="stylesheet" href="../static/css/components-create.css">
 {% endblock %}
 
 {% block content %}
 <div class="container mt-6 ">
     <div class="d-flex justify-content-center align-items-center">
-        <h1 class="mb-4 overtime-title">Создание переработки</h1>
-        <!-- Иконка для модального окна -->
+        <h1 class="page-title">Создание переработки</h1>
         <div class="info-icon-container ms-2">
             <i class="bi bi-info-circle-fill" data-bs-toggle="modal" data-bs-target="#infoModal"></i>
         </div>
     </div>
 
-    <!-- Показать успешный алерт, если есть сообщение -->
     {% if msg %}
     <div class="alert alert-success alert-dismissible fade show" role="alert" id="alertSuccess">
         {{ msg }}
@@ -26,11 +24,10 @@
                 alertSuccess.classList.remove('show');
                 alertSuccess.classList.add('fade');
             }
-        }, 3000);  // Убираем алерт через 3 секунды
+        }, 3000);  
     </script>
     {% endif %}
 
-    <!-- Показать алерт об ошибке, если есть ошибка -->
     {% if error %}
     <div class="alert alert-danger alert-dismissible fade show" role="alert" id="alertError">
         {{ error }}
@@ -42,11 +39,10 @@
                 alertError.classList.remove('show');
                 alertError.classList.add('fade');
             }
-        }, 3000);  // Убираем алерт через 3 секунды
+        }, 3000); 
     </script>
     {% endif %}
 
-    <!-- Форма создания переработки -->
     <div class="create-overtime-container w-50 mx-auto">
         <form method="post" action="/overtime/create" class="form-group">
             <div class="mb-3">
@@ -69,7 +65,6 @@
     </div>
 </div>
 
-<!-- Модальное окно с пояснением -->
 <div class="modal fade" id="infoModal" tabindex="-1" aria-labelledby="infoModalLabel" aria-hidden="true">
     <div class="modal-dialog">
         <div class="modal-content">
@@ -87,7 +82,6 @@
 {% endblock %}
 
 {% block scripts %}
-    <!-- Подключаем Bootstrap для тултипов -->
     <script>
         var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
         tooltipTriggerList.forEach(function (tooltipTriggerEl) {

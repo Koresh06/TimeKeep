@@ -5,7 +5,6 @@
         </a>
     </div>
     
-    <!-- Основные кнопки по центру -->
     <div class="nav-container">
         <a href="/overtime/">Переработки</a>
         <a href="/day_off/">Отгулы</a>
@@ -13,7 +12,6 @@
     </div>
 
 
-    <!-- Контейнер для кнопок уведомлений и кнопки выхода -->
     <div class="right-buttons">
         <div class="notification-buttons">
             {% if current_user.role.value == 'moderator' or current_user.role.value == 'superuser' %}
@@ -47,7 +45,6 @@
             {% endif %}
         </div>
 
-        <!-- Кнопка выхода -->
         <div class="logout">
             <a href="/auth/logout">Выход</a>
         </div>

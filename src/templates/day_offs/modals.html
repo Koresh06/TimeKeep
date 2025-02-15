@@ -1,6 +1,3 @@
-<!-- modals.html -->
-
-<!-- Модальное окно для подтверждения удаления -->
 {% for day_off in day_offs %}
 <div class="modal fade" id="deleteModal{{ day_off.oid }}" tabindex="-1" aria-labelledby="deleteModalLabel" aria-hidden="true">
   <div class="modal-dialog">
@@ -23,7 +20,6 @@
 </div>
 {% endfor %}
 
-<!-- Модальное окно с пояснением -->
 <div class="modal fade" id="infoModal" tabindex="-1" aria-labelledby="infoModalLabel" aria-hidden="true">
     <div class="modal-dialog">
         <div class="modal-content">

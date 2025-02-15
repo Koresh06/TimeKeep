@@ -2,17 +2,16 @@
 
 {% block styles %}
     <link rel="icon" type="image/png" href="../static/images/logo.png">
-
-    <link rel="stylesheet" href="../static/css/overtimes/edit.css">
+    <link rel="stylesheet" href="../static/css/layout-elements.css">
+    <link rel="stylesheet" href="../static/css/components-create.css">
 {% endblock %}
 
 {% block content %}
     <div class="text-center">
-        <h1 class="overtime-title">Изменить переработку</h1>
+        <h1 class="page-title">Изменить переработку</h1>
     </div>
 
     <div class="edit-overtime-container w-50 mx-auto">
-        <!-- Форма для редактирования переработки -->
         <form action="/overtime/edit/{{ overtime.oid }}" method="post" class="edit-overtime-form">
 
             <div class="form-group">
