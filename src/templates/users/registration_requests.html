@@ -1,8 +1,5 @@
 {% extends 'base.html' %}
 
-{% block styles %}
-    <link rel="stylesheet" href="../static/css/users/approval.css">
-{% endblock %}
 
 {% block content %}
 
@@ -31,11 +28,11 @@
                     <td>{{ user.create_at.strftime('%d.%m.%Y') }}</td>
                     <td class="text-center d-flex justify-content-around">
                         <div class="btn-group" role="group">
-                            <button class="btn btn-success me-2 rounded" data-bs-toggle="modal" data-bs-target="#confirmModal{{ user.oid }}">
+                            <button class="btn btn-success me-2 rounded" data-bs-toggle="modal" data-bs-target="#confirmUserModal{{ user.oid }}">
                                 <i class="bi bi-check-circle-fill"></i>
                             </button>
 
-                            <button class="btn btn-danger me-2 rounded" data-bs-toggle="modal" data-bs-target="#deleteModal{{ user.oid }}">
+                            <button class="btn btn-danger me-2 rounded" data-bs-toggle="modal" data-bs-target="#deleteUserModal{{ user.oid }}">
                                 <i class="bi bi-trash"></i>
                             </button>
                         </div>
@@ -54,6 +51,7 @@
             Нет данных для отображения.
         </div>
     {% endif %}
+        
 
     {% include 'users/modals.html' %}
 

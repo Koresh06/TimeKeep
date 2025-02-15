@@ -38,6 +38,9 @@
                     <button class="btn btn-success me-2 rounded" data-bs-toggle="modal" data-bs-target="#confirmModal{{ day_off.oid }}">
                         <i class="bi bi-check-circle-fill"></i>
                     </button>
+                    <button class="btn btn-danger me-2 rounded" data-bs-toggle="modal" data-bs-target="#deleteModerationModal{{ day_off.oid }}">
+                        <i class="bi bi-trash"></i>
+                    </button>
                 </td>
             </tr>
             {% endfor %}
@@ -49,7 +52,6 @@
     {% include 'pagination.html' %}
 
     {% else %}
-        <!-- Сообщение об отсутствии данных -->
         <div class="alert alert-warning text-center" role="alert">
             Нет данных для отображения.
         </div>

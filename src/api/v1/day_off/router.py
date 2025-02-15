@@ -274,11 +274,11 @@ async def modify_day_off(
     )
 
 
-@router.delete(
-    "/{oid}",
+@router.post(
+    "/delete/{oid}/me",
     response_model=None,
     status_code=status.HTTP_204_NO_CONTENT,
-    dependencies=[Depends(RoleRequired([Role.SUPERUSER, Role.MODERATOR]))],
+    dependencies=[Depends(RoleRequired([Role.SUPERUSER, Role.MODERATOR, Role.USER]))],
     name="day_off:delete",
     description="Delete day off by id",
 )
@@ -287,9 +287,31 @@ async def delete_day_off(
     day_off: DayOff = Depends(day_off_by_oid),
     current_user: User = Depends(get_current_user),
 ):
-    return await DayOffService(session).delete(
+    await DayOffService(session).delete(
         current_user=current_user, day_off=day_off
     )
+
+    return RedirectResponse("/day_off/", status_code=status.HTTP_303_SEE_OTHER)
+
+
+@router.post(
+    "/delete/{oid}",
+    response_model=None,
+    status_code=status.HTTP_204_NO_CONTENT,
+    dependencies=[Depends(RoleRequired([Role.SUPERUSER, Role.MODERATOR]))],
+    name="day_off:delete on moderation",
+    description="Delete day off on moderation",
+)
+async def delete_day_off(
+    session: Annotated[AsyncSession, Depends(get_async_session)],
+    day_off: DayOff = Depends(day_off_by_oid),
+    current_user: User = Depends(get_current_user),
+):
+    await DayOffService(session).delete(
+        current_user=current_user, day_off=day_off
+    )
+
+    return RedirectResponse("/day_off/notifications", status_code=status.HTTP_303_SEE_OTHER)
 
 
 @router.get(

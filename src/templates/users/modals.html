@@ -1,39 +1,39 @@
 {% for user in users %}
-    <div class="modal fade" id="confirmModal{{ user.oid }}" tabindex="-1" aria-labelledby="confirmModalLabel{{ user.oid }}" aria-hidden="true">
+    <div class="modal fade" id="confirmUserModal{{ user.oid }}" tabindex="-1" aria-labelledby="confirmUserModalLabel{{ user.oid }}" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title" id="confirmModalLabel{{ user.oid }}">Подтверждение пользователя</h5>
+                    <h5 class="modal-title" id="confirmUserModalLabel{{ user.oid }}">Подтверждение пользователя</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Закрыть"></button>
                 </div>
                 <div class="modal-body">
                     Вы уверены, что хотите подтвердить регистрацию пользователя <strong>{{ user.full_name }}</strong>?
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Отмена</button>
-                    <form method="POST" action="/user/approve/{{ user.oid }}">
+                    <form method="POST" action="/user/{{ user.oid }}/approve">
                         <button type="submit" class="btn btn-success">Подтвердить</button>
                     </form>
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Отмена</button>
                 </div>
             </div>
         </div>
     </div>
 
-<div class="modal fade" id="deleteModal{{ user.oid }}" tabindex="-1" aria-labelledby="deleteModalLabel{{ user.oid }}" aria-hidden="true">
+<div class="modal fade" id="deleteUserModal{{ user.oid }}" tabindex="-1" aria-labelledby="deleteUserModalLabel{{ user.oid }}" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title" id="deleteModalLabel{{ user.oid }}">Удаление пользователя</h5>
+                <h5 class="modal-title" id="deleteUserModalLabel{{ user.oid }}">Удаление пользователя</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Закрыть"></button>
             </div>
             <div class="modal-body">
                 Вы уверены, что хотите удалить пользователя <strong>{{ user.full_name }}</strong>?
             </div>
             <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Отмена</button>
                 <form method="POST" action="/user/delete/{{ user.oid }}">
                     <button type="submit" class="btn btn-danger">Удалить</button>
                 </form>
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Отмена</button>
             </div>
         </div>
     </div>
