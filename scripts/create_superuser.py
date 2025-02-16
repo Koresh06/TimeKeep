@@ -1,7 +1,7 @@
 import os
 import sys
 
-sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..', 'src')))
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 
 import asyncio
 from getpass import getpass
@@ -16,7 +16,6 @@ async def create_superuser() -> None:
     async with async_session_maker() as session:  
         print("Создание суперпользователя")
         
-        # Проверка пароля
         while True:
             password = getpass("Введите пароль (минимум 8 символов): ")
             if len(password) < 8:
@@ -27,21 +26,22 @@ async def create_superuser() -> None:
         username = input("Введите username суперпользователя: ")
         full_name = "Superuser"
         position = "superuser"
+        rank = "superuser"
         role = Role.SUPERUSER.value
         work_schedule = WorkSchedule.DAILY.value
 
-        # Проверяем, существует ли пользователь
         super_user = await UserService(session).create_superuser(
             UserCreate(
                 username=username,
                 full_name=full_name,
                 position=position,
+                rank=rank,
                 role=role,
                 work_schedule=work_schedule,
                 password=password,
             )
         )
-        print(f'Superuser created successfully.\nUsername: {super_user.username}\nPassword: {password}')
+        print(f'Superuser created successfully.\nUsername: {super_user.username}')
 
 if __name__ == '__main__':
     try:

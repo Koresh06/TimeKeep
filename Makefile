@@ -1,9 +1,7 @@
-
-
-# Запуск FastAPI
+# Запуск приложения
 start:
 	$ uvicorn --factory src.main:create_app --host $(API_HOST) --port $(API_PORT)
 
 # Создание суперпользователя
 create-superuser:
-	$(PYTHON_CMD) -m $(CREATE_SUPERUSER_SCRIPT)
+	$ python scripts\create_superuser.py
