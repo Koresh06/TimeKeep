@@ -32,6 +32,7 @@ class UserRepository(BaseRepo):
             user_data = data.model_dump(exclude={"password"})
             user_data["hashed_password"] = hashed_password
             user = User(**user_data)
+            user.is_active = True
 
             self.session.add(user)
             await self.session.commit()
