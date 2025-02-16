@@ -7,7 +7,7 @@ from pydantic import BaseModel, ConfigDict
 class DepartmentBase(BaseModel):
     name: str
     description: str
-    organization_oid: uuid.UUID
+    organization_oid: uuid.UUID = None
 
 
 class DepartmentCreate(DepartmentBase):
@@ -33,6 +33,17 @@ class DepartmentUpdate(DepartmentCreate):
 class DepartmentUpdatePartil(DepartmentCreate):
     name: str | None = None
     description: str | None = None
+
+    @classmethod
+    def as_form(
+        cls,
+        name: str = Form(None),
+        description: str = Form(None),
+    ):
+        return cls(
+            name=name,
+            description=description,
+        )
 
 
 class DepartmentOut(DepartmentBase):

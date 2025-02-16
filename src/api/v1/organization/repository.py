@@ -85,13 +85,13 @@ class OrganizationRepository(BaseRepo):
         organization_update: OrganizationUpdate | OrganizationUpdatePartil,
         partial: bool = False,
     ) -> Optional[Organization]:
-        # try:
+        try:
             for key, value in organization_update.model_dump(exclude_unset=partial).items():
                 setattr(organization, key, value)
 
             await self.session.commit()
             await self.session.refresh(organization)
             return organization
-        # except SQLAlchemyError as e:
-        #     raise HTTPException(status_code=500, detail=f"Database error: {str(e)}")
+        except SQLAlchemyError as e:
+            raise HTTPException(status_code=500, detail=f"Database error: {str(e)}")
         

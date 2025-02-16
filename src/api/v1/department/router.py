@@ -103,6 +103,59 @@ async def create_department(
         )
 
 
+
+
+@router.get(
+    "/edit/{oid}",
+    response_class=HTMLResponse,
+    status_code=status.HTTP_200_OK,
+    dependencies=[Depends(RoleRequired([Role.SUPERUSER]))],
+    name="department:modify",
+    description="Modify department",
+)
+async def edit_department_page(
+    request: Request,
+    department: Department = Depends(department_by_oid),
+    current_user: User = Depends(get_current_user),
+    count_day_offs: int = Depends(count_notifications_day_offs),
+    notifications_count_user: int = Depends(get_unread_notifications_count_user),
+):
+    return templates.TemplateResponse(
+        request=request,
+        name="departments/edit.html",
+        context={
+            "current_user": current_user,
+            "department": department,
+            "count_day_offs": count_day_offs,
+            "notifications_count_user": notifications_count_user
+        },
+    )
+
+
+@router.post(
+    "/edit/{oid}",
+    response_class=RedirectResponse,
+    status_code=status.HTTP_302_FOUND,
+    dependencies=[Depends(RoleRequired([Role.SUPERUSER]))],
+    name="department:modify",
+    description="Modify department",
+)
+async def modify_department(
+    request: Request,
+    session: Annotated[AsyncSession, Depends(get_async_session)],
+    department: Department = Depends(department_by_oid),
+    department_update: DepartmentUpdatePartil = Depends(DepartmentUpdatePartil.as_form),
+):
+    await DepartmentService(session).modify(
+        department=department,
+        department_update=department_update,
+        partil=True,
+    )
+    return RedirectResponse(url=f"/organization/", status_code=status.HTTP_302_FOUND)
+
+
+
+
 @router.get(
     "/",
     response_model=List[DepartmentOut],
