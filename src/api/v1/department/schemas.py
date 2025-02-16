@@ -1,3 +1,4 @@
+from datetime import datetime
 import uuid
 from pydantic import BaseModel, ConfigDict
 
@@ -5,8 +6,6 @@ from pydantic import BaseModel, ConfigDict
 class DepartmentBase(BaseModel):
     name: str
     description: str
-    # create_at: datetime
-    # update_at: datetime
 
 
 class DepartmentCreate(DepartmentBase):
@@ -26,4 +25,6 @@ class DepartmentOut(DepartmentBase):
     oid: uuid.UUID
 
     model_config = ConfigDict(from_attributes=True)
+    
+
 

@@ -8,8 +8,10 @@ from src.api.v1.organization.schemas import (
     OrganizationOut,
     PaginatedResponse,
     OrganizationCreate,
+    OrganizationExtendedOut
 )
-from src.models import User
+from src.api.v1.department.schemas import DepartmentOut
+
 
 
 class OrganizationService:
@@ -33,10 +35,25 @@ class OrganizationService:
     ) -> PaginatedResponse[OrganizationOut] | List[OrganizationOut]:
         if limit is None and offset is None:
             return await self.repo.get_all_register()
-        
-        organizations, total_count = await self.repo.get_all(limit=limit, offset=offset)
-        organizations_data = [
-            OrganizationOut.model_validate(org).model_dump() for org in organizations
+
+        organizations, total_count = await self.repo.get_all(limit=limit,   offset=offset)
+
+        # Правильная обработка департаментов как списка
+        extended_organizations_data = [
+            OrganizationExtendedOut.model_validate(
+                {
+                    **OrganizationOut.model_validate(organization).model_dump   (),
+                    "departments": [
+                        department
+                        for department in organization.department_rel
+                    ],
+                }
+            )
+            for organization in organizations
         ]
 
-        return PaginatedResponse(count=total_count, items=organizations_data)
+        return PaginatedResponse(
+            count=total_count,
+            items=extended_organizations_data,
+        )
+

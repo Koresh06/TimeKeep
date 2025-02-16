@@ -7,7 +7,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from src.api.v1.day_off.dependencies import count_notifications_day_offs
 from src.core.session import get_async_session
 from src.api.conf_static import templates
-from src.api.v1.organization.schemas import OrganizationCreate, OrganizationOut
+from src.api.v1.organization.schemas import OrganizationCreate
 from src.api.v1.organization.service import OrganizationService
 from src.api.v1.auth.permissions import RoleRequired
 from src.api.v1.auth.dependencies import get_current_user

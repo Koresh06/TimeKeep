@@ -4,6 +4,8 @@ import uuid
 from fastapi import Form
 from pydantic import BaseModel, ConfigDict, Field
 
+from src.api.v1.department.schemas import DepartmentOut
+
 
 M = TypeVar("M")
 
@@ -51,7 +53,19 @@ class OrganizationUpdatePartil(OrganizationCreate):
     rank: str | None = None
 
 
+# class DepartmentOut(BaseModel):
+#     oid: uuid.UUID
+#     name: str
+#     descpription: str
+
+
 class OrganizationOut(OrganizationBase):
     oid: uuid.UUID
+
+    model_config = ConfigDict(from_attributes=True)
+
+
+class OrganizationExtendedOut(OrganizationOut):
+    departments: List[DepartmentOut]
 
     model_config = ConfigDict(from_attributes=True)

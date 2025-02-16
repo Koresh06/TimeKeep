@@ -48,9 +48,15 @@ class OrganizationRepository(BaseRepo):
             stmt_count = select(func.count()).select_from(Organization)
             total_count = await self.session.scalar(stmt_count)
 
-            stmt = select(Organization).limit(limit).offset(offset).order_by(Organization.create_at.desc())
-            result: Result = await self.session.scalars(stmt)
+            stmt = (
+                select(Organization)
+                .options(selectinload(Organization.department_rel))  
+                .limit(limit)
+                .offset(offset)
+                .order_by(Organization.create_at.desc())
+            )
+            result = await self.session.scalars(stmt)
 
-            return result.all(), total_count
+            return result.all(), total_count 
         except SQLAlchemyError as e:
             raise HTTPException(status_code=500, detail=f"Database error: {str(e)}")
