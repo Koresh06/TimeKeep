@@ -4,4 +4,4 @@ start:
 
 # Создание суперпользователя
 create-superuser:
-	$ python scripts\create_superuser.py
+	$ python scripts/create_superuser.py

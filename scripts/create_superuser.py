@@ -41,6 +41,7 @@ async def create_superuser() -> None:
                 password=password,
             )
         )
+        super_user.is_active = True
         print(f'Superuser created successfully.\nUsername: {super_user.username}')
 
 if __name__ == '__main__':
