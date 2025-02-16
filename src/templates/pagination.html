@@ -22,17 +22,17 @@
             {% if page == current_page %}
             <span class="current-page">{{ page }}</span>
             {% else %}
-            <a class="pagination-btn" href="{{ pagination_url }}?limit={{ limit }}&offset={{ (page - 1) * limit }}">{{ page }}</a>
+            <a class="pagination-btn" href="{{ pagination_url }}?limit={{ limit }}&offset={{ (page - 1) * limit }}&filter={{ filter }}">{{ page }}</a>
             {% endif %}
             {% endfor %}
 
             {% if current_page < total_pages - 2 %}
             <span class="ellipsis">...</span>
-            <a class="pagination-btn" href="{{ pagination_url }}?limit={{ limit }}&offset={{ (total_pages - 1) * limit }}">{{ total_pages }}</a>
+            <a class="pagination-btn" href="{{ pagination_url }}?limit={{ limit }}&offset={{ (total_pages - 1) * limit }}&filter={{ filter }}">{{ total_pages }}</a>
             {% endif %}
 
             {% if current_page < total_pages %}
-            <a class="pagination-btn" href="{{ pagination_url }}?limit={{ limit }}&offset={{ current_page * limit }}">Следующая</a>
+            <a class="pagination-btn" href="{{ pagination_url }}?limit={{ limit }}&offset={{ current_page * limit }}&filter={{ filter }}">Следующая</a>
             {% endif %}
         </div>
     </div>
