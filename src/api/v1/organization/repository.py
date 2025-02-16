@@ -60,3 +60,12 @@ class OrganizationRepository(BaseRepo):
             return result.all(), total_count 
         except SQLAlchemyError as e:
             raise HTTPException(status_code=500, detail=f"Database error: {str(e)}")
+        
+    
+    async def get_all_dep_organizations(self) -> List[Organization]:
+        try:
+            stmt = select(Organization)
+            result: Result = await self.session.scalars(stmt)
+            return result
+        except SQLAlchemyError as e:
+            raise HTTPException(status_code=500, detail=f"Database error: {str(e)}")

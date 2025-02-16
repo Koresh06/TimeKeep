@@ -1,15 +1,29 @@
 from datetime import datetime
 import uuid
+from fastapi import Form
 from pydantic import BaseModel, ConfigDict
 
 
 class DepartmentBase(BaseModel):
     name: str
     description: str
+    organization_oid: uuid.UUID
 
 
 class DepartmentCreate(DepartmentBase):
-    pass
+    @classmethod
+    def as_form(
+        cls,
+        name: str = Form(...),
+        description: str = Form(...),
+        organization_oid: uuid.UUID = Form(...),
+
+    ):
+        return cls(
+            name=name,
+            description=description,
+            organization_oid=organization_oid,
+        )
 
 
 class DepartmentUpdate(DepartmentCreate):

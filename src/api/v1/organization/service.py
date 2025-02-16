@@ -37,12 +37,11 @@ class OrganizationService:
             return await self.repo.get_all_register()
 
         organizations, total_count = await self.repo.get_all(limit=limit,   offset=offset)
-
-        # Правильная обработка департаментов как списка
+        
         extended_organizations_data = [
             OrganizationExtendedOut.model_validate(
                 {
-                    **OrganizationOut.model_validate(organization).model_dump   (),
+                    **OrganizationOut.model_validate(organization).model_dump(),
                     "departments": [
                         department
                         for department in organization.department_rel
@@ -57,3 +56,7 @@ class OrganizationService:
             items=extended_organizations_data,
         )
 
+
+    async def get_all_dep_organizations(self) -> List[OrganizationOut]:
+        organizations = await self.repo.get_all_dep_organizations()
+        return [OrganizationOut.model_validate(organization) for organization in organizations]

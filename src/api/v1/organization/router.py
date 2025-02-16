@@ -36,7 +36,6 @@ async def create_organization(
     notifications_count_user: int = Depends(get_unread_notifications_count_user),
 ):
     success_message = request.cookies.get("success_message")
-    # Декодируем сообщение из куки
     if success_message:
         success_message = unquote(success_message)
 

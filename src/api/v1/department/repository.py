@@ -13,7 +13,7 @@ from src.api.v1.department.schemas import DepartmentCreate, DepartmentUpdate, De
 class DepartmentRepository(BaseRepo):
     
     async def create(self, department_create: DepartmentCreate) -> DepartmentOut:
-        result = await self.session.execute(select(Department).where(Department.name == department_create.name))
+        result = await self.session.execute(select(Department).where(Department.name == department_create.name and Department.organization_oid == department_create.organization_oid))
         existing_department = result.scalar()
 
         if existing_department:

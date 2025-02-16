@@ -1,0 +1,71 @@
+{% extends "base.html" %}
+
+{% block styles %}
+    <link rel="stylesheet" href="/static/css/components.css">
+    <link rel="stylesheet" href="/static/css/alert-create.css">
+{% endblock %}
+
+{% block content %}
+<div class="container mt-6 ">
+    <div class="d-flex justify-content-center align-items-center">
+        <h1 class="page-title">Создание департамента</h1>
+    </div>
+
+    {% if msg %}
+    <div class="alert alert-success alert-dismissible fade show" role="alert" id="alertSuccess">
+        {{ msg }}
+    </div>
+    <script>
+        setTimeout(function() {
+            var alertSuccess = document.getElementById('alertSuccess');
+            if (alertSuccess) {
+                alertSuccess.classList.remove('show');
+                alertSuccess.classList.add('fade');
+            }
+        }, 3000);  
+    </script>
+    {% endif %}
+
+    {% if error %}
+    <div class="alert alert-danger alert-dismissible fade show" role="alert" id="alertError">
+        {{ error }}
+    </div>
+    <script>
+        setTimeout(function() {
+            var alertError = document.getElementById('alertError');
+            if (alertError) {
+                alertError.classList.remove('show');
+                alertError.classList.add('fade');
+            }
+        }, 3000); 
+    </script>
+    {% endif %}
+
+    <div class="create-department-container w-50 mx-auto">
+        <form method="post" action="/department/create" class="form-group">
+            <div class="mb-3">
+                <label for="name" class="form-label">Название департамента:</label>
+                <input type="text" id="name" name="name" class="form-control" required>
+            </div>
+        
+            <div class="mb-3">
+                <label for="description" class="form-label">Описание:</label>
+                <input type="text" id="description" name="description" class="form-control" required>
+            </div>
+        
+            <div class="mb-3">
+                <label for="organization_oid" class="form-label">Организация:</label>
+                <select id="organization_oid" name="organization_oid" class="form-control" required>
+                    <option value="" disabled selected>Выберите организацию</option>
+                    {% for organization in organizations %}
+                        <option value="{{ organization.oid }}">{{ organization.name }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+        
+            <button type="submit" class="btn btn-primary w-100">Создать</button>
+        </form>
+    </div>
+</div>
+
+{% endblock %}
