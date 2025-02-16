@@ -52,11 +52,20 @@ class OrganizationUpdatePartil(OrganizationCreate):
     position: str | None = None
     rank: str | None = None
 
-
-# class DepartmentOut(BaseModel):
-#     oid: uuid.UUID
-#     name: str
-#     descpription: str
+    @classmethod
+    def as_form(
+        cls,
+        name: str = Form(None),
+        name_boss: str = Form(None),
+        position: str = Form(None),
+        rank: str = Form(None),
+    ):
+        return cls(
+            name=name,
+            name_boss=name_boss,
+            position=position,
+            rank=rank,
+        )
 
 
 class OrganizationOut(OrganizationBase):

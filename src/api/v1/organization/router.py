@@ -5,13 +5,15 @@ from fastapi.responses import HTMLResponse, RedirectResponse
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from src.api.v1.day_off.dependencies import count_notifications_day_offs
+from src.api.v1.organization.dependencies import organization_by_oid
 from src.core.session import get_async_session
 from src.api.conf_static import templates
-from src.api.v1.organization.schemas import OrganizationCreate
+from src.api.v1.organization.schemas import OrganizationCreate, OrganizationUpdatePartil
 from src.api.v1.organization.service import OrganizationService
 from src.api.v1.auth.permissions import RoleRequired
 from src.api.v1.auth.dependencies import get_current_user
 from src.middlewares.notification.dependencies import get_unread_notifications_count_user
+from src.models.organization import Organization
 from src.models.user import User, Role
 
 
@@ -128,3 +130,52 @@ async def get_all_organizations(
             "notifications_count_user": notifications_count_user,
         },
     )
+
+
+@router.get(
+    "/edit/{oid}",
+    response_class=HTMLResponse,
+    status_code=status.HTTP_200_OK,
+    dependencies=[Depends(RoleRequired([Role.SUPERUSER]))],
+    name="organization:modify",
+    description="Modify organization",
+)
+async def edit_organization_page(
+    request: Request,
+    organization: Organization = Depends(organization_by_oid),
+    current_user: User = Depends(get_current_user),
+    count_day_offs: int = Depends(count_notifications_day_offs),
+    notifications_count_user: int = Depends(get_unread_notifications_count_user),
+):
+    return templates.TemplateResponse(
+        request=request,
+        name="organizations/edit.html",
+        context={
+            "current_user": current_user,
+            "organization": organization,
+            "count_day_offs": count_day_offs,
+            "notifications_count_user": notifications_count_user
+        },
+    )
+
+
+@router.post(
+    "/edit/{oid}",
+    response_class=RedirectResponse,
+    status_code=status.HTTP_302_FOUND,
+    dependencies=[Depends(RoleRequired([Role.SUPERUSER]))],
+    name="organization:modify",
+    description="Modify organization",
+)
+async def modify_organization(
+    request: Request,
+    session: Annotated[AsyncSession, Depends(get_async_session)],
+    organization: Organization = Depends(organization_by_oid),
+    organization_update: OrganizationUpdatePartil = Depends(OrganizationUpdatePartil.as_form),
+):
+    await OrganizationService(session).modify(
+        organization=organization,
+        organization_update=organization_update,
+        partial=True,
+    )
+    return RedirectResponse(url=f"/organization/", status_code=status.HTTP_302_FOUND)

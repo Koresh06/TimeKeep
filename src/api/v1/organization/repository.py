@@ -8,7 +8,7 @@ from sqlalchemy.exc import IntegrityError, SQLAlchemyError
 
 from src.core.repo.base import BaseRepo
 from src.models import Organization, User
-from src.api.v1.organization.schemas import OrganizationCreate, OrganizationOut
+from src.api.v1.organization.schemas import OrganizationCreate, OrganizationOut, OrganizationUpdate, OrganizationUpdatePartil
 
 
 
@@ -69,3 +69,29 @@ class OrganizationRepository(BaseRepo):
             return result
         except SQLAlchemyError as e:
             raise HTTPException(status_code=500, detail=f"Database error: {str(e)}")
+        
+
+    async def get_one(self, oid: uuid.UUID) -> Organization:
+        try:
+            stmt = select(Organization).where(Organization.oid == oid)
+            result: Result = await self.session.scalar(stmt)
+            return result
+        except SQLAlchemyError as e:
+            raise HTTPException(status_code=500, detail=f"Database error: {str(e)}")
+        
+    async def update(
+        self,
+        organization: Organization,
+        organization_update: OrganizationUpdate | OrganizationUpdatePartil,
+        partial: bool = False,
+    ) -> Optional[Organization]:
+        # try:
+            for key, value in organization_update.model_dump(exclude_unset=partial).items():
+                setattr(organization, key, value)
+
+            await self.session.commit()
+            await self.session.refresh(organization)
+            return organization
+        # except SQLAlchemyError as e:
+        #     raise HTTPException(status_code=500, detail=f"Database error: {str(e)}")
+        

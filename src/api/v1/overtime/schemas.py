@@ -60,8 +60,10 @@ class OvertimeUpdatePartial(BaseModel):
         o_date: Optional[date] = Form(None),
         description: Optional[str] = Form(None),
     ) -> "OvertimeUpdatePartial":
-        return cls(o_date=o_date, description=description)
-
+        return cls(
+            o_date=o_date,
+            description=description,
+        )
 
 
 class OvertimeOut(OvertimeBase):

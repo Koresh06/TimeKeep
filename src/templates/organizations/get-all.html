@@ -27,12 +27,17 @@
         </thead>
         <tbody>
             {% for organization in organizations %}
-            <tr class="text-center" data-bs-toggle="collapse" data-bs-target="#org-{{ organization.oid }}">
-                <td>{{ loop.index + (current_page - 1) * limit }}</td>
-                <td>{{ organization.name }}</td>
-                <td>{{ organization.name_boss }}</td>
-                <td>{{ organization.position }}</td>
-                <td>{{ organization.rank }}</td>
+            <tr class="text-center">
+                <td data-bs-toggle="collapse" data-bs-target="#org-{{ organization.oid }}">{{ loop.index + (current_page - 1) * limit }}</td>
+                <td data-bs-toggle="collapse" data-bs-target="#org-{{ organization.oid }}">{{ organization.name }}</td>
+                <td data-bs-toggle="collapse" data-bs-target="#org-{{ organization.oid }}">{{ organization.name_boss }}</td>
+                <td data-bs-toggle="collapse" data-bs-target="#org-{{ organization.oid }}">{{ organization.position }}</td>
+                <td data-bs-toggle="collapse" data-bs-target="#org-{{ organization.oid }}">{{ organization.rank }}</td>
+                <td>
+                    <a href="/organization/edit/{{ organization.oid }}" class="btn btn-primary">
+                        <i class="bi bi-pencil-square"></i>
+                    </a>
+                </td>
             </tr>
             <tr id="org-{{ organization.oid }}" class="collapse">
                 <td colspan="6">
@@ -53,6 +58,11 @@
                                     <td>{{ loop.index }}</td>
                                     <td>{{ department.name }}</td>
                                     <td>{{ department.description }}</td>
+                                    <td>
+                                        <a href="#" class="btn btn-primary">
+                                            <i class="bi bi-pencil-square"></i>
+                                        </a>
+                                    </td>
                                 </tr>
                                 {% endfor %}
                             </tbody>
@@ -60,6 +70,7 @@
                     {% endif %}
                 </td>
             </tr>
+            
             {% endfor %}
         </tbody>
     </table>
