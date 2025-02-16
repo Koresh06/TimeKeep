@@ -45,16 +45,20 @@ class UserRepository(BaseRepo):
         self,
         limit: int,
         offset: int,
-        is_active: bool,
+        is_active: Optional[bool] = None,
     ) -> Tuple[List[User], int]:
         try:
-            stmt_count = select(func.count()).where(User.is_active == is_active)
+            stmt_count = select(func.count())
+            stmt = select(User).options(selectinload(User.department_rel))
+
+            if is_active is not None:
+                stmt_count = stmt_count.where(User.is_active == is_active)
+                stmt = stmt.where(User.is_active == is_active)
+
             total_count = await self.session.scalar(stmt_count)
 
             stmt = (
-                select(User)
-                .options(selectinload(User.department_rel))
-                .where(User.is_active == is_active)
+                stmt
                 .limit(limit)
                 .offset(offset)
                 .order_by(User.create_at.desc())
@@ -65,6 +69,7 @@ class UserRepository(BaseRepo):
 
         except SQLAlchemyError as e:
             raise HTTPException(status_code=500, detail=f"Database error: {str(e)}")
+
 
     async def approve_or_reject_user(
         self,

@@ -86,7 +86,7 @@ class UserOut(UserBase):
     is_active: bool
     create_at: datetime
     update_at: datetime
-    # department_rel: Optional[DepartmentOut] = None
+    department_rel: Optional[DepartmentOut] = None
 
     model_config = ConfigDict(from_attributes=True)
 

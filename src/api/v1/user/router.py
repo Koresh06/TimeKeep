@@ -223,64 +223,44 @@ async def get_statistics_current_year(
     return {"statistics": statistics}
 
 
+
 @router.get(
-    "/{oid}",
-    response_model=UserOut,
-    dependencies=[Depends(RoleRequired([Role.SUPERUSER, Role.MODERATOR]))],
+    "/",
+    response_class=HTMLResponse,
     status_code=status.HTTP_200_OK,
-    name="users:get_one",
-    description="Get one user by id",
+    dependencies=[Depends(RoleRequired([Role.SUPERUSER]))],
+    name="users:get_all",
+    description="Get all users",
 )
-async def get_one(
-    user: UserOut = Depends(user_by_oid),
+async def get_all(
+    request: Request,
+    session: Annotated[AsyncSession, Depends(get_async_session)],
+    current_user: User = Depends(get_current_user),
+    limit: int = Query(10, ge=1, le=100),
+    offset: int = Query(0, ge=0),
+    count_day_offs: int = Depends(count_notifications_day_offs),
+    notifications_count_user: int = Depends(get_unread_notifications_count_user),
 ):
-    return user
-
-
-@router.patch(
-    "/{oid}",
-    response_model=UserOut,
-    dependencies=[Depends(RoleRequired(Role.SUPERUSER))],
-    status_code=status.HTTP_200_OK,
-    name="users:modify",
-    description="Modify user by id",
-)
-async def modify(
-    session: Annotated[
-        AsyncSession,
-        Depends(get_async_session),
-    ],
-    user_update: UserUpdatePartial,
-    user: User = Depends(user_by_oid),
-):
-    return await UserService(session).modify(
-        user=user,
-        user_update=user_update,
-        partil=True,
+    data = await UserService(session).get_all(
+        limit=limit,
+        offset=offset,
     )
 
-
-@router.put(
-    "/{oid}",
-    response_model=UserOut,
-    dependencies=[Depends(RoleRequired(Role.SUPERUSER))],
-    status_code=status.HTTP_200_OK,
-    name="users:replace",
-    description="Replace user by id",
-)
-async def replace(
-    session: Annotated[
-        AsyncSession,
-        Depends(get_async_session),
-    ],
-    user_update: UserUpdate,
-    user: User = Depends(user_by_oid),
-):
-    return await UserService(session).replace(
-        user=user,
-        user_update=user_update,
-        partil=False,
+    return templates.TemplateResponse(
+        request=request,
+        name="users/get-all.html",
+        context={
+            "current_user": current_user,
+            "users": data.items,
+            "total_pages": data.total_pages,
+            "current_page": data.current_page,
+            "limit": limit,
+            "offset": offset,
+            "count_day_offs": count_day_offs,
+            "notifications_count_user": notifications_count_user,
+        },
     )
+
 
 
 
