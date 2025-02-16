@@ -49,7 +49,7 @@ class UserRepository(BaseRepo):
     ) -> Tuple[List[User], int]:
         try:
             stmt_count = select(func.count())
-            stmt = select(User).options(selectinload(User.department_rel))
+            stmt = select(User).options(selectinload(User.department_rel), selectinload(User.organization_rel))
 
             if is_active is not None:
                 stmt_count = stmt_count.where(User.is_active == is_active)
@@ -106,15 +106,15 @@ class UserRepository(BaseRepo):
         user_update: UserUpdate | UserUpdatePartial,
         partil: bool = False,
     ) -> User:
-        try:
+        # try:
             for key, value in user_update.model_dump(exclude_unset=partil).items():
                 setattr(user, key, value)
             await self.session.commit()
             await self.session.refresh(user)
             return user
-        except SQLAlchemyError as e:
-            await self.session.rollback()
-            raise HTTPException(status_code=500, detail=f"Database error: {str(e)}")
+        # except SQLAlchemyError as e:
+        #     await self.session.rollback()
+        #     raise HTTPException(status_code=500, detail=f"Database error: {str(e)}")
 
     async def delete(self, user: User):
         try:

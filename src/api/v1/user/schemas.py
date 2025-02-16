@@ -7,6 +7,7 @@ from pydantic import BaseModel, ConfigDict, Field, field_validator
 from src.models import Role, WorkSchedule
 
 from src.api.v1.department.schemas import DepartmentOut
+from src.api.v1.organization.schemas import OrganizationOut
 
 
 M = TypeVar("M")
@@ -78,8 +79,32 @@ class UserUpdate(UserBase):
 
 
 class UserUpdatePartial(UserUpdate):
-    pass
+    username: str | None = None
+    full_name: str | None = None
+    position: str | None = None
+    rank: str | None = None
+    role: Role | None = None
+    work_schedule: WorkSchedule | None = None
 
+    @classmethod
+    def as_form(
+        cls,
+        username: str = Form(None),
+        full_name: str = Form(None),
+        position: str = Form(None),
+        rank: str = Form(None),
+        role: Role = Form(None),
+        work_schedule: WorkSchedule = Form(None),
+    ):
+        return cls(
+            username=username,
+            full_name=full_name,
+            position=position,
+            rank=rank,
+            role=role,
+            work_schedule=work_schedule,
+        )
+        
 
 class UserOut(UserBase):
     oid: uuid.UUID
@@ -87,6 +112,7 @@ class UserOut(UserBase):
     create_at: datetime
     update_at: datetime
     department_rel: Optional[DepartmentOut] = None
+    organization_rel: Optional[OrganizationOut] = None
 
     model_config = ConfigDict(from_attributes=True)
 

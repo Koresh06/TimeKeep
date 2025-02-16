@@ -263,6 +263,57 @@ async def get_all(
 
 
 
+@router.get(
+    "/edit/{oid}",
+    response_class=HTMLResponse,
+    status_code=status.HTTP_200_OK,    
+    dependencies=[Depends(RoleRequired([Role.SUPERUSER]))],
+    name="users:edit",
+    description="Edit user",
+)
+async def edit_user_page(
+    request: Request,
+    user: User = Depends(user_by_oid),
+    current_user: User = Depends(get_current_user),
+    count_day_offs: int = Depends(count_notifications_day_offs),
+    notifications_count_user: int = Depends(get_unread_notifications_count_user),
+):
+    return templates.TemplateResponse(
+        request=request,
+        name="users/edit.html",
+        context={
+            "current_user": current_user,
+            "user": user,
+            "count_day_offs": count_day_offs,
+            "notifications_count_user": notifications_count_user
+        },
+    )
+
+
+@router.post(
+    "/edit/{oid}",
+    response_class=RedirectResponse,
+    status_code=status.HTTP_302_FOUND,
+    dependencies=[Depends(RoleRequired([Role.SUPERUSER]))],
+    name="users:edit",
+    description="Edit user",
+)
+async def edit_user(
+    session: Annotated[
+        AsyncSession,
+        Depends(get_async_session),
+    ],
+    user: User = Depends(user_by_oid),
+    user_update: UserUpdatePartial = Depends(UserUpdatePartial.as_form),
+    
+):
+    await UserService(session).modify(
+        user=user,
+        user_update=user_update,
+        partil=True,
+    )
+    return RedirectResponse(url="/user/", status_code=status.HTTP_302_FOUND)
+
 
 @router.post(
     "/toggle-role/{oid}",

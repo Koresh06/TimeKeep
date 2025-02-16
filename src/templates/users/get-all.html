@@ -22,6 +22,7 @@
                 <th>Должность</th>
                 <th>Звание</th>
                 <th>Департамент</th>
+                <th>Организация</th>
                 <th>Дата создания</th>
                 <th></th>
             </tr>
@@ -44,9 +45,10 @@
                 <td>{{ user.position }}</td>
                 <td>{{ user.rank }}</td>
                 <td>{{ user.department_rel.name }}</td>
+                <td>{{ user.organization_rel.name }}</td>
                 <td>{{ user.create_at.strftime('%d.%m.%Y %H:%M') }}</td>
                 <td>
-                    <a href="/user/edit/{{ user.uid }}" class="btn btn-primary">
+                    <a href="/user/edit/{{ user.oid }}" class="btn btn-primary">
                         <i class="bi bi-pencil-square"></i>
                     </a>
                 </td>
