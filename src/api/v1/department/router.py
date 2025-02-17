@@ -6,7 +6,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from src.api.v1.auth.dependencies import get_current_user
 from src.api.v1.day_off.dependencies import count_notifications_day_offs
-from src.core.session import get_async_session
+from src.core.database.infrastructure import db_helper
 from src.middlewares.notification.dependencies import get_unread_notifications_count_user
 from src.models import Department, Role
 from src.api.v1.auth.permissions import RoleRequired
@@ -35,7 +35,7 @@ router = APIRouter(
 )
 async def create_department_page(
     request: Request,
-    session: Annotated[AsyncSession, Depends(get_async_session)],
+    session: Annotated[AsyncSession, Depends(db_helper.get_session)],
     current_user: User = Depends(get_current_user),
     count_day_offs: int = Depends(count_notifications_day_offs),
     notifications_count_user: int = Depends(get_unread_notifications_count_user),
@@ -75,7 +75,7 @@ async def create_department(
     request: Request,
     session: Annotated[
         AsyncSession,
-        Depends(get_async_session),
+        Depends(db_helper.get_session),
     ],
     current_user: User = Depends(get_current_user),
     department_create: DepartmentCreate = Depends(DepartmentCreate.as_form),
@@ -142,7 +142,7 @@ async def edit_department_page(
 )
 async def modify_department(
     request: Request,
-    session: Annotated[AsyncSession, Depends(get_async_session)],
+    session: Annotated[AsyncSession, Depends(db_helper.get_session)],
     department: Department = Depends(department_by_oid),
     department_update: DepartmentUpdatePartil = Depends(DepartmentUpdatePartil.as_form),
 ):
@@ -167,7 +167,7 @@ async def modify_department(
 async def get_all_departments(
     session: Annotated[
         AsyncSession,
-        Depends(get_async_session),
+        Depends(db_helper.get_session),
     ],
 ):
     return await DepartmentService(session).get_all()
@@ -185,7 +185,7 @@ async def get_all_departments(
 async def get_all_departments(
     session: Annotated[
         AsyncSession,
-        Depends(get_async_session),
+        Depends(db_helper.get_session),
     ],
 ):
     return await DepartmentService(session).get_all()
@@ -212,7 +212,7 @@ async def get_one_department(department: Department = Depends(department_by_oid)
     description="Modify department by id",
 )
 async def modify_department(
-    session: Annotated[AsyncSession, Depends(get_async_session)],
+    session: Annotated[AsyncSession, Depends(db_helper.get_session)],
     department_update: DepartmentUpdatePartil,
     department: Department = Depends(department_by_oid),
 ):
@@ -232,7 +232,7 @@ async def modify_department(
     description="Replace department by id",
 )
 async def replace_department(
-    session: Annotated[AsyncSession, Depends(get_async_session)],
+    session: Annotated[AsyncSession, Depends(db_helper.get_session)],
     department_update: DepartmentUpdatePartil,
     department: Department = Depends(department_by_oid),
 ):
@@ -250,7 +250,7 @@ async def replace_department(
     description="Delete department by id",
 )
 async def delete_department(
-    session: Annotated[AsyncSession, Depends(get_async_session)],
+    session: Annotated[AsyncSession, Depends(db_helper.get_session)],
     department: Department = Depends(department_by_oid),
 ):
     await DepartmentService(session).delete(department=department)

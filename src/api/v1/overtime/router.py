@@ -10,7 +10,7 @@ from src.api.conf_static import templates
 from src.api.v1.auth.dependencies import get_current_user, get_is_authenticated
 from src.models.user import User
 from src.models import Overtime, Role
-from src.core.session import get_async_session
+from src.core.database.infrastructure import db_helper
 from src.api.v1.auth.permissions import RoleRequired
 from src.api.v1.overtime.service import OvertimeService
 from src.api.v1.overtime.schemas import (
@@ -75,7 +75,7 @@ async def create_overtime_page(
 )
 async def create_overtime(
     request: Request,
-    session: Annotated[AsyncSession, Depends(get_async_session)],
+    session: Annotated[AsyncSession, Depends(db_helper.get_session)],
     current_user: User = Depends(get_current_user),
     overtime_create: OvertimeCreate = Depends(OvertimeCreate.as_form),
 ):
@@ -113,7 +113,7 @@ async def create_overtime(
 )
 async def get_all_overtimes(
     request: Request,
-    session: Annotated[AsyncSession, Depends(get_async_session)],
+    session: Annotated[AsyncSession, Depends(db_helper.get_session)],
     current_user: User = Depends(get_current_user),
     limit: int = Query(10, ge=1, le=100),
     offset: int = Query(0, ge=0),
@@ -193,7 +193,7 @@ async def edit_overtime_page(
 async def modify_overtime(
     session: Annotated[
         AsyncSession,
-        Depends(get_async_session),
+        Depends(db_helper.get_session),
     ],
     overtime_update: OvertimeUpdatePartial = Depends(OvertimeUpdatePartial.as_form),
     overtime: Overtime = Depends(overtime_by_oid),
@@ -217,7 +217,7 @@ async def modify_overtime(
 async def delete_overtime(
     session: Annotated[
         AsyncSession,
-        Depends(get_async_session),
+        Depends(db_helper.get_session),
     ],
     overtime: Overtime = Depends(overtime_by_oid),
 ):

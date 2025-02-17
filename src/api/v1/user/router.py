@@ -5,7 +5,7 @@ from fastapi.responses import HTMLResponse, RedirectResponse
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from src.models.user import Role, User
-from src.core.session import get_async_session
+from src.core.database.infrastructure import db_helper
 from src.api.conf_static import templates
 from src.api.v1.auth.permissions import RoleRequired
 from src.api.v1.auth.dependencies import get_current_user
@@ -41,7 +41,7 @@ async def register_page(
     request: Request,
     session: Annotated[
         AsyncSession,
-        Depends(get_async_session),
+        Depends(db_helper.get_session),
     ],
 ):
     organizations = await OrganizationService(session).get_all()
@@ -68,7 +68,7 @@ async def register(
     request: Request,
     session: Annotated[
         AsyncSession,
-        Depends(get_async_session),
+        Depends(db_helper.get_session),
     ],
     user_create: UserCreate = Depends(UserCreate.as_form),
 ):
@@ -103,7 +103,7 @@ async def register_requests_page(
     request: Request,
     session: Annotated[
         AsyncSession,
-        Depends(get_async_session),
+        Depends(db_helper.get_session),
     ],
     current_user: User = Depends(get_current_user),
     limit: int = Query(10, ge=1, le=100),
@@ -144,7 +144,7 @@ async def register_requests_page(
 async def register_requests(
     session: Annotated[
         AsyncSession,
-        Depends(get_async_session),
+        Depends(db_helper.get_session),
     ],
     user: User = Depends(user_by_oid),
 ):
@@ -169,7 +169,7 @@ async def register_requests(
 async def delete(
     session: Annotated[
         AsyncSession,
-        Depends(get_async_session),
+        Depends(db_helper.get_session),
     ],
     user: User = Depends(user_by_oid),
 ):
@@ -189,7 +189,7 @@ async def delete(
 )
 async def get_me(
     request: Request,
-    session: Annotated[AsyncSession, Depends(get_async_session)],
+    session: Annotated[AsyncSession, Depends(db_helper.get_session)],
     current_user: User = Depends(get_current_user),
     count_day_offs: int = Depends(count_notifications_day_offs),
     notifications_count_user: int = Depends(get_unread_notifications_count_user),
@@ -215,7 +215,7 @@ async def get_me(
     status_code=status.HTTP_200_OK,
 )
 async def get_statistics_current_year(
-    session: Annotated[AsyncSession, Depends(get_async_session)],
+    session: Annotated[AsyncSession, Depends(db_helper.get_session)],
     current_user: User = Depends(get_current_user),
     year: int = None,
 ):
@@ -234,7 +234,7 @@ async def get_statistics_current_year(
 )
 async def get_all(
     request: Request,
-    session: Annotated[AsyncSession, Depends(get_async_session)],
+    session: Annotated[AsyncSession, Depends(db_helper.get_session)],
     current_user: User = Depends(get_current_user),
     limit: int = Query(10, ge=1, le=100),
     offset: int = Query(0, ge=0),
@@ -301,7 +301,7 @@ async def edit_user_page(
 async def edit_user(
     session: Annotated[
         AsyncSession,
-        Depends(get_async_session),
+        Depends(db_helper.get_session),
     ],
     user: User = Depends(user_by_oid),
     user_update: UserUpdatePartial = Depends(UserUpdatePartial.as_form),
@@ -326,7 +326,7 @@ async def edit_user(
 async def toggle(
     session: Annotated[
         AsyncSession,
-        Depends(get_async_session),
+        Depends(db_helper.get_session),
     ],
     user: User = Depends(user_by_oid),
     role: Role = Query(Role),

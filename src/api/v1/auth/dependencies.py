@@ -6,7 +6,7 @@ from fastapi.responses import RedirectResponse
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from src.core.config import settings
-from src.core.session import get_async_session
+from src.core.database.infrastructure import db_helper
 
 from src.models import User
 from src.api.v1.auth.service import AuthService
@@ -19,7 +19,7 @@ cookie_scheme = APIKeyCookie(name="access_token", auto_error=False)
 
 
 async def get_current_user(
-    session: Annotated[AsyncSession, Depends(get_async_session)],
+    session: Annotated[AsyncSession, Depends(db_helper.get_session)],
     token: Annotated[str, Security(cookie_scheme)],
 ):
     credentials_exception = HTTPException(

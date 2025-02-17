@@ -5,7 +5,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from src.api.conf_static import templates
 from src.api.v1.day_off.dependencies import count_notifications_day_offs
-from src.core.session import get_async_session
+from src.core.database.infrastructure import db_helper
 from src.api.v1.auth.dependencies import get_current_user
 from src.middlewares.notification.dependencies import get_unread_notifications_count_user
 from src.models import User
@@ -20,7 +20,7 @@ async def home_page(
     request: Request, 
     session: Annotated[
         AsyncSession,
-        Depends(get_async_session),
+        Depends(db_helper.get_session),
     ],
     current_user: User = Depends(get_current_user),
     count_day_offs: int = Depends(count_notifications_day_offs),

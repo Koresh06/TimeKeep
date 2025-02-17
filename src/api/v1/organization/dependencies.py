@@ -4,7 +4,7 @@ from typing import Annotated
 from fastapi import Path, Depends, HTTPException, status
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from src.core.session import get_async_session
+from src.core.database.infrastructure import db_helper
 from src.models import Organization
 
 from src.api.v1.organization.service import OrganizationService
@@ -13,7 +13,7 @@ from src.api.v1.organization.service import OrganizationService
 
 async def organization_by_oid(
     oid: Annotated[uuid.UUID, Path],
-    session: Annotated[AsyncSession, Depends(get_async_session)],
+    session: Annotated[AsyncSession, Depends(db_helper.get_session)],
 ) -> Organization:
     organization = await OrganizationService(session).get_one(oid=oid)
     if organization is not None:

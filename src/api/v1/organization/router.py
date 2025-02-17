@@ -6,7 +6,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from src.api.v1.day_off.dependencies import count_notifications_day_offs
 from src.api.v1.organization.dependencies import organization_by_oid
-from src.core.session import get_async_session
+from src.core.database.infrastructure import db_helper
 from src.api.conf_static import templates
 from src.api.v1.organization.schemas import OrganizationCreate, OrganizationUpdatePartil
 from src.api.v1.organization.service import OrganizationService
@@ -67,7 +67,7 @@ async def create_organization(
 )
 async def create_organization(
     request: Request,
-    session: Annotated[AsyncSession, Depends(get_async_session)],
+    session: Annotated[AsyncSession, Depends(db_helper.get_session)],
     current_user: User = Depends(get_current_user),
     organization_create: OrganizationCreate = Depends(OrganizationCreate.as_form),
 ):
@@ -103,7 +103,7 @@ async def create_organization(
     description="Get all organizations",
 )
 async def get_all_organizations(
-    session: Annotated[AsyncSession, Depends(get_async_session)],
+    session: Annotated[AsyncSession, Depends(db_helper.get_session)],
     request: Request,
     current_user: User = Depends(get_current_user),
     limit: int = Query(10, ge=1, le=100),
@@ -169,7 +169,7 @@ async def edit_organization_page(
 )
 async def modify_organization(
     request: Request,
-    session: Annotated[AsyncSession, Depends(get_async_session)],
+    session: Annotated[AsyncSession, Depends(db_helper.get_session)],
     organization: Organization = Depends(organization_by_oid),
     organization_update: OrganizationUpdatePartil = Depends(OrganizationUpdatePartil.as_form),
 ):

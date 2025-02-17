@@ -8,7 +8,7 @@ from httpx import ASGITransport, AsyncClient
 from asgi_lifespan import LifespanManager
 
 from main import create_app
-from src.core.session import get_async_session
+from src.core.database.infrastructure import db_helper
 from src.core.config import settings
 from src.models import Base, Role, WorkSchedule, Department
 from src.api.v1.user.service import UserService
@@ -71,7 +71,7 @@ async def async_client(async_db_session) -> AsyncGenerator[AsyncClient, None]:
         yield async_db_session
 
     app = create_app()
-    app.dependency_overrides[get_async_session] = override_get_db
+    app.dependency_overrides[db_helper.get_session] = override_get_db
 
     async with LifespanManager(app):
         async with AsyncClient(

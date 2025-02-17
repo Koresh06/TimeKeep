@@ -6,7 +6,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from fastapi import APIRouter, Depends, HTTPException, Request, Response, status
 
 from src.models import User
-from src.core.session import get_async_session
+from src.core.database.infrastructure import db_helper
 from src.core.config import settings
 from src.api.v1.auth.dependencies import get_current_user
 from src.api.conf_static import templates
@@ -47,7 +47,7 @@ async def login_access_token(
     ],
     session: Annotated[
         AsyncSession,
-        Depends(get_async_session),
+        Depends(db_helper.get_session),
     ],
 ) -> Token:
     return await AuthService(session).authenticate_and_create_token(form_data)
@@ -63,7 +63,7 @@ async def login_access_token(
 async def login(
     request: Request,
     form_data: Annotated[LoginForm, Depends(LoginForm.as_form)],
-    session: Annotated[AsyncSession, Depends(get_async_session)],
+    session: Annotated[AsyncSession, Depends(db_helper.get_session)],
 ):
     try:
         oauth_form_data = OAuth2PasswordRequestForm(

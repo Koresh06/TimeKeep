@@ -10,7 +10,7 @@ from fastapi.responses import (
 )
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from src.core.session import get_async_session
+from src.core.database.infrastructure import db_helper
 from src.models import User, Role, DayOff
 from src.api.conf_static import templates
 
@@ -86,7 +86,7 @@ async def create_day_off(
     request: Request,
     session: Annotated[
         AsyncSession,
-        Depends(get_async_session),
+        Depends(db_helper.get_session),
     ],
     day_off_create: DayOffCreate = Depends(DayOffCreate.as_form),
     current_user: User = Depends(get_current_user),
@@ -124,7 +124,7 @@ async def get_all_day_offs(
     request: Request,
     session: Annotated[
         AsyncSession,
-        Depends(get_async_session),
+        Depends(db_helper.get_session),
     ],
     current_user: User = Depends(get_current_user),
     limit: int = Query(10, ge=1, le=100),
@@ -177,7 +177,7 @@ async def notifications_page(
     request: Request,
     session: Annotated[
         AsyncSession,
-        Depends(get_async_session),
+        Depends(db_helper.get_session),
     ],
     current_user: User = Depends(get_current_user),
     limit: int = Query(10, ge=1, le=100),
@@ -221,7 +221,7 @@ async def notifications_page(
     description="Approve day off by id",
 )
 async def approve_day_off(
-    session: Annotated[AsyncSession, Depends(get_async_session)],
+    session: Annotated[AsyncSession, Depends(db_helper.get_session)],
     day_off: DayOff = Depends(day_off_by_oid),
     current_user: User = Depends(get_current_user),
 ):
@@ -246,7 +246,7 @@ async def approve_day_off(
 )
 async def get_one_day_off(
     oid: Annotated[uuid.UUID, Path],
-    session: Annotated[AsyncSession, Depends(get_async_session)],
+    session: Annotated[AsyncSession, Depends(db_helper.get_session)],
     current_user: User = Depends(get_current_user),
 ):
     return await DayOffService(session).get_one(current_user=current_user, oid=oid)
@@ -261,7 +261,7 @@ async def get_one_day_off(
     description="Modify day off by id",
 )
 async def modify_day_off(
-    session: Annotated[AsyncSession, Depends(get_async_session)],
+    session: Annotated[AsyncSession, Depends(db_helper.get_session)],
     day_off_update: DayOffUpdatePartil,
     day_off: DayOff = Depends(day_off_by_oid),
     current_user: User = Depends(get_current_user),
@@ -283,7 +283,7 @@ async def modify_day_off(
     description="Delete day off by id",
 )
 async def delete_day_off(
-    session: Annotated[AsyncSession, Depends(get_async_session)],
+    session: Annotated[AsyncSession, Depends(db_helper.get_session)],
     day_off: DayOff = Depends(day_off_by_oid),
     current_user: User = Depends(get_current_user),
 ):
@@ -303,7 +303,7 @@ async def delete_day_off(
     description="Delete day off on moderation",
 )
 async def delete_day_off(
-    session: Annotated[AsyncSession, Depends(get_async_session)],
+    session: Annotated[AsyncSession, Depends(db_helper.get_session)],
     day_off: DayOff = Depends(day_off_by_oid),
     current_user: User = Depends(get_current_user),
 ):
@@ -324,7 +324,7 @@ async def delete_day_off(
 async def download_report(
     session: Annotated[
         AsyncSession,
-        Depends(get_async_session),
+        Depends(db_helper.get_session),
     ],
     day_off: DayOff = Depends(day_off_by_oid),
     current_user: User = Depends(get_current_user),
