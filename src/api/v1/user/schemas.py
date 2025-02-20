@@ -29,6 +29,7 @@ class UserBase(BaseModel):
     full_name: str
     position: str
     rank: str
+    role: Role | None = None
     work_schedule: WorkSchedule = Field(
         ..., description="Work schedule type: 'daily' or 'shift'"
     )

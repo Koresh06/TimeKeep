@@ -27,8 +27,8 @@ async def create_superuser() -> None:
         full_name = "Superuser"
         position = "superuser"
         rank = "superuser"
-        role = Role.SUPERUSER.value
-        work_schedule = WorkSchedule.DAILY.value
+        role = Role.SUPERUSER
+        work_schedule = WorkSchedule.DAILY
 
         super_user = await UserService(session).create_superuser(
             UserCreate(
