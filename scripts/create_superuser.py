@@ -5,7 +5,7 @@ sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 
 import asyncio
 from getpass import getpass
-from src.core.session import async_session_maker
+from src.core.database.infrastructure import db_helper
 from src.api.v1.user.service import UserService
 from src.api.v1.user.schemas import UserCreate
 from src.models.user import Role, WorkSchedule
@@ -13,7 +13,7 @@ from src.models.user import Role, WorkSchedule
 
 
 async def create_superuser() -> None:
-    async with async_session_maker() as session:  
+    async with db_helper.sessionmaker() as session:  
         print("Создание суперпользователя")
         
         while True:
