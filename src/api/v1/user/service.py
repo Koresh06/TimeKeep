@@ -11,7 +11,8 @@ from src.api.v1.user.schemas import (
     UserFilterParams,
     UserUpdatePartial,
     UserUpdate,
-    PaginatedResponse
+    PaginatedResponse,
+    SuperUserCreate
 )
 
 
@@ -37,12 +38,11 @@ class UserService:
             raise HTTPException(
                 status_code=status.HTTP_400_BAD_REQUEST, detail="Пользователь с таким именем уже существует"
             )
-        user = await self.repository.create(data=data)
-        return UserOut.model_validate(user)
+        await self.repository.create(data=data)
     
 
-    async def create_superuser(self, data: UserCreate):
-        user = await self.repository.create(data=data)
+    async def create_superuser(self, data: SuperUserCreate):
+        user = await self.repository.create_superuser(data=data)
         return user
 
 

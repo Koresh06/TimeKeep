@@ -9,7 +9,7 @@ from sqlalchemy.exc import IntegrityError, SQLAlchemyError
 
 from src.core.repo.base import BaseRepo
 from src.models import User, Role, Overtime, DayOff
-from src.api.v1.user.schemas import UserCreate, UserUpdatePartial, UserUpdate
+from src.api.v1.user.schemas import UserCreate, UserUpdatePartial, UserUpdate, SuperUserCreate
 from src.api.v1.auth.security import get_password_hash
 
 
@@ -26,6 +26,22 @@ class UserRepository(BaseRepo):
         return result
 
     async def create(self, data: UserCreate) -> User:
+        try:
+            hashed_password = get_password_hash(data.password)
+
+            user_data = data.model_dump(exclude={"password"})
+            user_data["hashed_password"] = hashed_password
+            user = User(**user_data)
+
+            self.session.add(user)
+            await self.session.commit()
+            await self.session.refresh(user)
+            return user
+        except IntegrityError as e:
+            raise HTTPException(status_code=500, detail=f"Database error: {str(e)}")
+        
+    
+    async def create_superuser(self, data: SuperUserCreate) -> User:
         try:
             hashed_password = get_password_hash(data.password)
 

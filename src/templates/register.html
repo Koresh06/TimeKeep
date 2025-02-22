@@ -1,7 +1,7 @@
 {% extends 'base.html' %}
 
 {% block styles %}
-    <link rel="stylesheet" href="/static/css/auth.css">
+<link rel="stylesheet" href="/static/css/auth.css">
 {% endblock %}
 
 {% block content %}
@@ -13,9 +13,9 @@
                     <h2 class="h4 text-primary">Регистрация</h2>
                 </div>
                 {% if msg %}
-                    <div class="alert alert-info fade show" role="alert">
-                        {{ msg }}
-                    </div>
+                <div class="alert alert-info fade show" role="alert">
+                    {{ msg }}
+                </div>
                 {% endif %}
                 <div class="card-body">
                     <form action="/user/register" method="post">
@@ -24,7 +24,9 @@
                                 <label for="username" class="form-label">Имя пользователя</label>
                                 <div class="input-group">
                                     <span class="input-group-text"><i class="bi bi-person"></i></span>
-                                    <input type="text" id="username" name="username" class="form-control form-control-lg" required placeholder="Введите имя пользователя">
+                                    <input type="text" id="username" name="username"
+                                        class="form-control form-control-lg" required
+                                        placeholder="Введите имя пользователя">
                                 </div>
                             </div>
 
@@ -32,16 +34,20 @@
                                 <label for="password" class="form-label">Пароль</label>
                                 <div class="input-group">
                                     <span class="input-group-text"><i class="bi bi-lock"></i></span>
-                                    <input type="password" id="password" name="password" class="form-control form-control-lg" required minlength="8" placeholder="Введите пароль">
+                                    <input type="password" id="password" name="password"
+                                        class="form-control form-control-lg" required minlength="8"
+                                        placeholder="Введите пароль">
                                 </div>
-                                <small id="passwordHelp" class="form-text text-muted">Пароль должен содержать не менее 8 символов.</small>
+                                <small id="passwordHelp" class="form-text text-muted">Пароль должен содержать не менее 8
+                                    символов.</small>
                             </div>
 
                             <div class="col-md-6 mb-3">
                                 <label for="full_name" class="form-label">Полное имя</label>
                                 <div class="input-group">
                                     <span class="input-group-text"><i class="bi bi-person-lines-fill"></i></span>
-                                    <input type="text" id="full_name" name="full_name" class="form-control form-control-lg" required placeholder="Введите ФИО">
+                                    <input type="text" id="full_name" name="full_name"
+                                        class="form-control form-control-lg" required placeholder="Введите ФИО">
                                 </div>
                             </div>
 
@@ -49,40 +55,44 @@
                                 <label for="position" class="form-label">Должность</label>
                                 <div class="input-group">
                                     <span class="input-group-text"><i class="bi bi-briefcase"></i></span>
-                                    <input type="text" id="position" name="position" class="form-control form-control-lg" required placeholder="Введите должность">
+                                    <input type="text" id="position" name="position"
+                                        class="form-control form-control-lg" required placeholder="Введите должность">
                                 </div>
+                            </div>
+
+                            <div class="col-md-6 mb-3">
+                                <label for="organization_oid" class="form-label">Выберите организацию</label>
+                                <select id="organization_oid" name="organization_oid"
+                                    class="form-control form-control-lg" required>
+                                    <option value="" disabled selected>Выберите организацию</option>
+                                    {% for organization in organizations %}
+                                    <option value="{{ organization.oid }}">{{ organization.name }}</option>
+                                    {% endfor %}
+                                </select>
                             </div>
 
                             <div class="col-md-6 mb-3">
                                 <label for="rank" class="form-label">Звание</label>
                                 <div class="input-group">
                                     <span class="input-group-text"><i class="bi bi-star"></i></span>
-                                    <input type="text" id="rank" name="rank" class="form-control form-control-lg" required placeholder="Введите звание">
+                                    <input type="text" id="rank" name="rank" class="form-control form-control-lg"
+                                        required placeholder="Введите звание">
                                 </div>
                             </div>
 
+
                             <div class="col-md-6 mb-3">
-                                <label for="organization_oid" class="form-label">Выберите организацию</label>
-                                <select id="organization_oid" name="organization_oid" class="form-control form-control-lg" required>
-                                    <option value="" disabled selected>Выберите организацию</option>
-                                    {% for organization in organizations %}
-                                        <option value="{{ organization.oid }}">{{ organization.name }}</option>
-                                    {% endfor %}
+                                <label for="department_oid" class="form-label">Выберите департамент</label>
+                                <select id="department_oid" name="department_oid" class="form-control form-control-lg"
+                                    required>
+                                    <option value="" disabled selected>Сначала выберите организацию</option>
                                 </select>
                             </div>
 
                             <div class="col-md-6 mb-3">
-                                <label for="department_oid" class="form-label">Выберите департамент</label>
-                                <select id="department_oid" name="department_oid" class="form-control form-control-lg" required>
-                                    <option value="" disabled selected>Выберите департамент</option>
-                                    {% for department in departments %}
-                                        <option value="{{ department.oid }}">{{ department.name }}</option>
-                                    {% endfor %}
-                                </select>
-                            </div>
-                            <div class="col-md-6 mb-3">
                                 <label for="work_schedule" class="form-label">Выберите режим работы</label>
-                                <select id="work_schedule" name="work_schedule" class="form-control form-control-lg" required>
+                                <select id="work_schedule" name="work_schedule" class="form-control form-control-lg"
+                                    required>
                                     <option value="" disabled selected>Выберите режим работы</option>
                                     <option value="daily">Ежедневник</option>
                                     <option value="shift">Смена</option>
@@ -107,4 +117,44 @@
         </div>
     </div>
 </div>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        const organizationSelect = document.getElementById("organization_oid");
+        const departmentSelect = document.getElementById("department_oid");
+    
+        organizationSelect.addEventListener("change", async function () {
+            const organizationId = this.value;
+    
+            if (!organizationId) {
+                departmentSelect.innerHTML = '<option value="" disabled selected>Сначала выберите организацию</option>';
+                return;
+            }
+    
+            try {
+                const response = await fetch(`/department/registry/${organizationId}`);
+                if (!response.ok) {
+                    throw new Error(`Ошибка загрузки: ${response.status} ${response.statusText}`);
+                }
+    
+                const departments = await response.json();
+    
+                // Очищаем старые данные в выпадающем списке
+                departmentSelect.innerHTML = '<option value="" disabled selected>Выберите департамент</option>';
+    
+                // Добавляем новые данные
+                departments.forEach(dep => {
+                    const option = document.createElement("option");
+                    option.value = dep.oid;
+                    option.textContent = dep.name;
+                    departmentSelect.appendChild(option);
+                });
+            } catch (error) {
+                console.error("Ошибка загрузки департаментов:", error);
+            }
+        });
+    });
+    
+</script>
+
 {% endblock %}

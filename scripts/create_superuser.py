@@ -7,7 +7,7 @@ import asyncio
 from getpass import getpass
 from src.core.database.infrastructure import db_helper
 from src.api.v1.user.service import UserService
-from src.api.v1.user.schemas import UserCreate
+from src.api.v1.user.schemas import SuperUserCreate
 from src.models.user import Role, WorkSchedule
 
 
@@ -31,7 +31,7 @@ async def create_superuser() -> None:
         work_schedule = WorkSchedule.DAILY
 
         super_user = await UserService(session).create_superuser(
-            UserCreate(
+            SuperUserCreate(
                 username=username,
                 full_name=full_name,
                 position=position,
@@ -39,7 +39,6 @@ async def create_superuser() -> None:
                 role=role,
                 work_schedule=work_schedule,
                 password=password,
-                is_active=True,
             )
         )
         print(f'Superuser created successfully.\nUsername: {super_user.username}')

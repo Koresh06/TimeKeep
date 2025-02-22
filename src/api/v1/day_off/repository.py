@@ -151,7 +151,8 @@ class DayOffRepository(BaseRepo):
                 .limit(limit)
                 .offset(offset)
                 .options(
-                    selectinload(DayOff.links).selectinload(OvertimeDayOffLink.day_off_rel)
+                    joinedload(DayOff.user_rel).joinedload(User.department_rel),
+                    joinedload(DayOff.user_rel).joinedload(User.organization_rel)
                 )
                 .order_by(DayOff.create_at.desc())
             )

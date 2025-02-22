@@ -1,5 +1,6 @@
 from typing import Annotated, List
 from urllib.parse import quote, unquote
+import uuid
 from fastapi import APIRouter, Depends, Request, status
 from fastapi.responses import HTMLResponse, RedirectResponse
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -65,7 +66,7 @@ async def create_department_page(
 
 @router.post(
     "/create",
-    response_model=DepartmentOut,
+    response_class=RedirectResponse | HTMLResponse,
     status_code=status.HTTP_201_CREATED,
     dependencies=[Depends(RoleRequired(Role.SUPERUSER))],
     name="department:create",
@@ -78,6 +79,8 @@ async def create_department(
         Depends(db_helper.get_session),
     ],
     current_user: User = Depends(get_current_user),
+    count_day_offs: int = Depends(count_notifications_day_offs),
+    notifications_count_user: int = Depends(get_unread_notifications_count_user),
     department_create: DepartmentCreate = Depends(DepartmentCreate.as_form),
 ):
     try:
@@ -88,21 +91,23 @@ async def create_department(
             url="/department/create",
             status_code=status.HTTP_303_SEE_OTHER,
         )
-        success_message = quote("✔️ Департамент успешно создана!")
+        success_message = quote("✔️ Департамент успешно создан!")
         response.set_cookie(key="success_message", value=success_message)
         return response
     
     except Exception as e:
+        organizations = await OrganizationService(session).get_all_dep_organizations()
         return templates.TemplateResponse(
             request=request,
             name="departments/create.html",
             context={
-                "error": str(e),
+                "error": e.detail,
                 "current_user": current_user,
+                "count_day_offs": count_day_offs,
+                "notifications_count_user": notifications_count_user,
+                "organizations": organizations,
             },
         )
-
-
 
 
 @router.get(
@@ -254,3 +259,13 @@ async def delete_department(
     department: Department = Depends(department_by_oid),
 ):
     await DepartmentService(session).delete(department=department)
+
+
+@router.get("/registry/{organization_oid}", response_model=List[DepartmentOut])
+async def get_departments_by_organization(
+    session: Annotated[AsyncSession, Depends(db_helper.get_session)],
+    organization_oid: uuid.UUID,
+):
+    departments = await DepartmentService(session).get_by_organization(organization_oid)   
+    return departments
+

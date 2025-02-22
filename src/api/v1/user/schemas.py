@@ -29,7 +29,6 @@ class UserBase(BaseModel):
     full_name: str
     position: str
     rank: str
-    role: Role | None = None
     work_schedule: WorkSchedule = Field(
         ..., description="Work schedule type: 'daily' or 'shift'"
     )
@@ -66,6 +65,16 @@ class UserCreate(UserBase):
             password=password,
             work_schedule=work_schedule,
         )
+    
+class SuperUserCreate(UserBase):
+    password: str
+    role: Role = Role.SUPERUSER
+
+    @field_validator("password")
+    def validate_password(cls, value: str) -> str:
+        if len(value) < 8:
+            raise ValueError("Password must be at least 8 characters")
+        return value
 
 
 class UserUpdate(UserBase):

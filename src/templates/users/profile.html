@@ -98,7 +98,6 @@
     const ctx = document.getElementById('overtimeChart').getContext('2d');
 
     let currentYear = "{{ statistics['selected_year'] }}"; 
-    console.log(currentYear)
 
     let overtimeData = {{ statistics["overtime"]["monthly"] | tojson }};
 

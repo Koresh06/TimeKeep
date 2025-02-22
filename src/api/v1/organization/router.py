@@ -179,3 +179,4 @@ async def modify_organization(
         partial=True,
     )
     return RedirectResponse(url=f"/organization/", status_code=status.HTTP_302_FOUND)
+

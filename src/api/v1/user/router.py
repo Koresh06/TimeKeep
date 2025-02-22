@@ -80,14 +80,11 @@ async def register(
             name="auth.html",
         )
     except HTTPException as e:
-        departments = await DepartmentService(session).get_all()
-
         return templates.TemplateResponse(
             request=request,
             name="register.html",
             context={
                 "msg": e.detail,
-                "departments": departments,
             },
         )
 

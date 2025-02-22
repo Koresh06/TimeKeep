@@ -18,10 +18,13 @@ class DepartmentService:
     def __init__(self, session: AsyncSession):
         self.repository = DepartmentRepository(session=session)
 
-    async def create(self, department_create: DepartmentCreate) -> DepartmentOut:
-        department = await self.repository.create(department_create=department_create)
-        if not department:
-            raise HTTPException(status_code=400, detail="Department already exists.")
+    async def create(
+        self,
+        department_create: DepartmentCreate,
+    ) -> DepartmentOut:
+        department = await self.repository.create(
+            department_create=department_create,
+        )
         return DepartmentOut.model_validate(department)
 
     async def get_all(self) -> List[DepartmentOut]:
@@ -58,3 +61,11 @@ class DepartmentService:
 
     async def delete(self, department: Department):
         await self.repository.delete(department=department)
+
+    async def get_by_organization(
+        self, organization_oid: uuid.UUID
+    ) -> List[DepartmentOut]:
+        departments = await self.repository.get_by_organization(
+            organization_oid=organization_oid
+        )
+        return [DepartmentOut.model_validate(department) for department in departments]

@@ -108,7 +108,7 @@ async def create_day_off(
         return templates.TemplateResponse(
             request=request,
             name="day_offs/create.html",
-            context={"error": str(e), "current_user": current_user},
+            context={"error": e.detail, "current_user": current_user},
         )
 
 
