@@ -38,7 +38,7 @@ services:
     env_file:
       - .env
     environment:
-      DATABASE_URL: postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres:5432/${POSTGRES_DB}
+      DATABASE_URL: postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@{DB_HOST}:@{DB_PORT}/${POSTGRES_DB}
 
   nginx:
     image: nginx:latest
