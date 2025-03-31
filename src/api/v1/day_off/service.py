@@ -95,7 +95,7 @@ class DayOffService:
                 DayOffExtendedOut.model_validate(
                     {
                         **DayOffOut.model_validate(day_off).model_dump(),
-                        "user": UserOut.model_validate(day_off.user_rel).model_dump(),
+                        "user": UserOut.model_validate(day_off.user_rel, from_attributes=True).model_dump(),
                     }
                 )
                 for day_off in day_offs

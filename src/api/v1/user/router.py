@@ -80,11 +80,15 @@ async def register(
             name="auth.html",
         )
     except HTTPException as e:
+        organizations = await OrganizationService(session).get_all()
+        departments = await DepartmentService(session).get_all()
         return templates.TemplateResponse(
             request=request,
             name="register.html",
             context={
                 "msg": e.detail,
+                "organizations": organizations,
+                "departments": departments,
             },
         )
 
@@ -157,7 +161,7 @@ async def register_requests(
 
 
 @router.post(
-    "/delete/{oid}",
+    "/delete-registration-request/{oid}",
     dependencies=[Depends(RoleRequired(Role.SUPERUSER))],
     status_code=status.HTTP_204_NO_CONTENT,
     name="user:delete",
@@ -329,3 +333,22 @@ async def toggle(
     role: Role = Query(Role),
 ):
     return await UserService(session).toggle_role(user=user, role=role)
+
+
+@router.post(
+    "/delete/{oid}",
+    dependencies=[Depends(RoleRequired(Role.SUPERUSER))],
+    status_code=status.HTTP_204_NO_CONTENT,
+    name="users:delete",
+    description="Delete user by id",
+)
+async def delete(
+    session: Annotated[
+        AsyncSession,
+        Depends(db_helper.get_session),
+    ],
+    user: User = Depends(user_by_oid),
+):
+    await UserService(session).delete(user=user)
+
+    return RedirectResponse(url="/user/", status_code=status.HTTP_303_SEE_OTHER)

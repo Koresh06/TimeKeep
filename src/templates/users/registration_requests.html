@@ -13,6 +13,8 @@
                 <th>#</th>
                 <th>Имя</th>
                 <th>Должность</th>
+                <th>Организация</th>
+                <th>Департамент</th>
                 <th>График работ</th>
                 <th>Дата регистрации</th>
                 <th></th>
@@ -24,6 +26,8 @@
                     <td>{{ loop.index + (current_page - 1) * limit }}</td>
                     <td>{{ user.full_name }}</td>
                     <td>{{ user.position }}</td>
+                    <td>{{ user.organization_rel.name }}</td>
+                    <td>{{ user.department_rel.name }}</td>
                     <td>{{ "Ежедневник" if user.work_schedule.value == "daily" else "Смена" }}</td>
                     <td>{{ user.create_at.strftime('%d.%m.%Y') }}</td>
                     <td class="text-center d-flex justify-content-around">
@@ -32,7 +36,7 @@
                                 <i class="bi bi-check-circle-fill"></i>
                             </button>
 
-                            <button class="btn btn-danger me-2 rounded" data-bs-toggle="modal" data-bs-target="#deleteUserModal{{ user.oid }}">
+                            <button class="btn btn-danger me-2 rounded" data-bs-toggle="modal" data-bs-target="#deleteRegistrationModal{{ user.oid }}">
                                 <i class="bi bi-trash"></i>
                             </button>
                         </div>

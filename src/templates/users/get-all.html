@@ -28,31 +28,38 @@
             </tr>
             </thead>
             <tbody>
-            {% for user in users %}
-            <tr class="text-center">
-                <td>{{ loop.index + (current_page - 1) * limit }}</td>
-                <td>{{ user.username }}</td>
-                <td>{{ user.full_name }}</td>
-                <td>{{ user.role }}</td>
-                <td>{{ "Ежедневник" if user.work_schedule.value == "daily" else "Смена" }}</td>
-                <td>{{ user.position }}</td>
-                <td>{{ user.rank }}</td>
-                <td>{{ user.department_rel.name }}</td>
-                <td>{{ user.organization_rel.name }}</td>
-                <td>{{ user.create_at.strftime('%d.%m.%Y %H:%M') }}</td>
-                <td>
-                    <a href="/user/edit/{{ user.oid }}" class="btn btn-primary">
-                        <i class="bi bi-pencil-square"></i>
-                    </a>
-                </td>
-            </tr>
-            {% endfor %}
+                {% for user in users %}
+                    {% if user.role != "superuser" %}
+                    <tr class="text-center">
+                        <td>{{ loop.index + (current_page - 1) * limit }}</td>
+                        <td>{{ user.username }}</td>
+                        <td>{{ user.full_name }}</td>
+                        <td>{{ user.role }}</td>
+                        <td>{{ "Ежедневник" if user.work_schedule.value == "daily" else "Смена" }}</td>
+                        <td>{{ user.position }}</td>
+                        <td>{{ user.rank }}</td>
+                        <td>{{ user.department_rel.name }}</td>
+                        <td>{{ user.organization_rel.name }}</td>
+                        <td>{{ user.create_at.strftime('%d.%m.%Y %H:%M') }}</td>
+                        <td>
+                            <a href="/user/edit/{{ user.oid }}" class="btn btn-primary">
+                                <i class="bi bi-pencil-square"></i>
+                            </a>
+                            <button class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#deleteUserModal{{ user.oid }}">
+                                <i class="bi bi-trash"></i>
+                            </button>
+                        </td>
+                    </tr>
+                    {% endif %}
+                {% endfor %}
             </tbody>
+            
         </table>
     </div>
 
     {% set pagination_url = '/user/' %}
     {% include 'pagination.html' %}
+    {% include 'users/modals.html' %}
 
     {% else %}
         <div class="alert alert-warning text-center" role="alert">

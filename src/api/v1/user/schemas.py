@@ -25,7 +25,6 @@ class PaginatedResponse(BaseModel, Generic[M]):
 class UserBase(BaseModel):
     organization_oid: uuid.UUID | None = None
     department_oid: uuid.UUID | None = None
-    role: str
     username: str
     full_name: str
     position: str
@@ -119,6 +118,7 @@ class UserUpdatePartial(UserUpdate):
 
 class UserOut(UserBase):
     oid: uuid.UUID
+    role: str
     is_active: bool
     create_at: datetime
     update_at: datetime

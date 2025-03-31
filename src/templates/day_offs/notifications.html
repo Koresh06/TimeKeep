@@ -20,6 +20,8 @@
                 <th>График работы</th>
                 <th>Дата отгула</th>
                 <th>Причина</th>
+                <th>Организация</th>
+                <th>Департамент</th>
                 <th>Дата создания</th>
                 <th></th>
             </tr>
@@ -33,6 +35,8 @@
                 <td>{{ "Ежедневник" if day_off.user.work_schedule.value == "daily" else "Смена" }}</td>
                 <td>{{ day_off.o_date.strftime('%d.%m.%Y') }}</td>
                 <td>{{ day_off.reason }}</td>
+                <td>{{ day_off.user.organization_rel.name }}</td>
+                <td>{{ day_off.user.department_rel.name }}</td>
                 <td>{{ day_off.create_at.strftime('%d.%m.%Y %H:%M') }}</td>
                 <td class="text-center">
                     <button class="btn btn-success me-2 rounded" data-bs-toggle="modal" data-bs-target="#confirmModal{{ day_off.oid }}">
