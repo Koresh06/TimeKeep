@@ -16,13 +16,15 @@
         <section id="about" class="section text-center">
             <h2 class="mb-4 fw-semibold" style="font-size: 2rem;">Что такое TimeKeep?</h2>
             <p class="lead fs-4" style="max-width: 800px; margin: 0 auto;">
-                TimeKeep — это сервис, который помогает эффективно отслеживать рабочее время и отдых сотрудников. Мы облегчаем процесс учета и контроля рабочего времени, предоставляя простой и удобный инструмент для работников и их руководителей.
+                Сервис, который помогает эффективно отслеживать рабочее время и отдых сотрудников.
             </p>
+            {% if not current_user.role.value == 'superuser' %}
             <div class="mt-4">
                 <a href="/overtime/" class="btn btn-secondary btn-lg rounded-pill shadow-lg">
                     Начать использовать
                 </a>
             </div>
+            {% endif %}
         </section>
     </main>
 {% endblock %}

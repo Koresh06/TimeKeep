@@ -6,8 +6,10 @@
     </div>
     
     <div class="nav-container">
+        {% if not current_user.role.value == 'superuser' %}
         <a href="/overtime/">Переработки</a>
         <a href="/day_off/">Отгулы</a>
+        {% endif %}
         <a href="/user/me">Профиль</a>
     </div>
 
