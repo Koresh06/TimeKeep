@@ -1,5 +1,7 @@
 import logging
 from fastapi import FastAPI, Request, HTTPException, status
+from fastapi.exceptions import RequestValidationError
+from jinja2 import UndefinedError
 from sqlalchemy.exc import DatabaseError, IntegrityError
 from pydantic import ValidationError
 from starlette.exceptions import HTTPException as StarletteHTTPException
@@ -59,6 +61,20 @@ def register_error_handlers(app: FastAPI) -> None:
             },
             status_code=status.HTTP_400_BAD_REQUEST
         )
+
+    @app.exception_handler(UndefinedError)
+    async def handle_jinja_undefined_error(request: Request, exc: UndefinedError):
+        logger.error(f"Ошибка шаблона: {exc} (URL: {request.url})")
+        return templates.TemplateResponse(
+            "error.html",
+            {
+                "request": request,
+                "error_message": "Ошибка шаблона. Попробуйте позже или обратитесь к администратору.",
+                "details": str(exc),
+            },
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR
+        )
+
 
     @app.exception_handler(StarletteHTTPException)
     def handle_http_exception(request: Request, exc: StarletteHTTPException):
