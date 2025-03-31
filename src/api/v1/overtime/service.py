@@ -45,7 +45,6 @@ class OvertimeService:
             filter=filter,
         )
 
-        # Если роль пользователя - обычный пользователь, возвращаем стандартные данные
         if current_user.role == Role.USER:
             overtimes_data = [
                 OvertimeOut.model_validate(overtime).model_dump()
@@ -56,13 +55,12 @@ class OvertimeService:
                 items=overtimes_data,
             )
 
-        # Если роль - модератор или суперюйзер, возвращаем расширенные данные
         else:
             extended_overtimes_data = [
                 OvertimeExtendedOut.model_validate(
                     {
                         **OvertimeOut.model_validate(overtime).model_dump(),
-                        "user": UserOut.model_validate(overtime.user_rel).model_dump(),
+                        "user": UserOut.model_validate(overtime.user_rel, from_attributes=True).model_dump(),
                     }
                 )
                 for overtime in overtimes

@@ -49,10 +49,9 @@
                 <div class="col-md-6 mb-3">
                     <label for="role" class="form-label">Выберите роль</label>
                     <select id="role" name="role" class="form-control form-control-lg" required>
-                        <option value="" disabled {% if not user.role %}selected{% endif %}>Выберите роль</option>
-                        <option value="user" {% if user.role == "user" %}selected{% endif %}>Пользователь</option>
-                        <option value="moderator" {% if user.role == "moderator" %}selected{% endif %}>Модератор</option>
-                        <option value="superuser" {% if user.role == "superuser" %}selected{% endif %}>Суперюзер</option>
+                        <option value="user" {% if user.role.value == "user" %}selected{% endif %}>Пользователь</option>
+                        <option value="moderator" {% if user.role.value == "moderator" %}selected{% endif %}>Модератор</option>
+                        <option value="superuser" {% if user.role.value == "superuser" %}selected{% endif %}>Суперюзер</option>
                     </select>
                 </div>
                 

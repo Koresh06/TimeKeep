@@ -25,6 +25,7 @@ class PaginatedResponse(BaseModel, Generic[M]):
 class UserBase(BaseModel):
     organization_oid: uuid.UUID | None = None
     department_oid: uuid.UUID | None = None
+    role: str
     username: str
     full_name: str
     position: str

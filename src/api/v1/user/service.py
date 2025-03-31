@@ -95,7 +95,8 @@ class UserService:
             user_update=user_update,
             partil=partil,
         )
-        return UserOut.model_validate(user)
+        # return UserOut.model_validate(user)
+        return user
     
 
     async def replace(

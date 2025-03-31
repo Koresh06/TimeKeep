@@ -23,7 +23,7 @@ services:
     build:
       context: .
       dockerfile: src/Dockerfile
-    command: sh -c "alembic upgrade head && uvicorn --factory src.main:create_app --host 0.0.0.0 --port 8000 --proxy-headers"
+    command: sh -c "alembic upgrade head && uvicorn --factory src.main:create_app --host 0.0.0.0 --port ${API_PORT} --proxy-headers"
     ports:
       - "8000:8000"
     volumes:
@@ -34,7 +34,7 @@ services:
     env_file:
       - .env
     environment:
-      DATABASE_URL: postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@${DB_HOST}:${DB_PORT}/${POSTGRES_DB}
+      DATABASE_URL: postgresql+asyncpg://${POSTGRES_USER}:${POSTGRES_PASSWORD}@${DB_HOST}:${DB_PORT}/${POSTGRES_DB}
 
   nginx:
     image: nginx:latest
