@@ -42,13 +42,15 @@
                         <td>{{ user.organization_rel.name }}</td>
                         <td>{{ user.create_at.strftime('%d.%m.%Y %H:%M') }}</td>
                         <td>
-                            <a href="/user/edit/{{ user.oid }}" class="btn btn-primary">
-                                <i class="bi bi-pencil-square"></i>
-                            </a>
-                            <button class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#deleteUserModal{{ user.oid }}">
-                                <i class="bi bi-trash"></i>
-                            </button>
-                        </td>
+                            <div class="d-flex justify-content-center">
+                                <a href="/user/edit/{{ user.oid }}" class="btn btn-primary me-2">
+                                    <i class="bi bi-pencil-square"></i>
+                                </a>
+                                <button class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#deleteUserModal{{ user.oid }}">
+                                    <i class="bi bi-trash"></i>
+                                </button>
+                            </div>
+                        </td>                        
                     </tr>
                     {% endif %}
                 {% endfor %}
