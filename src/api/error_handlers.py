@@ -1,34 +1,80 @@
-from logging import getLogger
-from fastapi import Request, HTTPException
-from fastapi.responses import RedirectResponse
-from fastapi import status
+import logging
+from fastapi import FastAPI, Request, HTTPException, status
+from sqlalchemy.exc import DatabaseError, IntegrityError
+from pydantic import ValidationError
+from starlette.exceptions import HTTPException as StarletteHTTPException
 
-logger = getLogger(__name__)
+from src.api.conf_static import templates
 
 
-async def http_exception_handler(request: Request, exc: HTTPException):
-    """
-    Обработчик для HTTPException с учётом разных статусов.
-    """
-    if exc.status_code == status.HTTP_401_UNAUTHORIZED:
-        # Неавторизован - перенаправляем на страницу авторизации
-        logger.error(exc.detail)
-        return RedirectResponse("/auth/", status_code=status.HTTP_307_TEMPORARY_REDIRECT)
-    
-    elif exc.status_code == status.HTTP_403_FORBIDDEN:
-        # Доступ запрещён - перенаправляем на страницу ошибки доступа
-        logger.error(exc.detail)
-        return RedirectResponse("/forbidden/", status_code=status.HTTP_307_TEMPORARY_REDIRECT)
-    
-    elif exc.status_code == status.HTTP_404_NOT_FOUND:
-        # Не найдено - перенаправляем на страницу "Не найдено"
-        logger.error(exc.detail)
-        return RedirectResponse("/not-found/", status_code=status.HTTP_307_TEMPORARY_REDIRECT)
-    
-    elif exc.status_code == status.HTTP_500_INTERNAL_SERVER_ERROR:
-        logger.error(exc.detail)
-        # Внутренняя ошибка сервера - кастомная страница
-        return RedirectResponse("/server-error/", status_code=status.HTTP_307_TEMPORARY_REDIRECT)
-    
-    # Для других ошибок возвращаем стандартное исключение
-    return False
+logging.basicConfig(
+    level=logging.ERROR,
+    format="%(asctime)s - %(levelname)s - %(message)s",
+    handlers=[
+        logging.FileHandler("errors.log"),
+        logging.StreamHandler()
+    ]
+)
+
+logger = logging.getLogger(__name__)
+
+
+def register_error_handlers(app: FastAPI) -> None:
+
+    @app.exception_handler(ValidationError)
+    def handle_pydantic_validation_error(request: Request, exc: ValidationError):
+        logger.error(f"Ошибка валидации: {exc.errors()}")
+        return templates.TemplateResponse(
+            "error.html",
+            {
+                "request": request,
+                "error_message": "Ошибка валидации данных. Проверьте введённые данные и попробуйте снова.",
+                "details": exc.errors(),
+            },
+            status_code=status.HTTP_400_BAD_REQUEST
+        )
+
+    @app.exception_handler(DatabaseError)
+    def handle_database_error(request: Request, exc: DatabaseError):
+        logger.error(f"Ошибка базы данных: {exc}")
+        return templates.TemplateResponse(
+            "error.html",
+            {
+                "request": request,
+                "error_message": "Ошибка базы данных. Попробуйте позже или обратитесь к администратору.",
+                "details": str(exc),
+            },
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR
+        )
+
+    @app.exception_handler(IntegrityError)
+    def handle_integrity_error(request: Request, exc: IntegrityError):
+        logger.error(f"Ошибка целостности данных: {exc}")
+        return templates.TemplateResponse(
+            "error.html",
+            {
+                "request": request,
+                "error_message": "Ошибка целостности данных. Возможно, вы пытаетесь добавить дубликат.",
+                "details": str(exc),
+            },
+            status_code=status.HTTP_400_BAD_REQUEST
+        )
+
+    @app.exception_handler(StarletteHTTPException)
+    def handle_http_exception(request: Request, exc: StarletteHTTPException):
+        error_messages = {
+            status.HTTP_404_NOT_FOUND: "Страница не найдена. Проверьте адрес и попробуйте снова.",
+            status.HTTP_403_FORBIDDEN: "Доступ запрещён. У вас недостаточно прав для выполнения этой операции.",
+            status.HTTP_401_UNAUTHORIZED: "Требуется авторизация. Войдите в систему и попробуйте снова.",
+            status.HTTP_500_INTERNAL_SERVER_ERROR: "Внутренняя ошибка сервера. Попробуйте позже.",
+        }
+        logger.error(f"HTTP ошибка {exc.status_code}: {exc.detail}")
+        return templates.TemplateResponse(
+            "error.html",
+            {
+                "request": request,
+                "error_message": error_messages.get(exc.status_code, "Произошла неизвестная ошибка."),
+                "details": str(exc.detail),
+            },
+            status_code=exc.status_code
+        )

@@ -13,7 +13,7 @@ from fastapi.responses import RedirectResponse
 
 from src.api.conf_static import configure_static
 from src.api.v1.router_registration import register_routers
-from src.api.error_handlers import http_exception_handler
+from src.api.error_handlers import register_error_handlers
 from src.core.config import settings
 from src.core.logging import setup_logging
 from src.middlewares.notification.middleware import NotificationMiddleware
@@ -28,8 +28,8 @@ def create_app():
     
     configure_static(app)
     register_routers(app)
-
-    app.add_exception_handler(HTTPException, http_exception_handler)
+    
+    register_error_handlers(app)
 
     app.add_middleware(NotificationMiddleware)
 
@@ -39,8 +39,7 @@ def create_app():
         return RedirectResponse(
             url="/auth/",
             status_code=status.HTTP_302_FOUND,
-        )
-    
+        )        
 
     return app
 
